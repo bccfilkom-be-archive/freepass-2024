@@ -124,7 +124,7 @@ You might be overwhelmed by these requirements. Don’t worry, here’s a list o
 
 ## **🔪** Accepted Weapons
 
-> BEFORE CHOOSING YOUR LANGUAGE, PLEASE VISIT OUR [CONVENTION](http://CONTENTION.md) ON THIS PROJECT
+> BEFORE CHOOSING YOUR LANGUAGE, PLEASE VISIT OUR [CONVENTION](CONVENTION.md) ON THIS PROJECT
 >
 > **Any code that did not follow the convention will be rejected!**
 >
