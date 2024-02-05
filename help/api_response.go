@@ -20,6 +20,13 @@ func SuccessResponse(c *gin.Context, message string, data interface{}) {
 	})
 }
 
+func UnauthorizedResponse(c *gin.Context, message string, err error) {
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+		"message": message,
+		"error":   err.Error(),
+	})
+}
+
 type ErrorObject struct {
 	Code    int
 	Message string

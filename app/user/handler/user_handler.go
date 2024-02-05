@@ -5,6 +5,7 @@ import (
 	"freepass-bcc/domain"
 	"freepass-bcc/help"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,4 +53,18 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	}
 
 	help.SuccessResponse(c, "Welcome "+user.Name, apiResponse)
+}
+
+func (h *UserHandler) PromoteUser(c *gin.Context) {
+	userIdString := c.Param("userId")
+	userId, _ := strconv.Atoi(userIdString)
+
+	promotedUser, errorObject := h.userUsecase.PromoteUser(userId)
+	if errorObject != nil{
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "succes promote user", promotedUser)
 }

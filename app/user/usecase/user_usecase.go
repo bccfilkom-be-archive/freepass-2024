@@ -13,6 +13,7 @@ import (
 type IUserUsecase interface {
 	SignUp(userRequest domain.UserRequest) (domain.Users, any)
 	LoginUser(userLogin domain.UserLogin) (domain.Users, interface{}, any)
+	PromoteUser(userId int) (domain.Users, any)
 }
 
 type UserUsecase struct {
@@ -97,4 +98,45 @@ func (u *UserUsecase) LoginUser(userLogin domain.UserLogin) (domain.Users, inter
 	}
 
 	return user, apiResponse, nil
+}
+
+func (u *UserUsecase) PromoteUser(userId int) (domain.Users, any){
+	var user domain.Users
+	err := u.userRepository.GetUserByCondition(&user, "id = ?", userId)
+	if err != nil {
+		return domain.Users{}, help.ErrorObject{
+			Code: http.StatusNotFound,
+			Message: "user not found",
+			Err: err,
+		}
+	}
+
+	if user.Role == "ADMIN" {
+		return domain.Users{}, help.ErrorObject{
+			Code: http.StatusBadRequest,
+			Message: "admin can't be candidate",
+			Err: errors.New("role not user"),
+		}
+	}
+
+	if user.Role == "CANDIDATE" {
+		return domain.Users{}, help.ErrorObject {
+			Code: http.StatusBadRequest,
+			Message: "already candidate",
+			Err: errors.New("role not user"),
+		}
+	}
+	
+	user.Role = "CANDIDATE"
+
+	err = u.userRepository.UpdateUser(&user)
+	if err != nil{
+		return domain.Users{}, help.ErrorObject{
+			Code: http.StatusInternalServerError,
+			Message: "error occured when update user",
+			Err: err,
+		}
+	}
+
+	return user, nil
 }

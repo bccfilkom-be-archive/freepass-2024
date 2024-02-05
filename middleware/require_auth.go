@@ -5,7 +5,6 @@ import (
 	"freepass-bcc/domain"
 	"freepass-bcc/help"
 	"freepass-bcc/infrastucture/database"
-	"net/http"
 	"strings"
 	"time"
 
@@ -17,25 +16,25 @@ func RequireAuth(c *gin.Context) {
 	token := strings.Split(bearerToken, " ")[1]
 
 	if token == "" {
-		help.FailedResponse(c, http.StatusUnauthorized, "failed to authentication", errors.New("no token detected"))
+		help.UnauthorizedResponse(c, "failed to authentication", errors.New("no token detected"))
 		return
 	}
 
 	userId, expTime, err := help.ValidateToken(token)
 	if err != nil {
-		help.FailedResponse(c, http.StatusUnauthorized, "failed to authentication", err)
+		help.UnauthorizedResponse(c, "failed to authentication", err)
 		return
 	}
 
 	var user domain.Users
 	err = database.DB.First(&user, "id = ?", userId).Error
 	if err != nil {
-		help.FailedResponse(c, http.StatusUnauthorized, "failed to authentication", err)
+		help.UnauthorizedResponse(c, "failed to authentication", err)
 		return
 	}
 
 	if float64(time.Now().Unix()) > expTime {
-		help.FailedResponse(c, http.StatusUnauthorized, "failed to authentication", errors.New("token expired"))
+		help.UnauthorizedResponse(c, "failed to authentication", errors.New("token expired"))
 		return
 	}
 
