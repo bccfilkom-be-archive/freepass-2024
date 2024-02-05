@@ -24,6 +24,7 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 	err := c.ShouldBindJSON(&userRequest)
 	if err != nil {
 		help.FailedResponse(c, http.StatusBadRequest, "failed to bind user request", err)
+		return
 	}
 
 	newUser, errorObject := h.userUsecase.SignUp(userRequest)
@@ -42,6 +43,7 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&userLogin)
 	if err != nil {
+		help.FailedResponse(c, http.StatusBadRequest, "failed to bind user request", err)
 		return
 	}
 
@@ -55,16 +57,62 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	help.SuccessResponse(c, "Welcome "+user.Name, apiResponse)
 }
 
-func (h *UserHandler) PromoteUser(c *gin.Context) {
-	userIdString := c.Param("userId")
-	userId, _ := strconv.Atoi(userIdString)
-
-	promotedUser, errorObject := h.userUsecase.PromoteUser(userId)
-	if errorObject != nil{
+func (h *UserHandler) GetCandidates(c *gin.Context) {
+	candidates, errorObject := h.userUsecase.GetCandidates()
+	if errorObject != nil {
 		errorObject := errorObject.(help.ErrorObject)
 		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
 		return
 	}
 
-	help.SuccessResponse(c, "succes promote user", promotedUser)
+	help.SuccessResponse(c, "success get all candidates information", candidates)
+}
+
+func (h *UserHandler) UpdateAccount(c *gin.Context) {
+	var userRequest domain.UserRequest
+	err := c.ShouldBindJSON(&userRequest)
+	if err != nil {
+		help.FailedResponse(c, http.StatusBadRequest, "failed to bind user request", err)
+		return
+	}
+
+	userIdString := c.Param("userId")
+	userId, _ := strconv.Atoi(userIdString)
+
+	updatedUser, errorObject := h.userUsecase.UpdateAccount(c, userRequest, userId)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "success update account", updatedUser)
+}
+
+func (h *UserHandler) PromoteUser(c *gin.Context) {
+	userIdString := c.Param("userId")
+	userId, _ := strconv.Atoi(userIdString)
+
+	promotedUser, errorObject := h.userUsecase.PromoteUser(userId)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "success promote user", promotedUser)
+}
+
+func (h *UserHandler) DeleteAccount(c *gin.Context) {
+	userIdString := c.Param("userId")
+	userId, _ := strconv.Atoi(userIdString)
+
+	deletedAccount, errorObject := h.userUsecase.DeleteAccount(c, userId)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "success delete account", deletedAccount)
 }

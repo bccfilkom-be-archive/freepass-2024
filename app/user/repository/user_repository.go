@@ -9,7 +9,9 @@ import (
 type IUserRepository interface {
 	GetUserByCondition(user *domain.Users, condition string, value any) error
 	CreateUser(user *domain.Users) error
-	UpdateUser(user *domain.Users) error
+	GetCandidates(candidates *[]domain.Users) error
+	UpdateAccount(user *domain.Users) error
+	DeleteAccount(user *domain.Users) error
 }
 
 type UserRepository struct {
@@ -38,11 +40,29 @@ func (r *UserRepository) CreateUser(user *domain.Users) error {
 	return nil
 }
 
-func (r *UserRepository) UpdateUser(user *domain.Users) error {
+func (r *UserRepository) GetCandidates(candidates *[]domain.Users) error {
+	err := r.db.Find(&candidates, "role = ?", "CANDIDATE").Error
+	return err
+}
+
+func (r *UserRepository) UpdateAccount(user *domain.Users) error {
 	tx := r.db.Begin()
 
-	err := r.db.Save(&user).Error
+	err := r.db.Save(user).Error
 	if err != nil{
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func (r *UserRepository) DeleteAccount(user *domain.Users) error {
+	tx := r.db.Begin()
+
+	err := r.db.Delete(user).Error
+	if err != nil {
 		tx.Rollback()
 		return err
 	}
