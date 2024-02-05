@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "npx ts-node ./src/index.ts",
     "dev": "npx nodemon",
     "build": "tsc",
     "format": "prettier --write .",
