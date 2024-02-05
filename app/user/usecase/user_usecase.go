@@ -12,6 +12,7 @@ import (
 
 type IUserUsecase interface {
 	SignUp(userRequest domain.UserRequest) (domain.Users, any)
+	LoginUser(userLogin domain.UserLogin) (domain.Users, interface{}, any)
 }
 
 type UserUsecase struct {
@@ -26,18 +27,18 @@ func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any)
 	isUserExist := u.userRepository.GetUserByCondition(&domain.Users{}, "email = ?", userRequest.Email)
 	if isUserExist == nil {
 		return domain.Users{}, help.ErrorObject{
-			Code: http.StatusBadRequest,
+			Code:    http.StatusBadRequest,
 			Message: "email already used",
-			Err: errors.New(""),
+			Err:     errors.New(""),
 		}
 	}
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), 10)
 	if err != nil {
 		return domain.Users{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: "error occured when hashing password",
-			Err: err,
+			Err:     err,
 		}
 	}
 
@@ -58,4 +59,42 @@ func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any)
 	}
 
 	return user, nil
+}
+
+func (u *UserUsecase) LoginUser(userLogin domain.UserLogin) (domain.Users, interface{}, any) {
+	var user domain.Users
+	err := u.userRepository.GetUserByCondition(&user, "email = ?", userLogin.Email)
+	if err != nil {
+		return domain.Users{}, "", help.ErrorObject{
+			Code:    http.StatusNotFound,
+			Message: "invalid username or password",
+			Err:     err,
+		}
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userLogin.Password))
+	if err != nil {
+		return domain.Users{}, "", help.ErrorObject{
+			Code:    http.StatusNotFound,
+			Message: "invalid username or password",
+			Err:     err,
+		}
+	}
+
+	tokenString, err := help.GenerateToken(user)
+	if err != nil {
+		return domain.Users{}, "", help.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "error occured when making jwt token",
+			Err:     err,
+		}
+	}
+
+	apiResponse := struct {
+		Token string `json:"token"`
+	}{
+		tokenString,
+	}
+
+	return user, apiResponse, nil
 }

@@ -35,3 +35,21 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 
 	help.SuccessResponse(c, "succes to create account", newUser)
 }
+
+func (h *UserHandler) LoginUser(c *gin.Context) {
+	var userLogin domain.UserLogin
+
+	err := c.ShouldBindJSON(&userLogin)
+	if err != nil {
+		return
+	}
+
+	user, apiResponse, errorObject := h.userUsecase.LoginUser(userLogin)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "Welcome "+user.Name, apiResponse)
+}
