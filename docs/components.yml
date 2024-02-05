@@ -3,20 +3,99 @@ components:
     User:
       type: object
       properties:
-        id:
+        _id:
           type: string
-        email:
-          type: string
-          format: email
+          description: User ID
         username:
           type: string
-        name:
+          description: Username
+        password:
           type: string
-        role:
+          description: Password
+        email:
           type: string
-          enum: [user, admin, candidate]
-      example:
-        id: 5ebac534954b54139806c112
-        email: fake@example.com
-        name: fake name
-        role: user
+          description: Email address
+        profileDetails:
+          type: string
+          description: User profile details
+        userType:
+          type: string
+          enum: ['regular', 'admin']
+          description: User type
+
+    Candidate:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Candidate ID
+        user:
+          $ref: '#/components/schemas/User'
+          description: Reference to the associated user
+        campaignDetails:
+          type: string
+          description: Campaign details for the candidate
+
+    Admin:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Admin ID
+        user:
+          $ref: '#/components/schemas/User'
+          description: Reference to the associated user
+
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Post ID
+        candidate:
+          $ref: '#/components/schemas/Candidate'
+          description: Reference to the candidate who created the post
+        text:
+          type: string
+          description: Post text
+        date:
+          type: string
+          format: date-time
+          description: Date and time when the post was created
+
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Comment ID
+        user:
+          $ref: '#/components/schemas/User'
+          description: Reference to the user who made the comment
+        candidate:
+          $ref: '#/components/schemas/Candidate'
+          description: Reference to the candidate's post
+        text:
+          type: string
+          description: Comment text
+        date:
+          type: string
+          format: date-time
+          description: Date and time when the comment was made
+
+    Vote:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Vote ID
+        user:
+          $ref: '#/components/schemas/User'
+          description: Reference to the user who cast the vote
+        candidate:
+          $ref: '#/components/schemas/Candidate'
+          description: Reference to the candidate who received the vote
+        date:
+          type: string
+          format: date-time
+          description: Date and time when the vote was cast
