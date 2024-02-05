@@ -1,14 +1,14 @@
 import express, { type Application, type NextFunction, type Request, type Response, type RequestHandler } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import mongoose from 'mongoose'
 import { type ParsedQs } from 'qs'
 import { router } from './routes/v1/index'
 import { logger } from './utils/logger'
 import { unknownEndpoint, errorHandler } from './middlewares/error'
+import { config } from './utils/config'
 
 const app: Application = express()
-const hostname: string = '0.0.0.0'
-const port: number = 4000
 
 // set security HTTP headers
 app.use(helmet())
@@ -36,6 +36,18 @@ app.use('/', (req: Request, res: Response, next: NextFunction) => {
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
-app.listen(port, hostname, () => {
-  logger.info(`Server is listening on port ${port}`)
+mongoose.set('strictQuery', false)
+logger.info('Connecting to ', config.mongodbUri)
+
+mongoose
+  .connect(config.mongodbUri)
+  .then(() => {
+    logger.info('Connected to MongoDB')
+  })
+  .catch((error) => {
+    logger.error('error connecting to MongoDB: ', error.message)
+  })
+
+app.listen(config.port, '0.0.0.0', () => {
+  logger.info(`Server is listening on port ${config.port}`)
 })
