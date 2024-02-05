@@ -10,7 +10,7 @@ export const swaggerDef = {
   },
   servers: [
     {
-      url: 'http://inilink.com/v1'
+      url: 'https://freepass-2024-ahargunyllib.up.railway.app/v1'
     }
   ]
 }
