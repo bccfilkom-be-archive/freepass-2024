@@ -3,7 +3,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import { app } from '../app'
 import { User } from '../models/user.model'
-import type { RegisterForm } from '../types/auth.type'
+import type { RegisterForm, LoginForm } from '../types/auth.type'
 
 describe('authRoutes', () => {
   beforeAll(async () => {
@@ -53,6 +53,52 @@ describe('authRoutes', () => {
       newUser.email = ''
       const res = await supertest(app).post('/v1/auth/register').send(newUser)
       expect(res.body.status).toBe(400)
+    })
+  })
+
+  describe('POST /v1/auth/login', () => {
+    beforeAll(async () => {
+      const newUser: RegisterForm = {
+        fullName: 'valid full name',
+        username: 'validusername',
+        nim: '231502001110111',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/login').send(newUser)
+    })
+
+    let existingUser: LoginForm
+    beforeEach(() => {
+      existingUser = {
+        username: 'validusername',
+        password: 'validpassword'
+      }
+    })
+
+    test('should return 200 if request data is ok', async () => {
+      const res = await supertest(app).post('/v1/auth/login').send(existingUser)
+      expect(res.body.status).toBe(200)
+    })
+
+    test('should return 400 if request data is not ok', async () => {
+      existingUser.username = ''
+      const res = await supertest(app).post('/v1/auth/login').send(existingUser)
+      expect(res.body.status).toBe(400)
+    })
+
+    test('should return 401 if user not found', async () => {
+      existingUser.username = 'notFound'
+      const res = await supertest(app).post('/v1/auth/login').send(existingUser)
+      expect(res.body.status).toBe(401)
+    })
+
+    test('should return 401 if password is wrong', async () => {
+      existingUser.password = 'wrongPassword'
+      const res = await supertest(app).post('/v1/auth/login').send(existingUser)
+      expect(res.body.status).toBe(401)
     })
   })
 })
