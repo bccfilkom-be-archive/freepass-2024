@@ -46,8 +46,8 @@ func (u *PostUsecase) GetPost(postId int) (domain.Posts, any) {
 	err := u.postRepository.GetPostByCondition(&post, "id = ?", postId)
 	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
-			Message: "error occured when get post",
+			Code: http.StatusNotFound,
+			Message: "post not found",
 			Err: err,
 		}
 	}
@@ -95,8 +95,8 @@ func (u *PostUsecase) UpdatePost(c *gin.Context, postRequest domain.PostRequest,
 	err = u.postRepository.GetPostByCondition(&post, "id = ?", postId)
 	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code:    http.StatusInternalServerError,
-			Message: "error occured when get post id",
+			Code:    http.StatusNotFound,
+			Message: "post not found",
 			Err:     err,
 		}
 	}
@@ -136,8 +136,8 @@ func (u *PostUsecase) DeletePost(c *gin.Context, postId int) (domain.Posts, any)
 	err = u.postRepository.GetPostByCondition(&post, "id = ?", postId)
 	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code:    http.StatusInternalServerError,
-			Message: "error occured when get post id",
+			Code:    http.StatusNotFound,
+			Message: "post not found",
 			Err:     err,
 		}
 	}

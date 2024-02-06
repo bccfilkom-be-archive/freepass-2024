@@ -32,7 +32,7 @@ func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any)
 	isUserExist := u.userRepository.GetUserByCondition(&domain.Users{}, "email = ?", userRequest.Email)
 	if isUserExist == nil {
 		return domain.Users{}, help.ErrorObject{
-			Code:    http.StatusBadRequest,
+			Code:    http.StatusConflict,
 			Message: "email already used",
 			Err:     errors.New(""),
 		}

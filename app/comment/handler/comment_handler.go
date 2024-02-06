@@ -38,3 +38,20 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 
 	help.SuccessResponse(c, "success create comment", comment)
 }
+
+func (h *CommentHandler) DeleteComment(c *gin.Context) {
+	postIdString := c.Param("postId")
+	postId, _ := strconv.Atoi(postIdString)
+
+	commentIdString := c.Param("commentId")
+	commentId, _ := strconv.Atoi(commentIdString)
+
+	deletedComment, errorObject := h.commentUsecase.DeleteComment(postId, commentId)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "success delete comment", deletedComment)
+}

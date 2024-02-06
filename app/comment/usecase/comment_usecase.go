@@ -12,6 +12,7 @@ import (
 
 type ICommentUsecase interface {
 	CreateComment(c *gin.Context, commentRequest domain.CommentRequest, postId int) (domain.Comments, any)
+	DeleteComment(postId int, commentId int) (domain.Comments, any)
 }
 
 type CommentUsecase struct {
@@ -53,6 +54,38 @@ func (u *CommentUsecase) CreateComment(c *gin.Context, commentRequest domain.Com
 			Code:    http.StatusInternalServerError,
 			Message: "error occured when create comment",
 			Err:     err,
+		}
+	}
+
+	return comment, nil
+}
+
+func (u *CommentUsecase) DeleteComment(postId int, commentId int) (domain.Comments, any){
+	err := u.postRepository.GetPostByCondition(&domain.Posts{}, "id = ?", postId)
+	if err != nil {
+		return domain.Comments{}, help.ErrorObject{
+			Code: http.StatusNotFound,
+			Message: "post not found",
+			Err: err,
+		}
+	}
+
+	var comment domain.Comments
+	err = u.commentRepository.GetCommentByCondition(&comment, "id = ?", commentId)
+	if err != nil {
+		return domain.Comments{}, help.ErrorObject{
+			Code: http.StatusNotFound,
+			Message: "comment not found",
+			Err: err,
+		}
+	}
+
+	err = u.commentRepository.DeleteComment(&comment)
+	if err != nil {
+		return domain.Comments{}, help.ErrorObject{
+			Code: http.StatusInternalServerError,
+			Message: "error occured when delete comment",
+			Err: err,
 		}
 	}
 

@@ -46,8 +46,10 @@ func (r *Rest) RoutePost(postHandler *post_handler.PostHandler) {
 func (r *Rest) RouteComment(commentHandler *comment_handler.CommentHandler){
 	validate := middleware.RequireAuth
 	UserOnly := middleware.CheckUser
+	AdminOnly := middleware.CheckAdmin
 
 	r.gin.POST("/posts/:postId/comments", validate, UserOnly , commentHandler.CreateComment)
+	r.gin.DELETE("/posts/:postId/comments/:commentId", validate, AdminOnly, commentHandler.DeleteComment)
 }
 
 func (r *Rest) Run() {
