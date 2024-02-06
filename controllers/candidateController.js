@@ -10,7 +10,7 @@ const viewCandidate = (req, res) => {
     }
 
     if (userResults.length === 0) {
-      return res.status(400).json({ message: 'User is not a candidate!' });
+      return res.status(400).json({ message: 'Candidate not found!' });
     }
 
     const user = userResults[0];

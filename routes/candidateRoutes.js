@@ -4,6 +4,6 @@ const candidateController = require('../controllers/candidateController');
 const authMiddleware = require('../middleware/authMiddleware');
 const userMiddleware = require('../middleware/userMiddleware');
 
-router.get('/', authMiddleware.authenticateUser, userMiddleware.checkUserExistence, candidateController.viewCandidate);
+router.get('/', authMiddleware.authenticateUser, candidateController.viewCandidate);
 
 module.exports = router;

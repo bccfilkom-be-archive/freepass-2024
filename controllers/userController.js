@@ -12,7 +12,14 @@ const viewUser = (req, res) => {
   const { username } = req.query;
 
   pool.query(`SELECT * FROM user WHERE username = ?`, [username == null ? req.session.username : username], (error, results) => {
-    if (error) throw error;
+    if (error) {
+      console.error(error);
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     res.json(results);
   });
 };
