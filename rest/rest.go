@@ -35,6 +35,8 @@ func (r *Rest) RoutePost(postHandler *post_handler.PostHandler) {
 	CandidateOnly := middleware.CheckCandidate
 	NotUser := middleware.CheckNotUser
 
+	r.gin.GET("/posts", validate, postHandler.GetAllPost)
+	r.gin.GET("/posts/:postId", validate, postHandler.GetPost)
 	r.gin.POST("/posts", validate, CandidateOnly, postHandler.CreatePost)
 	r.gin.PUT("/posts/:postId", validate, CandidateOnly, postHandler.UpdatePost)
 	r.gin.DELETE("/posts/:postId", validate, NotUser, postHandler.DeletePost)

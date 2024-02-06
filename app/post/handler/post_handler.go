@@ -18,6 +18,31 @@ func NewPostHandler(usecase usecase.IPostUsecase) *PostHandler {
 	return &PostHandler{usecase}
 }
 
+func (h *PostHandler) GetAllPost(c *gin.Context) {
+	posts, errorObject := h.postUsecase.GetAllPost()
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "succes get all post", posts)
+}
+
+func (h *PostHandler) GetPost(c *gin.Context) {
+	postIdString := c.Param("postId")
+	postId, _ := strconv.Atoi(postIdString)
+
+	post, errorObject := h.postUsecase.GetPost(postId)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "success get post", post)
+}
+
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	var postRequest domain.PostRequest
 	err := c.ShouldBindJSON(&postRequest)

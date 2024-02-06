@@ -7,6 +7,7 @@ import (
 )
 
 type IPostRepository interface {
+	GetAllPost(posts *[]domain.Posts) error
 	GetPostByCondition(post *domain.Posts, condition string, value any) error
 	CreatePost(post *domain.Posts) error
 	UpdatePost(post *domain.Posts) error
@@ -19,6 +20,11 @@ type PostRepository struct {
 
 func NewPostRepository(db *gorm.DB) *PostRepository {
 	return &PostRepository{db}
+}
+
+func (r *PostRepository) GetAllPost(posts *[]domain.Posts) error {
+	err := r.db.Find(posts).Error
+	return err
 }
 
 func (r *PostRepository) GetPostByCondition(post *domain.Posts, condition string, value any) error {

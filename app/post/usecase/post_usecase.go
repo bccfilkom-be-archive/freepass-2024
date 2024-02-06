@@ -5,7 +5,6 @@ import (
 	"freepass-bcc/app/post/repository"
 	"net/http"
 
-	// userRepository"freepass-bcc/app/user/repository"
 	"freepass-bcc/domain"
 	"freepass-bcc/help"
 
@@ -13,6 +12,8 @@ import (
 )
 
 type IPostUsecase interface {
+	GetAllPost() ([]domain.Posts, any)
+	GetPost(postId int) (domain.Posts, any)
 	CreatePost(c *gin.Context, postRequest domain.PostRequest) (domain.Posts, any)
 	UpdatePost(c *gin.Context, postRequest domain.PostRequest, postId int) (domain.Posts, any)
 	DeletePost(c *gin.Context, postId int) (domain.Posts, any)
@@ -20,12 +21,39 @@ type IPostUsecase interface {
 
 type PostUsecase struct {
 	postRepository repository.IPostRepository
-	// userRepository userRepository.IUserRepository
 }
 
 func NewPostUsecase(repository repository.IPostRepository) *PostUsecase {
 	return &PostUsecase{repository}
 }
+
+func (u *PostUsecase) GetAllPost() ([]domain.Posts, any) {
+	var posts []domain.Posts
+	err := u.postRepository.GetAllPost(&posts)
+	if err != nil {
+		return []domain.Posts{}, help.ErrorObject{
+			Code: http.StatusInternalServerError,
+			Message: "error occured when get all post",
+			Err: err,
+		}
+	}
+
+	return posts, nil
+}
+
+func (u *PostUsecase) GetPost(postId int) (domain.Posts, any) {
+	var post domain.Posts
+	err := u.postRepository.GetPostByCondition(&post, "id = ?", postId)
+	if err != nil {
+		return domain.Posts{}, help.ErrorObject{
+			Code: http.StatusInternalServerError,
+			Message: "error occured when get post",
+			Err: err,
+		}
+	}
+
+	return post, nil
+} 
 
 func (u *PostUsecase) CreatePost(c *gin.Context, postRequest domain.PostRequest) (domain.Posts, any) {
 	loginUser, err := help.GetLoginUser(c)
@@ -116,18 +144,18 @@ func (u *PostUsecase) DeletePost(c *gin.Context, postId int) (domain.Posts, any)
 
 	if loginUser.Role != "ADMIN" && loginUser.ID != post.UserID {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusBadRequest,
+			Code:    http.StatusBadRequest,
 			Message: "can't delete other candidate post",
-			Err: errors.New("access denied"),
+			Err:     errors.New("access denied"),
 		}
 	}
 
 	err = u.postRepository.DeletePost(&post)
-	if err != nil{
+	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: "error occured when delete post",
-			Err: err,
+			Err:     err,
 		}
 	}
 
