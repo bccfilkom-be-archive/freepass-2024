@@ -133,3 +133,43 @@ func Edit(c *gin.Context) {
 	user, _ := c.Get("user")
 	initializers.DB.Model(&user).Where("id = ?", user.(models.User).ID).Update("password", hash)
 }
+
+func PostsIndex(c *gin.Context) {
+	var posts []models.Post
+	initializers.DB.Find(&posts)
+
+	if len(posts) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to fetch posts",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"posts": posts,
+	})
+}
+
+func PostsShow(c *gin.Context) {
+	postID := c.Param("id")
+
+	var post models.Post
+	initializers.DB.Find(&post, postID)
+
+	if post.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to fetch post",
+		})
+
+		return
+	}
+	
+	var comments []models.Comment
+	initializers.DB.Where("post_id = ?", postID).Find(&comments)
+
+	c.JSON(http.StatusOK, gin.H{
+		"post": post,
+		"comments": comments,
+	})
+}

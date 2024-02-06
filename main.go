@@ -21,9 +21,12 @@ func main() {
 	r.POST("/api/login", controllers.Login)
 	r.PUT("/api/edit", middleware.RequireAuth, controllers.Edit)
 
-	r.POST("/api/post", middleware.RequireAuth, controllers.CreatePost)
-	r.PUT("/api/post/:id", middleware.RequireAuth, controllers.UpdatePost)
-	r.DELETE("/api/post/:id", middleware.RequireAuth, controllers.DeletePost)
+	r.GET("/api/posts", middleware.RequireAuth, controllers.PostsIndex)
+	r.GET("/api/posts/:id", middleware.RequireAuth, controllers.PostsShow)
+
+	r.POST("/api/posts", middleware.RequireAuth, controllers.CreatePost)
+	r.PUT("/api/posts/:id", middleware.RequireAuth, controllers.UpdatePost)
+	r.DELETE("/api/posts/:id", middleware.RequireAuth, controllers.DeletePost)
 
 	r.Run()
 }
