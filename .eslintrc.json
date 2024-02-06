@@ -16,7 +16,8 @@
     "ignorePatterns": [
         "**/build/*",
         "**/node_modules/*",
-        "**/public/*"
+        "**/public/*",
+        "/jest.config.js"
     ],
     "rules": {
         "semi": 2,

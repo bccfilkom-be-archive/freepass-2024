@@ -7,21 +7,22 @@ import { hashing } from '../utils/bcrypt'
 
 export const register = async (req: Request, res: Response) => {
   const payload: UserType = req.body
-  logger.info('auth - register: ', payload)
   const { error, value } = createUserValidation(payload)
   if (error) {
-    const errorMessage = error.details.map((details) => details.message).join(', ')
-    logger.error('auth - register - validation: ', errorMessage)
-    return res.status(500).send({ status: 500, message: 'create user failed', data: error })
+    logger.error(`auth - register - validation: ${error.details[0].message.replace(/"/g, '')}`)
+    return res
+      .status(400)
+      .send({ status: 400, message: `create user failed. ${error.details[0].message.replace(/"/g, '')}` })
   }
 
   try {
     const payload: UserType = value
     payload.password = hashing(payload.password)
     const user = await createUser(payload)
-    return res.status(201).send({ status: 201, message: 'create user success', data: user })
-  } catch (error) {
-    logger.error('auth - register - saving to db: ', error)
-    return res.status(500).send({ status: 500, message: 'create user failed', data: error })
+    return res.status(201).send({ status: 201, message: `create user success. please login ${user.username}` })
+  } catch (error: any) {
+    const taken: object = error.keyValue
+    logger.error(`auth - register - saving to db: ${Object.keys(taken)[0]} has been taken`)
+    return res.status(400).send({ status: 400, message: `create user failed. ${Object.keys(taken)[0]} has been taken` })
   }
 }
