@@ -53,7 +53,6 @@ func Register(c *gin.Context) {
 	})
 }
 
-
 func Login(c *gin.Context) {
 	var body struct {
 		Username string
@@ -107,7 +106,6 @@ func Login(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
 }
-
 
 func Edit(c *gin.Context) {
 	var body struct {

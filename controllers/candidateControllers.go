@@ -47,7 +47,6 @@ func CreatePost(c *gin.Context) {
 	})
 }
 
-
 func UpdatePost(c *gin.Context) {
 	postID := c.Param("id")
 	user, _ := c.Get("user")
@@ -89,7 +88,6 @@ func UpdatePost(c *gin.Context) {
 		"message": "successfully updated the post",
 	})
 }
-
 
 func DeletePost(c *gin.Context) {
 	postID := c.Param("id")
