@@ -48,11 +48,25 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 	}
 
 	updatedPost, errorObject := h.postUsecase.UpdatePost(c, postRequest, postId)
-	if errorObject != nil{
+	if errorObject != nil {
 		errorObject := errorObject.(help.ErrorObject)
 		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
 		return
 	}
 
 	help.SuccessResponse(c, "success update post", updatedPost)
+}
+
+func (h *PostHandler) DeletePost(c *gin.Context) {
+	postIdString := c.Param("postId")
+	postId, _ := strconv.Atoi(postIdString)
+
+	deletedPost, errorObject := h.postUsecase.DeletePost(c, postId)
+	if errorObject != nil {
+		errorObject := errorObject.(help.ErrorObject)
+		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
+		return
+	}
+
+	help.SuccessResponse(c, "success delete post", deletedPost)
 }

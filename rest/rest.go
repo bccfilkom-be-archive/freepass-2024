@@ -33,9 +33,11 @@ func (r *Rest) RouteUser(userHandler *user_handler.UserHandler) {
 func (r *Rest) RoutePost(postHandler *post_handler.PostHandler) {
 	validate := middleware.RequireAuth
 	CandidateOnly := middleware.CheckCandidate
+	NotUser := middleware.CheckNotUser
 
 	r.gin.POST("/posts", validate, CandidateOnly, postHandler.CreatePost)
 	r.gin.PUT("/posts/:postId", validate, CandidateOnly, postHandler.UpdatePost)
+	r.gin.DELETE("/posts/:postId", validate, NotUser, postHandler.DeletePost)
 }
 
 func (r *Rest) Run() {

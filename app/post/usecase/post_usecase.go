@@ -15,6 +15,7 @@ import (
 type IPostUsecase interface {
 	CreatePost(c *gin.Context, postRequest domain.PostRequest) (domain.Posts, any)
 	UpdatePost(c *gin.Context, postRequest domain.PostRequest, postId int) (domain.Posts, any)
+	DeletePost(c *gin.Context, postId int) (domain.Posts, any)
 }
 
 type PostUsecase struct {
@@ -35,7 +36,7 @@ func (u *PostUsecase) CreatePost(c *gin.Context, postRequest domain.PostRequest)
 			Err:     err,
 		}
 	}
-	
+
 	var post domain.Posts
 	post.UserID = loginUser.ID
 	post.Post = postRequest.Post
@@ -43,9 +44,9 @@ func (u *PostUsecase) CreatePost(c *gin.Context, postRequest domain.PostRequest)
 	err = u.postRepository.CreatePost(&post)
 	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: "error occured when create post",
-			Err: err,
+			Err:     err,
 		}
 	}
 
@@ -54,30 +55,29 @@ func (u *PostUsecase) CreatePost(c *gin.Context, postRequest domain.PostRequest)
 
 func (u *PostUsecase) UpdatePost(c *gin.Context, postRequest domain.PostRequest, postId int) (domain.Posts, any) {
 	loginUser, err := help.GetLoginUser(c)
-		if err != nil{
-			return domain.Posts{}, help.ErrorObject{
-				Code:    http.StatusNotFound,
-				Message: "account not found",
-				Err:     err,
-			}
+	if err != nil {
+		return domain.Posts{}, help.ErrorObject{
+			Code:    http.StatusNotFound,
+			Message: "account not found",
+			Err:     err,
 		}
-	
+	}
 
 	var post domain.Posts
 	err = u.postRepository.GetPostByCondition(&post, "id = ?", postId)
 	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: "error occured when get post id",
-			Err: err,
+			Err:     err,
 		}
 	}
 
 	if loginUser.ID != post.UserID {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusBadRequest,
+			Code:    http.StatusBadRequest,
 			Message: "can't edit other candidate post",
-			Err: errors.New("access denied"),
+			Err:     errors.New("access denied"),
 		}
 	}
 
@@ -85,8 +85,48 @@ func (u *PostUsecase) UpdatePost(c *gin.Context, postRequest domain.PostRequest,
 	err = u.postRepository.UpdatePost(&post)
 	if err != nil {
 		return domain.Posts{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: "error occured when update post",
+			Err:     err,
+		}
+	}
+
+	return post, nil
+}
+
+func (u *PostUsecase) DeletePost(c *gin.Context, postId int) (domain.Posts, any) {
+	loginUser, err := help.GetLoginUser(c)
+	if err != nil {
+		return domain.Posts{}, help.ErrorObject{
+			Code:    http.StatusNotFound,
+			Message: "account not found",
+			Err:     err,
+		}
+	}
+
+	var post domain.Posts
+	err = u.postRepository.GetPostByCondition(&post, "id = ?", postId)
+	if err != nil {
+		return domain.Posts{}, help.ErrorObject{
+			Code:    http.StatusInternalServerError,
+			Message: "error occured when get post id",
+			Err:     err,
+		}
+	}
+
+	if loginUser.Role != "ADMIN" && loginUser.ID != post.UserID {
+		return domain.Posts{}, help.ErrorObject{
+			Code: http.StatusBadRequest,
+			Message: "can't delete other candidate post",
+			Err: errors.New("access denied"),
+		}
+	}
+
+	err = u.postRepository.DeletePost(&post)
+	if err != nil{
+		return domain.Posts{}, help.ErrorObject{
+			Code: http.StatusInternalServerError,
+			Message: "error occured when delete post",
 			Err: err,
 		}
 	}

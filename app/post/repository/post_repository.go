@@ -10,6 +10,7 @@ type IPostRepository interface {
 	GetPostByCondition(post *domain.Posts, condition string, value any) error
 	CreatePost(post *domain.Posts) error
 	UpdatePost(post *domain.Posts) error
+	DeletePost(post *domain.Posts) error
 }
 
 type PostRepository struct {
@@ -42,6 +43,19 @@ func (r *PostRepository) UpdatePost(post *domain.Posts) error {
 	tx := r.db.Begin()
 
 	err := r.db.Save(post).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func (r *PostRepository) DeletePost(post *domain.Posts) error {
+	tx := r.db.Begin()
+
+	err := r.db.Delete(post).Error
 	if err != nil {
 		tx.Rollback()
 		return err
