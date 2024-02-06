@@ -4,6 +4,7 @@ import (
 	"freepass-2024/initializers"
 	"freepass-2024/models"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -109,4 +110,53 @@ func DeleteComment(c *gin.Context) {
 	}
 
 	initializers.DB.Delete(&comment)
+}
+
+func SetElection(c *gin.Context) {
+	userAdmin, _ := c.Get("user")
+	if userAdmin.(models.User).Username != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "you are not an admin",
+		})
+
+		return
+	}
+
+	var body struct {
+		Year  string
+		Start string
+		End   string
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to read request body",
+		})
+
+		return
+	}
+
+	const layout = "2006-01-02"
+	parsedStart, err1 := time.Parse(layout, body.Start)
+	parsedEnd, err2 := time.Parse(layout, body.End)
+	if err1 != nil || err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed parsing date",
+			"a":     err1,
+			"b":     err2,
+		})
+
+		return
+	}
+	
+	election := models.Election{Year: uint(time.Now().Year()), StartDate: parsedStart, EndDate: parsedEnd}
+	result := initializers.DB.Create(&election)
+
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to set election period",
+		})
+
+		return
+	}
 }

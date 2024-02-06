@@ -24,9 +24,12 @@ func main() {
 	r.GET("/api/posts", middleware.RequireAuth, controllers.FetchPosts)
 	r.POST("/api/posts/:id", middleware.RequireAuth, controllers.AddComment)
 	r.GET("/api/posts/:id", middleware.RequireAuth, controllers.ViewPost)
+	
+	r.PUT("/api/vote/:id", middleware.RequireAuth, controllers.CastVote)
 
 	r.PUT("/api/admin/promote/:id", middleware.RequireAuth, controllers.PromoteUser)
 	r.GET("/api/admin/posts", middleware.RequireAuth, controllers.FetchPosts)
+	r.POST("/api/admin/setElection", middleware.RequireAuth, controllers.SetElection)
 	r.DELETE("/api/admin/deleteUser/:id", middleware.RequireAuth, controllers.DeleteUser)
 	r.DELETE("/api/admin/deletePost/:id", middleware.RequireAuth, controllers.DeletePostAdmin)
 	r.DELETE("/api/admin/deleteComment/:id", middleware.RequireAuth, controllers.DeleteComment)

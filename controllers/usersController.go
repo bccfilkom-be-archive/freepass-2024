@@ -13,7 +13,6 @@ import (
 )
 
 func Register(c *gin.Context) {
-
 	var body struct {
 		Username string
 		Password string
@@ -211,4 +210,50 @@ func AddComment(c *gin.Context) {
 
 		return
 	}
+}
+
+func CastVote(c *gin.Context) {
+	user, _ := c.Get("user")
+
+	if user.(models.User).HasVoted {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "user has already voted",
+		})
+
+		return
+	}
+
+	var election models.Election
+	initializers.DB.Last(&election)
+
+	if !election.StartDate.Before(time.Now()) || !election.EndDate.After(time.Now()) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "exceeded the election period",
+		})
+
+		return
+	}
+
+	candidateID := c.Param("id")
+
+	var candidate models.User
+	initializers.DB.Find(&candidate, candidateID)
+	if candidate.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "candidate not found",
+		})
+
+		return
+	}
+
+	if !candidate.IsCandidate {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "the selected user is not a candidate",
+		})
+
+		return
+	}
+
+	initializers.DB.Model(&candidate).Where("id = ?", candidateID).Update("votes", candidate.Votes+1)
+	initializers.DB.Model(&user).Where("id = ?", user.(models.User).ID).Update("has_voted", true)
 }
