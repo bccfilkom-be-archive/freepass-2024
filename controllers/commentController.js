@@ -1,5 +1,38 @@
 const pool = require('../config/database');
 
+const viewComment = (req, res) => {
+  const { id, postId, username } = req.query;
+
+  if (id) {
+    pool.query(`SELECT * FROM comment WHERE id = ?`, [id], (error, results) => {
+      if (error) {
+        console.error(error);
+      }
+
+      res.json({ results });
+    });
+  } else if (postId) {
+    pool.query(`SELECT * FROM comment WHERE post_id = ?`, [postId], (error, results) => {
+      if (error) {
+        console.error(error);
+      }
+
+      res.json({ results });
+    });
+  } else if (username) {
+    pool.query(`SELECT * FROM comment WHERE user_id IN (SELECT id FROM user WHERE username = ?)`, [username], (error, results) => {
+      if (error) {
+        console.error(error);
+      }
+
+      res.json({ results });
+    });
+  } else {
+    return res.status(400).json({ error: 'Provide id, postId, or username!' });
+  }
+
+};
+
 const addComment = (req, res) => {
   const { postId, content } = req.body;
   pool.query(`INSERT INTO comment (user_id, post_id, content) VALUES (?, ?, ?)`, [req.session.userId, postId, content], (error, results) => {
@@ -23,6 +56,7 @@ const deleteComment = (req, res) => {
 };
 
 module.exports = {
+  viewComment,
   addComment,
   deleteComment
 };

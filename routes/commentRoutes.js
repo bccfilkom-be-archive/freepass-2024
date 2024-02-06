@@ -6,6 +6,7 @@ const postMiddleware = require('../middleware/postMiddleware');
 const commentMiddleware = require('../middleware/commentMiddleware');
 const userMiddleware = require('../middleware/userMiddleware');
 
+router.get('/', authMiddleware.authenticateUser, commentController.viewComment);
 router.post('/', authMiddleware.authenticateUser, postMiddleware.checkPostExistence, commentController.addComment);
 router.delete('/', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), commentMiddleware.checkCommentExistence, commentController.deleteComment);
 

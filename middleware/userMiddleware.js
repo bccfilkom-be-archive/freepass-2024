@@ -3,10 +3,6 @@ const pool = require('../config/database');
 const checkUserExistence = (req, res, next) => {
   const { username, id } = req.query;
 
-  if (!username) {
-    next();
-  }
-
   if (username) {
     pool.query(`SELECT * FROM user WHERE username = ?`, [username], (error, results) => {
       if (error) {
