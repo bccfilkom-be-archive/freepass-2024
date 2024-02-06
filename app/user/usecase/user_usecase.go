@@ -15,7 +15,7 @@ type IUserUsecase interface {
 	SignUp(userRequest domain.UserRequest) (domain.Users, any)
 	LoginUser(userLogin domain.UserLogin) (domain.Users, interface{}, any)
 	GetCandidates() ([]domain.Users, any)
-	UpdateAccount(c *gin.Context, userRequest domain.UserRequest, userId int) (domain.Users, any)
+	UpdateAccount(c *gin.Context, userRequest domain.UserRequest) (domain.Users, any)
 	PromoteUser(userId int) (domain.Users, any)
 	DeleteAccount(c *gin.Context, userId int) (domain.Users, any)
 }
@@ -118,7 +118,7 @@ func (u *UserUsecase) GetCandidates() ([]domain.Users, any) {
 	return candidates, nil
 }
 
-func (u *UserUsecase) UpdateAccount(c *gin.Context, userRequest domain.UserRequest, userId int) (domain.Users, any) {
+func (u *UserUsecase) UpdateAccount(c *gin.Context, userRequest domain.UserRequest) (domain.Users, any) {
 	loginUser, err := help.GetLoginUser(c)
 	if err != nil {
 		return domain.Users{}, help.ErrorObject{
@@ -128,16 +128,8 @@ func (u *UserUsecase) UpdateAccount(c *gin.Context, userRequest domain.UserReque
 		}
 	}
 
-	if loginUser.ID != userId {
-		return domain.Users{}, help.ErrorObject{
-			Code:    http.StatusBadRequest,
-			Message: "can't edit other people's account",
-			Err: errors.New("access denied"),
-		}
-	}
-
 	var user domain.Users
-	err = u.userRepository.GetUserByCondition(&user, "id = ?", userId)
+	err = u.userRepository.GetUserByCondition(&user, "id = ?", loginUser.ID)
 	if err != nil {
 		return domain.Users{}, help.ErrorObject{
 			Code:    http.StatusNotFound,

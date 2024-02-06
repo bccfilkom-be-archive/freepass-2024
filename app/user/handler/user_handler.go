@@ -76,10 +76,7 @@ func (h *UserHandler) UpdateAccount(c *gin.Context) {
 		return
 	}
 
-	userIdString := c.Param("userId")
-	userId, _ := strconv.Atoi(userIdString)
-
-	updatedUser, errorObject := h.userUsecase.UpdateAccount(c, userRequest, userId)
+	updatedUser, errorObject := h.userUsecase.UpdateAccount(c, userRequest)
 	if errorObject != nil {
 		errorObject := errorObject.(help.ErrorObject)
 		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
