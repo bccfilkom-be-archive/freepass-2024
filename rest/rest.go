@@ -1,9 +1,10 @@
 package rest
 
 import (
+	comment_handler "freepass-bcc/app/comment/handler"
 	post_handler "freepass-bcc/app/post/handler"
 	user_handler "freepass-bcc/app/user/handler"
-	comment_handler "freepass-bcc/app/comment/handler"
+	election_time_handler "freepass-bcc/app/election_time/handler"
 	"freepass-bcc/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -43,13 +44,20 @@ func (r *Rest) RoutePost(postHandler *post_handler.PostHandler) {
 	r.gin.DELETE("/posts/:postId", validate, NotUser, postHandler.DeletePost)
 }
 
-func (r *Rest) RouteComment(commentHandler *comment_handler.CommentHandler){
+func (r *Rest) RouteComment(commentHandler *comment_handler.CommentHandler) {
 	validate := middleware.RequireAuth
 	UserOnly := middleware.CheckUser
 	AdminOnly := middleware.CheckAdmin
 
-	r.gin.POST("/posts/:postId/comments", validate, UserOnly , commentHandler.CreateComment)
+	r.gin.POST("/posts/:postId/comments", validate, UserOnly, commentHandler.CreateComment)
 	r.gin.DELETE("/posts/:postId/comments/:commentId", validate, AdminOnly, commentHandler.DeleteComment)
+}
+
+func (r *Rest) RouteElectionTime(electionTimeHandler *election_time_handler.ElectionTimeHandler) {
+	validate := middleware.RequireAuth
+	AdminOnly := middleware.CheckAdmin
+
+	r.gin.POST("/election", validate, AdminOnly, electionTimeHandler.SetStartAndEndTime)
 }
 
 func (r *Rest) Run() {

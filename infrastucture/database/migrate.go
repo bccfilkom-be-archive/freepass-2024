@@ -7,5 +7,6 @@ func Migrate() {
 		&domain.Users{},
 		&domain.Posts{},
 		&domain.Comments{},
+		&domain.ElectionTimes{},
 	)
 }

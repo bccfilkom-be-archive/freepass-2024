@@ -10,6 +10,9 @@ import (
 	comment_handler "freepass-bcc/app/comment/handler"
 	comment_repository "freepass-bcc/app/comment/repository"
 	comment_usecase "freepass-bcc/app/comment/usecase"
+	election_time_handler "freepass-bcc/app/election_time/handler"
+	election_time_repository "freepass-bcc/app/election_time/repository"
+	election_time_usecase "freepass-bcc/app/election_time/usecase"
 	"freepass-bcc/infrastucture"
 	"freepass-bcc/infrastucture/database"
 	"freepass-bcc/rest"
@@ -25,20 +28,24 @@ func main() {
 	userRepository := user_repository.NewUserRepository(database.DB)
 	postRepository := post_repository.NewPostRepository(database.DB)
 	commentRepository := comment_repository.NewCommentRepository(database.DB)
+	electionTimeRepository := election_time_repository.NewElectionTimeRepository(database.DB)
 
 	userUsecase := user_usecase.NewUserUsecase(userRepository)
 	postUsecase := post_usecase.NewPostUsecase(postRepository)
 	commentUsecase := comment_usecase.NewCommentUsecase(commentRepository, postRepository)
+	electionTimeUsecase := election_time_usecase.NewElectionTimeUsecase(electionTimeRepository)
 
 	userHandler := user_handler.NewUserHandler(userUsecase)
 	postHandler := post_handler.NewPostHandler(postUsecase)
 	commentHandler := comment_handler.NewCommentHandler(commentUsecase)
+	electionTimeHandler := election_time_handler.NewElectionTimeHandler(electionTimeUsecase)
 
 	router := rest.NewRest(gin.Default())
 
 	router.RouteUser(userHandler)
 	router.RoutePost(postHandler)
 	router.RouteComment(commentHandler)
+	router.RouteElectionTime(electionTimeHandler)
 
 	router.Run()
 }
