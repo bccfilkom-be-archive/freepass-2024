@@ -149,6 +149,24 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 ## **🧪** API Installation
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+### Using Docker
+Make sure docker is running and execute these commands:
+```
+docker pull kmdavidds/freepass-2024:1.0
+```
+```
+docker run -p 1945:1945 kmdavidds/freepass-2024:1.0
+```
+### Using Go Run
+Make sure go is installed and execute these commands:
+```
+go run main.go
+```
+### Using .exe
+Lastly, you can run the server by executing the executable:
+```
+freepass-2024.exe
+```
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
