@@ -51,8 +51,8 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "successfully created a user with the username " + body.Username,
 	})
-
 }
+
 
 func Login(c *gin.Context) {
 	var body struct {
@@ -106,4 +106,32 @@ func Login(c *gin.Context) {
 
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
+}
+
+
+func Edit(c *gin.Context) {
+	var body struct {
+		NewPassword string
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to read request body",
+		})
+
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(body.NewPassword), 10)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to hash password",
+		})
+
+		return
+	}
+
+	user, _ := c.Get("user")
+	initializers.DB.Model(&user).Where("id = ?", user.(models.User).ID).Update("password", hash)
 }
