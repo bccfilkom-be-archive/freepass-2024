@@ -7,6 +7,7 @@ import (
 )
 
 type IElectionTimeRepository interface {
+	GetCurrentElectionTime(electionTime *domain.ElectionTimes) error
 	SetStartAndEndTime(setElectionTime *domain.ElectionTimes) error
 }
 
@@ -16,6 +17,11 @@ type ElectionTimeRepository struct {
 
 func NewElectionTimeRepository(db *gorm.DB) *ElectionTimeRepository {
 	return &ElectionTimeRepository{db}
+}
+
+func (r *ElectionTimeRepository) GetCurrentElectionTime(electionTime *domain.ElectionTimes) error {
+	err := r.db.Last(electionTime).Error
+	return err
 }
 
 func (r *ElectionTimeRepository) SetStartAndEndTime(setElectionTime *domain.ElectionTimes) error {

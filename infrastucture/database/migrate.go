@@ -8,5 +8,6 @@ func Migrate() {
 		&domain.Posts{},
 		&domain.Comments{},
 		&domain.ElectionTimes{},
+		&domain.Votes{},
 	)
 }

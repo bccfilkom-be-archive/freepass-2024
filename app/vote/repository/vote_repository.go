@@ -1,0 +1,32 @@
+package repository
+
+import (
+	"freepass-bcc/domain"
+
+	"gorm.io/gorm"
+)
+
+type IVoteRepository interface {
+	Vote(voted *domain.Votes) error
+}
+
+type VoteRepository struct {
+	db *gorm.DB
+}
+
+func NewVoteRepository(db *gorm.DB) *VoteRepository {
+	return &VoteRepository{db}
+}
+
+func (r *VoteRepository) Vote(voted *domain.Votes) error {
+	tx := r.db.Begin()
+
+	err := r.db.Create(voted).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
+}

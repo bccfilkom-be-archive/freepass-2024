@@ -5,6 +5,7 @@ import (
 	post_handler "freepass-bcc/app/post/handler"
 	user_handler "freepass-bcc/app/user/handler"
 	election_time_handler "freepass-bcc/app/election_time/handler"
+	vote_handler "freepass-bcc/app/vote/handler"
 	"freepass-bcc/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -58,6 +59,13 @@ func (r *Rest) RouteElectionTime(electionTimeHandler *election_time_handler.Elec
 	AdminOnly := middleware.CheckAdmin
 
 	r.gin.POST("/election", validate, AdminOnly, electionTimeHandler.SetStartAndEndTime)
+}
+
+func (r *Rest) RouteVote(voteHandler *vote_handler.VoteHandler) {
+	validate := middleware.RequireAuth
+	UserOnly := middleware.CheckUser
+
+	r.gin.POST("/election/:userId", validate, UserOnly, voteHandler.Vote)
 }
 
 func (r *Rest) Run() {

@@ -12,6 +12,7 @@ type Users struct {
 	UpdatedAt time.Time  `json:"-"`
 	Posts     []Posts    `json:"-" gorm:"foreignKey:user_id;references:id"`
 	Comments  []Comments `json:"-" gorm:"foreignKey:user_id;references:id"`
+	Vote      Votes      `json:"-" gorm:"foreignKey:user_id;references:id"`
 }
 
 type UserRequest struct {
