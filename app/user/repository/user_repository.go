@@ -41,7 +41,7 @@ func (r *UserRepository) CreateUser(user *domain.Users) error {
 }
 
 func (r *UserRepository) GetCandidates(candidates *[]domain.Users) error {
-	err := r.db.Find(&candidates, "role = ?", "CANDIDATE").Error
+	err := r.db.Find(candidates, "role = ?", "CANDIDATE").Error
 	return err
 }
 

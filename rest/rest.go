@@ -35,6 +35,7 @@ func (r *Rest) RoutePost(postHandler *post_handler.PostHandler) {
 	CandidateOnly := middleware.CheckCandidate
 
 	r.gin.POST("/posts", validate, CandidateOnly, postHandler.CreatePost)
+	r.gin.PUT("/posts/:postId", validate, CandidateOnly, postHandler.UpdatePost)
 }
 
 func (r *Rest) Run() {
