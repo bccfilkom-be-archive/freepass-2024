@@ -134,7 +134,7 @@ func Edit(c *gin.Context) {
 	initializers.DB.Model(&user).Where("id = ?", user.(models.User).ID).Update("password", hash)
 }
 
-func PostsIndex(c *gin.Context) {
+func FetchPosts(c *gin.Context) {
 	var posts []models.Post
 	initializers.DB.Find(&posts)
 
@@ -151,8 +151,44 @@ func PostsIndex(c *gin.Context) {
 	})
 }
 
-func PostsShow(c *gin.Context) {
+func ViewPost(c *gin.Context) {
 	postID := c.Param("id")
+
+	var post models.Post
+	initializers.DB.Find(&post, postID)
+
+	if post.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to view post",
+		})
+
+		return
+	}
+
+	var comments []models.Comment
+	initializers.DB.Where("post_id = ?", postID).Find(&comments)
+
+	c.JSON(http.StatusOK, gin.H{
+		"post":     post,
+		"comments": comments,
+	})
+}
+
+func AddComment(c *gin.Context) {
+	user, _ := c.Get("user")
+	postID := c.Param("id")
+
+	var body struct {
+		Body string
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to read body",
+		})
+
+		return
+	}
 
 	var post models.Post
 	initializers.DB.Find(&post, postID)
@@ -164,12 +200,15 @@ func PostsShow(c *gin.Context) {
 
 		return
 	}
-	
-	var comments []models.Comment
-	initializers.DB.Where("post_id = ?", postID).Find(&comments)
 
-	c.JSON(http.StatusOK, gin.H{
-		"post": post,
-		"comments": comments,
-	})
+	comment := models.Comment{PostID: post.ID, Username: user.(models.User).Username, Body: body.Body}
+	result := initializers.DB.Create(&comment)
+
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to create comment",
+		})
+
+		return
+	}
 }
