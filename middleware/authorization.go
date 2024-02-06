@@ -30,6 +30,17 @@ func CheckCandidate(c *gin.Context) {
 	}
 }
 
+func CheckUser(c *gin.Context){
+	user, ok := c.Get("user")
+	if !ok {
+		help.UnauthorizedResponse(c, "user not found", errors.New(""))
+	}
+
+	if user.(domain.Users).Role != "USER" {
+		help.UnauthorizedResponse(c, "user only", errors.New("access denied"))
+	}
+}
+
 func CheckNotUser(c *gin.Context) {
 	user, ok := c.Get("user")
 	if !ok {

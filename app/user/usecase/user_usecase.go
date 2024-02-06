@@ -24,8 +24,8 @@ type UserUsecase struct {
 	userRepository repository.IUserRepository
 }
 
-func NewUserUsecase(repository repository.IUserRepository) *UserUsecase {
-	return &UserUsecase{repository}
+func NewUserUsecase(userRepository repository.IUserRepository) *UserUsecase {
+	return &UserUsecase{userRepository}
 }
 
 func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any) {

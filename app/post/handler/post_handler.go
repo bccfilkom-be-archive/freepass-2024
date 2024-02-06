@@ -14,8 +14,8 @@ type PostHandler struct {
 	postUsecase usecase.IPostUsecase
 }
 
-func NewPostHandler(usecase usecase.IPostUsecase) *PostHandler {
-	return &PostHandler{usecase}
+func NewPostHandler(postUsecase usecase.IPostUsecase) *PostHandler {
+	return &PostHandler{postUsecase}
 }
 
 func (h *PostHandler) GetAllPost(c *gin.Context) {

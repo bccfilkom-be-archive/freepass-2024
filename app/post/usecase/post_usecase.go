@@ -23,8 +23,8 @@ type PostUsecase struct {
 	postRepository repository.IPostRepository
 }
 
-func NewPostUsecase(repository repository.IPostRepository) *PostUsecase {
-	return &PostUsecase{repository}
+func NewPostUsecase(postRepository repository.IPostRepository) *PostUsecase {
+	return &PostUsecase{postRepository}
 }
 
 func (u *PostUsecase) GetAllPost() ([]domain.Posts, any) {

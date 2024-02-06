@@ -8,6 +8,7 @@ type Posts struct {
 	Post      string    `json:"post"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
+	Comments []Comments `json:"-" gorm:"foreignKey:post_id;references:id"`
 }
 
 type PostRequest struct {
