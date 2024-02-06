@@ -1,7 +1,7 @@
 import Joi from 'joi'
-import type { UserType } from '../types/user.type'
+import type { RegisterForm } from '../types/auth.type'
 
-export const createUserValidation = (payload: UserType) => {
+export const createUserValidation = (payload: RegisterForm) => {
   const schema = Joi.object({
     fullName: Joi.string().required(),
     nim: Joi.string().required(),

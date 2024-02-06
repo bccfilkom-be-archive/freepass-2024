@@ -3,7 +3,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import { app } from '../app'
 import { User } from '../models/user.model'
-import type { UserType } from '../types/user.type'
+import type { RegisterForm } from '../types/auth.type'
 
 describe('authRoutes', () => {
   beforeAll(async () => {
@@ -17,7 +17,7 @@ describe('authRoutes', () => {
   })
 
   describe('POST /v1/auth/register', () => {
-    let newUser: UserType
+    let newUser: RegisterForm
     beforeEach(() => {
       newUser = {
         fullName: 'valid full name',
