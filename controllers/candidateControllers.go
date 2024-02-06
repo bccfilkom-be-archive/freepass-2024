@@ -94,7 +94,7 @@ func DeletePost(c *gin.Context) {
 	user, _ := c.Get("user")
 
 	var post models.Post
-	initializers.DB.First(postID)
+	initializers.DB.First(&post, postID)
 	if post.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "post not found",
