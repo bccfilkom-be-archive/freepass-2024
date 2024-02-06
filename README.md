@@ -157,16 +157,19 @@ docker pull kmdavidds/freepass-2024:1.0
 ```
 docker run -p 1945:1945 kmdavidds/freepass-2024:1.0
 ```
-### Using Go Run
-Make sure go is installed and execute these commands:
-```
-go run main.go
-```
 ### Using .exe
-Lastly, you can run the server by executing the executable:
+Alternatively, you can run the server by executing the executable:
 ```
 freepass-2024.exe
 ```
+### Using Go Run
+Lastly, you can run the server using the go run command:
+```
+go run main.go
+```
+A new .env file is needed for this to work.
+You can create the file according to the .env.example.
+
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
