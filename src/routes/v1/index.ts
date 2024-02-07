@@ -3,6 +3,7 @@ import { docsRouter } from './docs.route'
 import { authRouter } from './auth.route'
 import { userRouter } from './user.route'
 import { adminRouter } from './admin.route'
+import { postRouter } from './post.route'
 
 export const router: Router = express.Router()
 
@@ -27,6 +28,10 @@ const defaultRoutes: Route[] = [
   {
     path: '/admin',
     route: adminRouter
+  },
+  {
+    path: '/post',
+    route: postRouter
   }
 ]
 
