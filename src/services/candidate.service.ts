@@ -7,3 +7,11 @@ export const createCandidate = async (userId: string) => {
 export const findCandidateByField = async (field: string, value: string) => {
   return await Candidate.findOne({ [field]: value })
 }
+
+export const getAllCandidates = async () => {
+  return await Candidate.find({}).populate('posts')
+}
+
+export const findCandidateById = async (id: string) => {
+  return await Candidate.findById(id).populate('posts')
+}

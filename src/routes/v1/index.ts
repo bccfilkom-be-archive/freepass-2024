@@ -4,6 +4,7 @@ import { authRouter } from './auth.route'
 import { userRouter } from './user.route'
 import { adminRouter } from './admin.route'
 import { postRouter } from './post.route'
+import { candidateRouter } from './candidate.route'
 
 export const router: Router = express.Router()
 
@@ -32,6 +33,10 @@ const defaultRoutes: Route[] = [
   {
     path: '/post',
     route: postRouter
+  },
+  {
+    path: '/candidate',
+    route: candidateRouter
   }
 ]
 
