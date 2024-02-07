@@ -6,7 +6,7 @@ import { User } from '../models/user.model'
 import type { UpdateUserForm } from '../types/user.type'
 import type { RegisterForm } from '../types/auth.type'
 
-describe('authRoutes', () => {
+describe('userRoutes', () => {
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create()
     await mongoose.connect(mongoServer.getUri())
@@ -17,7 +17,7 @@ describe('authRoutes', () => {
     await mongoose.connection.close()
   })
 
-  describe('POST /v1/user/:id', () => {
+  describe('patch /v1/user/profile', () => {
     let token: string
     let newUser: RegisterForm
     let newOtherUser: RegisterForm
