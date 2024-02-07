@@ -8,6 +8,7 @@ import (
 	middleware "github.com/AkbarFikri/freepassBCC-2024/middlewares"
 	authRoute "github.com/AkbarFikri/freepassBCC-2024/routes/auth"
 	postRoute "github.com/AkbarFikri/freepassBCC-2024/routes/post"
+	userRoute "github.com/AkbarFikri/freepassBCC-2024/routes/user"
 
 )
 
@@ -26,5 +27,7 @@ func SetupRoute() *gin.Engine {
 	post := router.Group("/post", middleware.Auth())
 	postRoute.RegisterRoute(post)
 
+	user := router.Group("/user", middleware.Auth())
+	userRoute.RegisterRoute(user)
 	return router
 }

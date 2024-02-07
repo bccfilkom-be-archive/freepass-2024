@@ -1,4 +1,4 @@
-package repositorys
+package userRepositorys
 
 import (
 	"github.com/AkbarFikri/freepassBCC-2024/database"

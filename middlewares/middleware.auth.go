@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
@@ -30,7 +31,9 @@ func Auth() gin.HandlerFunc {
 			res.Data = nil
 			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
 		} else {
-			c.Set("user", token.Claims)
+			claims := token.Claims.(jwt.MapClaims)
+			user := schemas.UserResponse{ID: claims["id"].(string), Email: claims["email"].(string)}
+			c.Set("user", user)
 			c.Next()
 		}
 	})

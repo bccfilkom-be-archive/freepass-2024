@@ -1,4 +1,4 @@
-package controller
+package authController
 
 import (
 	"net/http"
@@ -6,9 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/AkbarFikri/freepassBCC-2024/models"
-	repositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/auth"
+	profileRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/profile"
+	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
+
 )
 
 func RegisterController(c *gin.Context) {
@@ -36,9 +38,15 @@ func RegisterController(c *gin.Context) {
 	user.Password = string(hashPass)
 	user.IsAdmin = false
 
-	newUser, err := repositorys.RegisterUser(user)
+	newUser, err := userRepositorys.CreatUser(user)
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Email alredy exist", Data: nil}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	if err := profileRepositorys.CreateProfile(newUser.ID); err != nil {
+		res := schemas.ResponeData{Error: true, Message: "User alredy exist", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}

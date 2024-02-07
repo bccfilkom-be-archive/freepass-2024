@@ -7,10 +7,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+
 )
 
 func SignJWT(Data map[string]interface{}, KeyEnvName string, ExpiredAt time.Duration) (string, error) {
-	expiredAt := time.Now().Add(time.Duration(time.Minute) * ExpiredAt).Unix()
+	expiredAt := time.Now().Add(time.Duration(time.Hour) * ExpiredAt).Unix()
 
 	JWTSecretKey := os.Getenv(KeyEnvName)
 

@@ -1,13 +1,14 @@
-package controller
+package authController
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	repositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
+	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
+
 )
 
 func LoginController(c *gin.Context) {
@@ -25,7 +26,7 @@ func LoginController(c *gin.Context) {
 		return
 	}
 
-	user, err := repositorys.FindUser(request)
+	user, err := userRepositorys.FindUser(request)
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Invalid Email or Password", Data: nil}
 		c.JSON(http.StatusNotFound, res)
@@ -39,7 +40,7 @@ func LoginController(c *gin.Context) {
 	}
 
 	accessData := map[string]interface{}{"id": user.ID, "email": user.Email}
-	accessToken, err := utils.SignJWT(accessData, "JWT_SECRET", 1)
+	accessToken, err := utils.SignJWT(accessData, "JWT_SECRET", 24)
 
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
