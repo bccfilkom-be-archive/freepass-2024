@@ -21,7 +21,7 @@ const viewUser = (req, res) => {
   executeQuery(query, [username == null ? req.session.username : username])
     .then((results) => {
       if (results.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found!' });
       } else {
         return res.json(results);
       }
@@ -122,7 +122,7 @@ const deleteUser = (req, res) => {
   executeQuery(deleteQuery, deleteParams)
     .then((results) => {
       if (results.affectedRows === 0) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found!' });
       }
       return res.json({ message: 'User deleted successfully' });
     })

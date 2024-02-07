@@ -39,18 +39,18 @@ const checkPostOwnership = (req, res, next) => {
     return next();
   }
 
-  pool.query(`SELECT user_id FROM post WHERE id = ?`, [postId], (error, results) => {
-    if (error) {
+  executeQuery(`SELECT user_id FROM post WHERE id = ?`, [postId])
+    .then((results) => {
+      if (results.length === 0 || results[0].user_id !== userId) {
+        return res.status(403).json({ error: 'You do not have permission to edit or delete this post' });
+      } else {
+        next();
+      }
+    })
+    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    if (results.length === 0 || results[0].user_id !== userId) {
-      return res.status(403).json({ error: 'Forbidden - You do not have permission to edit or delete this post' });
-    }
-
-    next();
-  });
+    })
 };
 
 module.exports = {

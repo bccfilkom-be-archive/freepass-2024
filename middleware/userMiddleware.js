@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { executeQuery } = require('../services/db');
 
 const checkUserExistence = (req, res, next) => {
   const { username, id } = req.query;
@@ -7,33 +8,29 @@ const checkUserExistence = (req, res, next) => {
     return next();
   }
 
+  let query = 'SELECT * FROM user WHERE';
+  let values = [];
+
   if (username) {
-    pool.query(`SELECT * FROM user WHERE username = ?`, [username], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-
-      if (results.length === 0) {
-        return res.status(404).json({ error: 'User not found!' });
-      }
-
-      next();
-    });
+    query += ' username = ?';
+    values.push(username);
   } else if (id) {
-    pool.query(`SELECT * FROM user WHERE id = ?`, [id], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
+    query += ' id = ?';
+    values.push(id);
+  }
 
+  executeQuery(query, values)
+    .then((results) => {
       if (results.length === 0) {
         return res.status(404).json({ error: 'User not found!' });
+      } else {
+        next();
       }
-
-      next();
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
     });
-  }
 };
 
 const checkUserStatus = (requiredStatus) => {
