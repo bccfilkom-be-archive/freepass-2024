@@ -29,6 +29,7 @@ const viewComment = (req, res) => {
       }
     })
     .catch((error) => {
+      console.log(error);
       res.status(500).json({ error: 'Internal Server Error' });
     });
 };
@@ -55,7 +56,7 @@ const deleteComment = (req, res) => {
 
   const query = `DELETE FROM comment WHERE id = ?`;
   const values = [id];
-  
+
   executeQuery(query, values)
     .then(() => {
       res.json({ message: 'Comment deleted successfully successfully' });
