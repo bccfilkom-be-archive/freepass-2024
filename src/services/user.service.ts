@@ -16,3 +16,7 @@ export const updateUserById = async (id: string, payload: UpdateUserForm) => {
 export const findUserByIdAndPromote = async (id: string) => {
   return await User.findByIdAndUpdate(id, { role: 'candidate' }, { new: true })
 }
+
+export const getAllUsers = async () => {
+  return await User.find({})
+}

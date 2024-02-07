@@ -5,6 +5,7 @@ import { app } from '../app'
 import { User } from '../models/user.model'
 import type { UpdateUserForm } from '../types/user.type'
 import type { RegisterForm } from '../types/auth.type'
+import { hashing } from '../utils/bcrypt'
 
 describe('userRoutes', () => {
   beforeAll(async () => {
@@ -88,6 +89,50 @@ describe('userRoutes', () => {
       request.email = newOtherUser.email
       const res = await supertest(app).patch('/v1/user/profile').set('Authorization', `Bearer ${token}`).send(request)
       expect(res.body.status).toBe(400)
+    })
+  })
+
+  describe('get /v1/user', () => {
+    let newUser: RegisterForm
+    beforeAll(async () => {
+      newUser = {
+        fullName: 'valid full name',
+        username: 'validusername',
+        nim: '231502001110111',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newUser)
+
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000001',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin@gmail.com',
+        username: 'admin',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+    })
+
+    test("should return 200 if logged user's role correct", async () => {
+      const token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin', password: 'password' })).body
+        .data
+      const res = await supertest(app).get('/v1/user').set('Authorization', `Bearer ${token}`)
+      expect(res.body.status).toBe(200)
+    })
+
+    test("should return 403 if logged user's role not correct", async () => {
+      const token = (
+        await supertest(app).post('/v1/auth/login').send({ username: newUser.username, password: newUser.password })
+      ).body.data
+      const res = await supertest(app).get('/v1/user').set('Authorization', `Bearer ${token}`)
+      expect(res.body.status).toBe(403)
     })
   })
 })

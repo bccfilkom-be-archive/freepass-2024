@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import { findUserById, updateUserById, findUserByField } from '../services/user.service'
+import { findUserById, updateUserById, findUserByField, getAllUsers } from '../services/user.service'
 import { updateUserValidation } from '../validation/user.validation'
 import type { UpdateUserForm } from '../types/user.type'
 
@@ -35,4 +35,11 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
       next(error)
     }
   }
+}
+
+export const viewAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+  const users = await getAllUsers()
+  return res
+    .status(200)
+    .send({ status: 200, message: 'get all users success', data: { ...users, length: users.length } })
 }
