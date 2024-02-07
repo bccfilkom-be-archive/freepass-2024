@@ -1,32 +1,32 @@
 const pool = require('../config/database');
 
-const viewAllPosts = (req, res) => {
-  pool.query(`SELECT * FROM post`, (error, posts) => {
-    if (error) throw error;
-
-    if (posts.length === 0) {
-      return res.status(400).json({ message: 'No result' });
-    }
-
-    posts.map((post, index) => {
-      pool.query(`SELECT * FROM comment WHERE post_id = ?`, [post.id], (commentError, commentResults) => {
-        if (commentError) throw commentError;
-
-        post.comments = commentResults;
-
-        if (index === posts.length - 1) {
-          res.json(posts);
-        }
-      });
-    });
-  });
-};
-
 const viewPost = (req, res) => {
   const { id, username } = req.query;
 
   if (id && username) {
     return res.status(400).json({ error: 'Provide either id or username, not both' });
+  }
+
+  if (!id && !username) {
+    pool.query(`SELECT * FROM post`, (error, posts) => {
+      if (error) throw error;
+
+      if (posts.length === 0) {
+        return res.status(400).json({ message: 'No result' });
+      }
+
+      posts.map((post, index) => {
+        pool.query(`SELECT * FROM comment WHERE post_id = ?`, [post.id], (commentError, commentResults) => {
+          if (commentError) throw commentError;
+
+          post.comments = commentResults;
+
+          if (index === posts.length - 1) {
+            res.json(posts);
+          }
+        });
+      });
+    });
   }
 
   if (id) {
@@ -96,7 +96,7 @@ const addPost = (req, res) => {
 const editPost = (req, res) => {
   const { id } = req.query;
   const { title, content } = req.body;
-  
+
   pool.query(`UPDATE post SET title = ?, content = ? WHERE id = ?`, [title, content, id], (error, results) => {
     if (error) {
       console.error(error);
@@ -124,7 +124,6 @@ const deletePost = (req, res) => {
 };
 
 module.exports = {
-  viewAllPosts,
   viewPost,
   addPost,
   editPost,

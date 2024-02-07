@@ -34,7 +34,8 @@ const viewComment = (req, res) => {
 };
 
 const addComment = (req, res) => {
-  const { postId, content } = req.body;
+  const { postId } = req.query;
+  const { content } = req.body;
   pool.query(`INSERT INTO comment (user_id, post_id, content) VALUES (?, ?, ?)`, [req.session.userId, postId, content], (error, results) => {
     if (error) {
       console.error(error);

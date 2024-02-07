@@ -1,18 +1,17 @@
 const pool = require('../config/database');
 
 const checkPostExistence = (req, res, next) => {
-  const { postId: idFromBody } = req.body;
-  const { id: idFromQuery } = req.query;
+  const { id, postId } = req.query;
 
-  let id;
+  let targetId;
 
-  if (idFromBody) {
-    id = idFromBody;
-  } else if (idFromQuery) {
-    id = idFromQuery;
-  }
+  if (id) {
+    targetId = id;
+  } else if (postId) {
+    targetId = postId;
+  }  
 
-  pool.query(`SELECT * FROM post WHERE id = ?`, [id], (error, results) => {
+  pool.query(`SELECT * FROM post WHERE id = ?`, [targetId], (error, results) => {
     if (error) {
       console.error(error);
       return res.status(500).json({ error: 'Internal Server Error' });
