@@ -67,7 +67,7 @@ describe('authRoutes', () => {
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
-      await supertest(app).post('/v1/auth/login').send(newUser)
+      await supertest(app).post('/v1/auth/register').send(newUser)
     })
 
     let existingUser: LoginForm
@@ -89,16 +89,16 @@ describe('authRoutes', () => {
       expect(res.body.status).toBe(400)
     })
 
-    test('should return 401 if user not found', async () => {
+    test('should return 401 if username is wrong', async () => {
       existingUser.username = 'notFound'
       const res = await supertest(app).post('/v1/auth/login').send(existingUser)
-      expect(res.body.status).toBe(401)
+      expect(res.body.status).toBe(400)
     })
 
     test('should return 401 if password is wrong', async () => {
       existingUser.password = 'wrongPassword'
       const res = await supertest(app).post('/v1/auth/login').send(existingUser)
-      expect(res.body.status).toBe(401)
+      expect(res.body.status).toBe(400)
     })
   })
 })

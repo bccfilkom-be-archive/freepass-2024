@@ -9,14 +9,14 @@ export const errorHandlerEndpoint = (error: Error, request: Request, response: R
   logger.error(error.message)
 
   if (error.name === 'CastError') {
-    return response.status(400).send({ status: 400, message: 'malformatted id' })
+    response.status(400).send({ status: 400, message: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ status: 400, message: error.message })
+    response.status(400).send({ status: 400, message: error.message })
   } else if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({ status: 401, message: 'invalid token' })
+    response.status(401).send({ status: 401, message: 'invalid token' })
   } else if (error.name === 'TokenExpiredError') {
-    return response.status(401).json({ status: 401, message: 'token expired' })
+    response.status(401).send({ status: 401, message: 'token expired' })
   } else {
-    next(error)
+    response.status(500).send({ status: 500, message: 'internal server error' })
   }
 }
