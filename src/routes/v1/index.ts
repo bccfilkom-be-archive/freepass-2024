@@ -1,6 +1,7 @@
 import express, { type Router } from 'express'
 import { docsRouter } from './docs.route'
 import { authRouter } from './auth.route'
+import { userRouter } from './user.route'
 
 export const router: Router = express.Router()
 
@@ -17,6 +18,10 @@ const defaultRoutes: Route[] = [
   {
     path: '/auth',
     route: authRouter
+  },
+  {
+    path: '/user',
+    route: userRouter
   }
 ]
 
