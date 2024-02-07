@@ -1,63 +1,67 @@
 const pool = require('../config/database');
+const { executeQuery } = require('../services/db');
 
 const viewCandidate = (req, res) => {
   const { username } = req.query;
 
-  if (!username) {
-    pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE status = 'candidate'`, (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-      if (results.length === 0) {
-        return res.status(400).json({ message: 'There is no candidate!' });
-      }
-      return res.json(results)
-    });
-  } else {
-    pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ? AND status = 'candidate'`, [username == null ? req.session.username : username], (userError, userResults) => {
-      if (userError) {
-        console.error(userError);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-  
+  const getUser = (username) => {
+    let userQuery = `SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE status = 'candidate'`;
+    const values = [];
+
+    if (username) {
+      userQuery += ` AND username = ?`;
+      values.push(username);
+    }
+
+    return executeQuery(userQuery, values);
+  };
+
+
+  const getPosts = (userId) => {
+    const postQuery = `SELECT * FROM post WHERE user_id = ?`;
+    return executeQuery(postQuery, [userId]);
+  };
+
+  const getComments = (postId) => {
+    const commentQuery = `
+    SELECT c.id, c.user_id, u.username AS username, u.name AS name, c.post_id, c.content, c.timestamp
+    FROM comment AS c
+    JOIN user u ON user_id = u.id 
+    WHERE post_id = ?`;
+    return executeQuery(commentQuery, [postId]);
+  };
+
+  getUser(username)
+    .then((userResults) => {
       if (userResults.length === 0) {
         return res.status(400).json({ message: 'Candidate not found!' });
       }
-  
-      const user = userResults[0];
-  
-      pool.query(`SELECT * FROM post WHERE user_id IN (SELECT id FROM user WHERE username = ?)`, [username], (error, posts) => {
-        if (error) {
-          console.error(error);
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
-  
-        if (posts.length === 0) {
-          return res.json({ profile: user, posts: {} });
-        }
-  
-        posts.map((post, index) => {
-          pool.query(`SELECT * FROM comment WHERE post_id = ?`, [post.id], (commentError, commentResults) => {
-            if (commentError) {
-              console.error(commentError);
-              return res.status(500).json({ error: 'Internal Server Error' });
-            }
-  
-            post.comments = commentResults;
-  
-            if (index === posts.length - 1) {
-              const candidateData = {
-                profile: user,
-                posts: posts
-              };
-              res.json(candidateData);
-            }
+
+      const getUsersPostsPromises = userResults.map((user) => {
+        return getPosts(user.id).then((posts) => {
+          const getCommentsPromises = posts.map((post) => {
+            return getComments(post.id);
           });
+
+          return Promise.all(getCommentsPromises)
+            .then((commentResults) => {
+              posts.forEach((post, index) => {
+                post.comments = commentResults[index];
+              });
+              return { profile: user, posts: posts };
+            });
         });
       });
-    }); 
-  }
+
+      return Promise.all(getUsersPostsPromises)
+        .then((candidateData) => {
+          res.json(candidateData);
+        });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
 };
 
 module.exports = {
