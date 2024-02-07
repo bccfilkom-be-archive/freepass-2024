@@ -1,9 +1,10 @@
-package middleware
+package middlewares
 
 import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+
 )
 
 func CORSMiddleware() gin.HandlerFunc {

@@ -6,7 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	middleware "github.com/AkbarFikri/freepassBCC-2024/middlewares"
-	routers "github.com/AkbarFikri/freepassBCC-2024/routes/auth"
+	authRoute "github.com/AkbarFikri/freepassBCC-2024/routes/auth"
+	postRoute "github.com/AkbarFikri/freepassBCC-2024/routes/post"
+
 )
 
 func SetupRoute() *gin.Engine {
@@ -19,7 +21,10 @@ func SetupRoute() *gin.Engine {
 	router.Use(middleware.CORSMiddleware())
 
 	auth := router.Group("/auth")
-	routers.AuthRoutes(auth)
+	authRoute.RegisterRoute(auth)
+
+	post := router.Group("/post", middleware.Auth())
+	postRoute.RegisterRoute(post)
 
 	return router
 }
