@@ -24,14 +24,14 @@ const checkUsername = (req, res, next) => {
     if (results.length === 0) {
       next();
     } else {
-      return res.status(400).json({ error: 'Username already used!' });
+      return res.status(409).json({ error: 'Username already used!' });
     }
   });
 }
 
 const checkLogOut = (req, res, next) => {
   if (req.session.loggedin) {
-    return res.status(400).json({ error: 'You must logout before accessing this route!' });
+    return res.status(401).json({ error: 'You must logout before accessing this route!' });
   } else {
     next();
   }

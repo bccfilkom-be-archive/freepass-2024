@@ -35,7 +35,7 @@ CREATE TABLE election (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL
 );
 
 CREATE TABLE vote (

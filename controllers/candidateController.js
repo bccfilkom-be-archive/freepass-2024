@@ -22,7 +22,7 @@ const viewCandidate = (req, res) => {
       }
 
       if (posts.length === 0) {
-        return res.status(400).json({ message: 'No result' });
+        return res.json({profile: user, posts: {}});
       }
 
       posts.map((post, index) => {

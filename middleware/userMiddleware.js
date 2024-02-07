@@ -15,7 +15,7 @@ const checkUserExistence = (req, res, next) => {
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found!' });
       }
 
       next();
@@ -28,7 +28,7 @@ const checkUserExistence = (req, res, next) => {
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found!' });
       }
 
       next();
