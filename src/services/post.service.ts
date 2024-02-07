@@ -16,3 +16,7 @@ export const findPostByField = async (field: string, value: string) => {
 export const updatePostById = async (id: string, payload: UpdatePostForm) => {
   return await Post.findByIdAndUpdate(id, payload, { new: true })
 }
+
+export const deletePostById = async (id: string) => {
+  return await Post.findByIdAndDelete(id)
+}

@@ -217,4 +217,101 @@ describe('postRoutes', () => {
       expect(res.body.status).toBe(403)
     })
   })
+
+  describe('delete /v1/post/:id', () => {
+    let newCandidate: RegisterForm
+    let newUser: RegisterForm
+    let postId: string
+    let token: string
+    beforeAll(async () => {
+      newCandidate = {
+        fullName: 'valid full name',
+        username: 'validusername5',
+        nim: '2315020011101115',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail5@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newCandidate).expect(201)
+
+      newUser = {
+        fullName: 'valid full name',
+        username: 'validusername6',
+        nim: '2315020011101116',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail6@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newUser).expect(201)
+
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000003',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin3@gmail.com',
+        username: 'admin3',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+
+      token = (
+        await supertest(app).post('/v1/auth/login').send({ username: 'admin3', password: 'password' }).expect(200)
+      ).body.data
+
+      const userCandidate = await findUserByField('username', newCandidate.username)
+      if (userCandidate) {
+        await supertest(app).post(`/v1/admin/${userCandidate._id}`).set('Authorization', `Bearer ${token}`).expect(200)
+      }
+
+      token = (
+        await supertest(app)
+          .post('/v1/auth/login')
+          .send({ username: newCandidate.username, password: newCandidate.password })
+          .expect(200)
+      ).body.data
+      const payload = {
+        caption: 'valid caption'
+      }
+      await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
+
+      if (userCandidate) {
+        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        if (candidate) {
+          const post = await findPostByField('candidateId', candidate._id.toString())
+          if (post) {
+            postId = post._id.toString()
+          }
+        }
+      }
+    })
+
+    test("should return 200 if id and logged user's role is correct", async () => {
+      const res = await supertest(app).delete(`/v1/post/${postId}`).set('Authorization', `Bearer ${token}`)
+      expect(res.body.status).toBe(200)
+
+      const user = await findUserByField('username', newCandidate.username)
+      if (user) {
+        const candidate = await findCandidateByField('userId', user._id.toString())
+        if (candidate) {
+          const post = await findPostByField('candidateId', candidate._id.toString())
+          if (post) {
+            expect(post).not.toBeDefined()
+            expect(candidate.posts).not.toEqual([post._id])
+            expect(res.body.status).toBe(200)
+          }
+        }
+      }
+    })
+
+    test('should return 403 forbidden if token is wrong or empty', async () => {
+      token = 'wrongtoken'
+      const res = await supertest(app).delete(`/v1/post/${postId}`).set('Authorization', `Bearer ${token}`)
+      expect(res.body.status).toBe(403)
+    })
+  })
 })

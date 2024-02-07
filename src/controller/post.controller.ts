@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import { createFormValidation, updatePostValidation } from '../validation/post.validation'
 import type { CreatePostForm, UpdatePostForm } from '../types/post.type'
-import { createPostForId, findPostById, updatePostById } from '../services/post.service'
+import { createPostForId, deletePostById, findPostById, updatePostById } from '../services/post.service'
 import { logger } from '../utils/logger'
 import { findCandidateByField } from '../services/candidate.service'
 
@@ -46,6 +46,32 @@ export const updatePost = async (req: Request, res: Response, next: NextFunction
   } catch (error: any) {
     if (error.message.includes('not found')) {
       logger.error('post - update - searching in db: ', error.message)
+      res.status(404).send({ status: 404, message: error.message })
+    } else {
+      next(error)
+    }
+  }
+}
+
+export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
+  const postId = req.params.postId
+
+  try {
+    const post = await findPostById(postId)
+    if (!post) throw new Error('post not found')
+
+    await deletePostById(postId)
+
+    const userId: string = res.locals.user._doc._id
+    const candidate = await findCandidateByField('userId', userId)
+    if (candidate) {
+      candidate.posts = candidate.posts.filter((post) => post._id.toString() !== postId.toString())
+      await candidate.save()
+    }
+    return res.status(200).send({ status: 200, message: 'delete post success' })
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      logger.error('post - delete - searching in db: ', error.message)
       res.status(404).send({ status: 404, message: error.message })
     } else {
       next(error)
