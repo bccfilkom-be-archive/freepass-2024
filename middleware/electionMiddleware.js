@@ -18,31 +18,36 @@ const checkCandidate = (req, res, next) => {
 };
 
 const checkElection = (req, res, next) => {
-  const { election_id: id } = req.body;
+  const { election_id: id, } = req.body;
+  const { id: idQuery } = req.query;
 
-  pool.query(`SELECT * FROM election WHERE id = ?`, [id], (error, results) => {
-    if (error) {
-      console.log(error);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
+  if (!id && !idQuery) {
+    return next();
+  } else {
+    pool.query(`SELECT * FROM election WHERE id = ?`, [id ? id : idQuery], (error, results) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Election not found!' });
-    }
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Election not found!' });
+      }
 
-    const election = results[0];
-    const currentDate = new Date();
+      const election = results[0];
+      const currentDate = new Date();
 
-    if (currentDate < new Date(election.start_date)) {
-      return res.status(401).json({ error: 'Election has not started yet!' });
-    }
+      if (currentDate < new Date(election.start_date)) {
+        return res.status(401).json({ error: 'Election has not started yet!' });
+      }
 
-    if (currentDate > new Date(election.end_date)) {
-      return res.status(401).json({ error: 'Election has finished!' });
-    }
+      if (currentDate > new Date(election.end_date)) {
+        return res.status(401).json({ error: 'Election has finished!' });
+      }
 
-    next();
-  });
+      next();
+    });
+  }
 };
 
 const checkVote = (req, res, next) => {
