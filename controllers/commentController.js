@@ -2,18 +2,15 @@ const pool = require('../config/database');
 
 const viewComment = (req, res) => {
   const { id, 'post-id': postId, username } = req.query;
-
   if (id) {
     pool.query(`SELECT * FROM comment WHERE id = ?`, [id], (error, results) => {
       if (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
       }
-
       if (results.length === 0) {
         return res.status(400).json({ error: 'No results' });
       }
-
       res.json({ results });
     });
   } else if (postId) {
@@ -22,11 +19,9 @@ const viewComment = (req, res) => {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
       }
-
       if (results.length === 0) {
         return res.status(400).json({ error: 'No results' });
       }
-
       res.json({ results });
     });
   } else if (username) {
@@ -35,17 +30,14 @@ const viewComment = (req, res) => {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
       }
-
       if (results.length === 0) {
         return res.status(400).json({ error: 'No results' });
       }
-
       res.json({ results });
     });
   } else {
     return res.status(400).json({ error: 'Provide id, postId, or username!' });
   }
-
 };
 
 const addComment = (req, res) => {

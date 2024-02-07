@@ -22,7 +22,20 @@ const createElection = (req, res) => {
   });
 };
 
+const editElection = (req, res) => {
+  const { id } = req.query;
+  const { name, start_date: startDate, end_date: endDate } = req.body;
+  pool.query(`UPDATE election SET name = ?, start_date = ?, end_date = ? WHERE id = ?`, [name, startDate, endDate, id], (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+    res.json({ message: 'Election edited successfully' });
+  });
+};
+
 module.exports = {
   castVote,
-  createElection
+  createElection,
+  editElection
 }

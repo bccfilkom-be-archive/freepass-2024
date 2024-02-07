@@ -12,6 +12,14 @@ const voteRoutes = require('./routes/voteRoutes');
 const app = express();
 const port = process.env.PORT || 3000;
 
+const apiKeyMiddleware = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || apiKey !== 'x-api-key') {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  next();
+};
+
 app.use(bodyParser.json());
 
 app.use(session({
@@ -19,6 +27,8 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
+
+app.use('/api', apiKeyMiddleware);
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);

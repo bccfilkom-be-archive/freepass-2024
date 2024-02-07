@@ -7,6 +7,7 @@ const voteMiddleware = require('../middleware/voteMiddleware')
 
 router.post('/', authMiddleware.authenticateUser, voteMiddleware.checkVote, voteMiddleware.checkElection, voteMiddleware.checkCandidate, voteController.castVote);
 
-router.post('/create', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), voteController.createElection);
+router.post('/election', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), voteController.createElection);
+router.put('/election', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), voteController.editElection);
 
 module.exports = router;
