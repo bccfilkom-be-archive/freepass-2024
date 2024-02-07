@@ -51,7 +51,7 @@ export const viewUser = async (req: Request, res: Response, next: NextFunction) 
     const id = await findUserById(userId)
     if (!id) throw new Error('id not found')
 
-    return res.status(200).send({ status: 200, message: 'view id success', data: id })
+    return res.status(200).send({ status: 200, message: 'view user by id success', data: id })
   } catch (error: any) {
     if (error.message.includes('not found')) {
       res.status(404).send({ status: 404, message: error.message })
