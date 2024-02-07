@@ -43,3 +43,20 @@ export const viewAllUsers = async (req: Request, res: Response, next: NextFuncti
     .status(200)
     .send({ status: 200, message: 'get all users success', data: { ...users, length: users.length } })
 }
+
+export const viewUser = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.params.id
+
+  try {
+    const id = await findUserById(userId)
+    if (!id) throw new Error('id not found')
+
+    return res.status(200).send({ status: 200, message: 'view id success', data: id })
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      res.status(404).send({ status: 404, message: error.message })
+    } else {
+      next(error)
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { User } from '../models/user.model'
 import type { UpdateUserForm } from '../types/user.type'
 import type { RegisterForm } from '../types/auth.type'
 import { hashing } from '../utils/bcrypt'
+import { findUserByField } from '../services/user.service'
 
 describe('userRoutes', () => {
   beforeAll(async () => {
@@ -133,6 +134,65 @@ describe('userRoutes', () => {
       ).body.data
       const res = await supertest(app).get('/v1/user').set('Authorization', `Bearer ${token}`)
       expect(res.body.status).toBe(403)
+    })
+  })
+
+  describe('get /v1/user/:id', () => {
+    let newUser: RegisterForm
+    beforeAll(async () => {
+      newUser = {
+        fullName: 'valid full name',
+        username: 'validusername2',
+        nim: '231502001110112',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail2@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newUser)
+
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000002',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin2@gmail.com',
+        username: 'admin2',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+    })
+
+    test("should return 200 if id is ok and logged user's role correct", async () => {
+      const token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin2', password: 'password' }))
+        .body.data
+      const user = await findUserByField('username', newUser.username)
+      if (user) {
+        const res = await supertest(app).get(`/v1/user/${user._id}`).set('Authorization', `Bearer ${token}`)
+        expect(res.body.status).toBe(200)
+      }
+    })
+
+    test('should return 400 if id is not ok', async () => {
+      const token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin2', password: 'password' }))
+        .body.data
+
+      const userId = 'wronguserid'
+      const res = await supertest(app).get(`/v1/user/${userId}`).set('Authorization', `Bearer ${token}`)
+      expect(res.body.status).toBe(400)
+    })
+
+    test("should return 403 if logged user's role not correct", async () => {
+      const token = (
+        await supertest(app).post('/v1/auth/login').send({ username: newUser.username, password: newUser.password })
+      ).body.data
+      const user = await findUserByField('username', newUser.username)
+      if (user) {
+        const res = await supertest(app).get(`/v1/user/${user._id}`).set('Authorization', `Bearer ${token}`)
+        expect(res.body.status).toBe(403)
+      }
     })
   })
 })
