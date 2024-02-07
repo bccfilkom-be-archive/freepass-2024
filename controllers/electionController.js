@@ -37,37 +37,54 @@ const editElection = (req, res) => {
 const viewElection = (req, res) => {
   const { id: electionId } = req.query;
 
-  if (electionId) {
-    pool.query(`SELECT * FROM election WHERE id = ?`, [electionId], (error, elections) => {
-      if (error) {
-        console.log(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-  
-      pool.query(`
-      SELECT u.username AS username, u.name AS name, candidate_id AS id, COUNT(*) AS vote_count 
-      FROM vote
-      JOIN user u ON candidate_id = u.id
-      WHERE election_id = ?
-      GROUP BY candidate_id
-    `, [electionId], (error, counts) => {
+  const fetchElectionInfo = () => {
+    return new Promise((resolve, reject) => {
+      const query = electionId ? 'SELECT * FROM election WHERE id = ?' : 'SELECT * FROM election';
+      pool.query(query, [electionId], (error, elections) => {
         if (error) {
           console.error(error);
-          return res.status(500).json({ error: 'Internal Server Error' });
+          reject('Internal Server Error');
+        } else {
+          resolve(elections);
         }
-        res.json({ information: elections[0], counts: counts });
       });
     });
-  } else {
-    pool.query(`SELECT * FROM election`, (error, elections) => {
-      if (error) {
-        console.log(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+  };
+
+  const fetchVoteCounts = () => {
+    return new Promise((resolve, reject) => {
+      if (!electionId) {
+        resolve([]);
+      } else {
+        pool.query(`
+          SELECT u.username AS username, u.name AS name, candidate_id AS id, COUNT(*) AS vote_count 
+          FROM vote
+          JOIN user u ON candidate_id = u.id
+          WHERE election_id = ?
+          GROUP BY candidate_id
+        `, [electionId], (error, counts) => {
+          if (error) {
+            console.error(error);
+            reject('Internal Server Error');
+          } else {
+            resolve(counts);
+          }
+        });
       }
-      
-      res.json(elections);
     });
-  }
+  };
+
+  Promise.all([fetchElectionInfo(), fetchVoteCounts()])
+    .then(([elections, counts]) => {
+      if (electionId && elections.length === 0) {
+        res.status(400).json({ error: 'No election found' });
+      } else {
+        res.json({ information: elections[0], counts: counts });
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    });
 };
 
 module.exports = {

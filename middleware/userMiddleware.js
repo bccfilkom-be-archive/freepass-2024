@@ -40,7 +40,7 @@ const checkUserStatus = (requiredStatus) => {
   return (req, res, next) => {
     if (!requiredStatus.includes(req.session.status)) {
       return res.status(403).json({
-        error: `Forbidden - Insufficient privileges, only ${requiredStatus.join(' or ')} can access`,
+        error: `Insufficient privileges, only ${requiredStatus.join(' or ')} can access`,
       });
     }
     next();

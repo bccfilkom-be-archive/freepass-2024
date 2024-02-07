@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const pool = require('../config/database');
 
 const viewAllUsers = (req, res) => {
-  pool.query(`SELECT * FROM user`, (error, results) => {
+  pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user`, (error, results) => {
     if (error) throw error;
     res.json(results);
   });
@@ -11,17 +11,30 @@ const viewAllUsers = (req, res) => {
 const viewUser = (req, res) => {
   const { username } = req.query;
 
-  pool.query(`SELECT * FROM user WHERE username = ?`, [username == null ? req.session.username : username], (error, results) => {
-    if (error) {
-      console.error(error);
-    }
+  const queryUser = (username) => {
+    return new Promise((resolve, reject) => {
+      pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ?`, [username], (error, results) => {
+        if (error) {
+          console.error(error);
+          reject('Internal Server Error');
+        } else {
+          resolve(results);
+        }
+      });
+    });
+  };
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(results);
-  });
+  queryUser(username == null ? req.session.username : username)
+    .then((results) => {
+      if (results.length === 0) {
+        res.status(404).json({ error: 'User not found' });
+      } else {
+        res.json(results);
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error });
+    });
 };
 
 const editProfile = (req, res) => {

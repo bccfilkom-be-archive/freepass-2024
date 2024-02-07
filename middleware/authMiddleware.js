@@ -4,14 +4,14 @@ const authenticateUser = (req, res, next) => {
   if (req.session.loggedin) {
     next();
   } else {
-    return res.status(401).json({ error: 'Unauthorized - Please log in' });
+    return res.status(401).json({ error: 'Please log in' });
   }
 };
 
 const checkUsername = (req, res, next) => {
   const { username } = req.body;
 
-  if (!username) {
+  if (!username || (req.session.username == username)) {
     return next();
   }
 

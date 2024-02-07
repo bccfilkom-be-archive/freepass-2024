@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const { executeQuery } = require('../services/db');
 const pool = require('../config/database');
 
 const register = (req, res) => {
@@ -29,33 +30,36 @@ const login = (req, res) => {
   const { username, password } = req.body;
 
   if (username && password) {
-    pool.query(`SELECT * FROM user WHERE username = ?`, [username], (error, results) => {
-      if (error) {
+    const query = `SELECT * FROM user WHERE username = ?`;
+    const values = [username];
+
+    executeQuery(query, values)
+      .then((results) => {
+        if (results.length > 0) {
+          const storedHashedPassword = results[0].password;
+          const status = results[0].status;
+          const userId = results[0].id;
+
+          bcrypt.compare(password, storedHashedPassword, (err, passwordMatch) => {
+            if (err || !passwordMatch) {
+              return res.status(401).json({ error: 'Incorrect Username and/or Password!' });
+            }
+
+            req.session.loggedin = true;
+            req.session.username = username;
+            req.session.status = status;
+            req.session.userId = userId;
+
+            res.json({ message: 'User logged in successfully', username });
+          });
+        } else {
+          res.status(401).json({ error: 'Incorrect Username and/or Password!' });
+        }
+      })
+      .catch((error) => {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
-      }
-
-      if (results.length > 0) {
-        const storedHashedPassword = results[0].password;
-        const status = results[0].status;
-        const userId = results[0].id;
-
-        bcrypt.compare(password, storedHashedPassword, (err, passwordMatch) => {
-          if (err || !passwordMatch) {
-            return res.status(401).json({ error: 'Incorrect Username and/or Password!' });
-          }
-
-          req.session.loggedin = true;
-          req.session.username = username;
-          req.session.status = status;
-          req.session.userId = userId;
-
-          res.json({ message: 'User logged in successfully', username });
-        });
-      } else {
-        res.status(401).json({ error: 'Incorrect Username and/or Password!' });
-      }
-    });
+      });
   } else {
     res.status(400).json({ error: 'Please enter Username and Password!' });
   }

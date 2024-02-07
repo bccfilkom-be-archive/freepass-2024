@@ -1,5 +1,7 @@
 CREATE DATABASE backend_bcc;
 
+USE backend_bcc;
+
 CREATE TABLE user (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nim BIGINT,
@@ -17,7 +19,7 @@ CREATE TABLE post (
     user_id INT,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
