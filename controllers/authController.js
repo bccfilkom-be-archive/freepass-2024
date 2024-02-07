@@ -15,15 +15,18 @@ const register = (req, res) => {
       return res.status(500).json({ error: 'Internal Server Error' });
     }
 
-    pool.query(`INSERT INTO user (nim, name, username, password, major, faculty, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nim, name, username, hash, major, faculty, status ? status : 'user', description], (error, results) => {
-        if (error) {
-          console.error(error);
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
+    let query = `INSERT INTO user (nim, name, username, password, major, faculty, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    let values = [nim, name, username, hash, major, faculty, status ? status : 'user', description];
+
+    executeQuery(query, values)
+      .then(() => {
         res.json({ message: 'User registered successfully', username });
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
       });
-  });
+});
 };
 
 const login = (req, res) => {
