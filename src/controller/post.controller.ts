@@ -78,3 +78,21 @@ export const deletePost = async (req: Request, res: Response, next: NextFunction
     }
   }
 }
+
+export const viewPost = async (req: Request, res: Response, next: NextFunction) => {
+  const postId = req.params.id
+
+  try {
+    const post = await findPostById(postId)
+    if (!post) throw new Error('post not found')
+
+    return res.status(200).send({ status: 200, message: 'view post success', data: post })
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      logger.error('post - delete - searching in db: ', error.message)
+      res.status(404).send({ status: 404, message: error.message })
+    } else {
+      next(error)
+    }
+  }
+}

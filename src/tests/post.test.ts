@@ -314,4 +314,88 @@ describe('postRoutes', () => {
       expect(res.body.status).toBe(403)
     })
   })
+
+  describe('get /v1/post/:id', () => {
+    let newCandidate: RegisterForm
+    let newUser: RegisterForm
+    let postId: string
+    let token: string
+    beforeAll(async () => {
+      newCandidate = {
+        fullName: 'valid full name',
+        username: 'validusername7',
+        nim: '2315020011101117',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail7@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newCandidate).expect(201)
+
+      newUser = {
+        fullName: 'valid full name',
+        username: 'validusername8',
+        nim: '2315020011101118',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail8@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newUser).expect(201)
+
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000004',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin4@gmail.com',
+        username: 'admin4',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+
+      token = (
+        await supertest(app).post('/v1/auth/login').send({ username: 'admin4', password: 'password' }).expect(200)
+      ).body.data
+
+      const userCandidate = await findUserByField('username', newCandidate.username)
+      if (userCandidate) {
+        await supertest(app).post(`/v1/admin/${userCandidate._id}`).set('Authorization', `Bearer ${token}`).expect(200)
+      }
+
+      token = (
+        await supertest(app)
+          .post('/v1/auth/login')
+          .send({ username: newCandidate.username, password: newCandidate.password })
+          .expect(200)
+      ).body.data
+      const payload = {
+        caption: 'valid caption'
+      }
+      await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
+
+      if (userCandidate) {
+        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        if (candidate) {
+          const post = await findPostByField('candidateId', candidate._id.toString())
+          if (post) {
+            postId = post._id.toString()
+          }
+        }
+      }
+    })
+
+    test('should return 200 if id is correct', async () => {
+      const res = await supertest(app).get(`/v1/post/${postId}`)
+      expect(res.body.status).toBe(200)
+    })
+
+    test('should return 400 if id is not correct', async () => {
+      postId = 'wrongid'
+      const res = await supertest(app).get(`/v1/post/${postId}`)
+      expect(res.body.status).toBe(400)
+    })
+  })
 })
