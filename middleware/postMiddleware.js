@@ -1,7 +1,7 @@
 const pool = require('../config/database');
 
 const checkPostExistence = (req, res, next) => {
-  const { id, postId } = req.query;
+  const { id, 'post-id': postId } = req.query;
 
   let targetId;
 

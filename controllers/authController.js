@@ -4,8 +4,8 @@ const pool = require('../config/database');
 const register = (req, res) => {
   const { nim, name, username, password, major, faculty, status, description } = req.body;
 
-  if (!username || !password || !status) {
-    return res.status(400).json({ error: 'Provide at least username, password, and status!' });
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Provide at least username and password' });
   }
 
   bcrypt.hash(password, 10, (err, hash) => {
@@ -15,7 +15,7 @@ const register = (req, res) => {
     }
 
     pool.query(`INSERT INTO user (nim, name, username, password, major, faculty, status, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nim, name, username, hash, major, faculty, status, description], (error, results) => {
+      [nim, name, username, hash, major, faculty, status ? status : 'user', description], (error, results) => {
         if (error) {
           console.error(error);
           return res.status(500).json({ error: 'Internal Server Error' });

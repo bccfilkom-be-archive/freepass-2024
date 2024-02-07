@@ -8,7 +8,7 @@ CREATE TABLE user (
     password VARCHAR(255) NOT NULL,
     major TEXT,
     faculty TEXT,
-    status TEXT NOT NULL,
+    status ENUM('user', 'candidate', 'admin') NOT NULL,
     description TEXT
 );
 
@@ -29,4 +29,23 @@ CREATE TABLE comment (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE
+);
+
+CREATE TABLE election (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+);
+
+CREATE TABLE vote (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    election_id INT NOT NULL,
+    candidate_id INT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (candidate_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (election_id) REFERENCES election(id) ON DELETE CASCADE,
+    UNIQUE (user_id, election_id)
 );

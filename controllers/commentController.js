@@ -1,12 +1,17 @@
 const pool = require('../config/database');
 
 const viewComment = (req, res) => {
-  const { id, postId, username } = req.query;
+  const { id, 'post-id': postId, username } = req.query;
 
   if (id) {
     pool.query(`SELECT * FROM comment WHERE id = ?`, [id], (error, results) => {
       if (error) {
         console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      if (results.length === 0) {
+        return res.status(400).json({ error: 'No results' });
       }
 
       res.json({ results });
@@ -15,6 +20,11 @@ const viewComment = (req, res) => {
     pool.query(`SELECT * FROM comment WHERE post_id = ?`, [postId], (error, results) => {
       if (error) {
         console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      if (results.length === 0) {
+        return res.status(400).json({ error: 'No results' });
       }
 
       res.json({ results });
@@ -23,6 +33,11 @@ const viewComment = (req, res) => {
     pool.query(`SELECT * FROM comment WHERE user_id IN (SELECT id FROM user WHERE username = ?)`, [username], (error, results) => {
       if (error) {
         console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      if (results.length === 0) {
+        return res.status(400).json({ error: 'No results' });
       }
 
       res.json({ results });
@@ -34,7 +49,7 @@ const viewComment = (req, res) => {
 };
 
 const addComment = (req, res) => {
-  const { postId } = req.query;
+  const { 'post-id': postId } = req.query;
   const { content } = req.body;
   pool.query(`INSERT INTO comment (user_id, post_id, content) VALUES (?, ?, ?)`, [req.session.userId, postId, content], (error, results) => {
     if (error) {

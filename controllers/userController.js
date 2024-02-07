@@ -126,7 +126,12 @@ const deleteUser = (req, res) => {
 };
 
 const editStatus = (req, res) => {
-  const { username, status } = req.body;
+  const { username } = req.query;
+  const { status } = req.body;
+
+  if (!username) {
+    return res.status(400).json({ error: 'Provide username in query!' });
+  }
   
   if (username == req.session.username) {
     req.session.status = status;

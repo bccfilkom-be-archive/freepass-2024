@@ -19,10 +19,10 @@ app.use(session({
   saveUninitialized: true
 }));
 
-app.use('/api/user', userRoutes);
-app.use('/api/post', postRoutes);
-app.use('/api/comment', commentRoutes);
-app.use('/api/candidate', candidateRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/candidates', candidateRoutes);
 app.use('/api', authRoutes);
 
 app.listen(port, () => {
