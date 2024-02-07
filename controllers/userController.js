@@ -1,39 +1,34 @@
 const bcrypt = require('bcrypt');
 const pool = require('../config/database');
+const { executeQuery } = require('../services/db');
 
 const viewAllUsers = (req, res) => {
-  pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user`, (error, results) => {
-    if (error) throw error;
-    res.json(results);
-  });
+  executeQuery(`SELECT id, nim, username, name, major, faculty, status, description FROM user`, [])
+    .then((results) => {
+      return res.json(results);
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    })
 };
 
 const viewUser = (req, res) => {
   const { username } = req.query;
 
-  const queryUser = (username) => {
-    return new Promise((resolve, reject) => {
-      pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ?`, [username], (error, results) => {
-        if (error) {
-          console.error(error);
-          reject('Internal Server Error');
-        } else {
-          resolve(results);
-        }
-      });
-    });
-  };
+  let query = `SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ?`;
 
-  queryUser(username == null ? req.session.username : username)
+  executeQuery(query, [username == null ? req.session.username : username])
     .then((results) => {
       if (results.length === 0) {
-        res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found' });
       } else {
-        res.json(results);
+        return res.json(results);
       }
     })
     .catch((error) => {
-      res.status(500).json({ error: error });
+      console.log(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     });
 };
 
@@ -55,6 +50,7 @@ const editProfile = (req, res) => {
   if (username) {
     updateFields.username = username;
     updateValues.push(username);
+    req.session.username = username;
   }
 
   if (password) {
@@ -87,13 +83,14 @@ const editProfile = (req, res) => {
 
   const updateQuery = `UPDATE user SET ` + Object.keys(updateFields).map(key => `${key} = ?`).join(`, `) + ` WHERE id = ?`;
 
-  pool.query(updateQuery, updateValues, (error, results) => {
-    if (error) {
+  executeQuery(updateQuery, updateValues)
+    .then(() => {
+      return res.json({ message: 'User profile updated successfully' });
+    })
+    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: 'Internal Server Error' });
-    }
-    res.json({ message: 'User profile updated successfully' });
-  });
+    })
 };
 
 const deleteUser = (req, res) => {
@@ -111,35 +108,28 @@ const deleteUser = (req, res) => {
     return res.status(403).json({ error: 'You cannot delete your own account' });
   }
 
+  let deleteQuery = 'DELETE FROM user WHERE ';
+  let deleteParams = [];
+
   if (id) {
-    pool.query(`DELETE FROM user WHERE id = ?`, [id], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
+    deleteQuery += 'id = ?';
+    deleteParams.push(id);
+  } else if (username) {
+    deleteQuery += 'username = ?';
+    deleteParams.push(username);
+  }
 
+  executeQuery(deleteQuery, deleteParams)
+    .then((results) => {
       if (results.affectedRows === 0) {
         return res.status(404).json({ error: 'User not found' });
       }
-
-      res.json({ message: 'User deleted succesfully' })
+      return res.json({ message: 'User deleted successfully' });
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
     });
-  }
-
-  if (username) {
-    pool.query(`DELETE FROM user WHERE username = ?`, [username], (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      }
-
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-
-      res.json({ message: 'User deleted succesfully' })
-    });
-  }
 };
 
 const editStatus = (req, res) => {
@@ -149,18 +139,21 @@ const editStatus = (req, res) => {
   if (!username) {
     return res.status(400).json({ error: 'Provide username in query!' });
   }
-  
+
   if (username == req.session.username) {
     req.session.status = status;
   }
 
-  pool.query(`UPDATE user SET status = ? WHERE username = ?`, [status, username], (error, results) => {
-    if (error) {
+  let query = `UPDATE user SET status = ? WHERE username = ?`;
+
+  executeQuery(query, [status, username])
+    .then(() => {
+      return res.json({ message: 'User status updated successfully' });
+    })
+    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: 'Internal Server Error' });
-    }
-    res.json({ message: 'User status updated successfully' });
-  });
+    });
 };
 
 module.exports = {
