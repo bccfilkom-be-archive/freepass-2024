@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from 'express'
 import { findUserById, updateUserById, findUserByField } from '../services/user.service'
 import { updateUserValidation } from '../validation/user.validation'
 import type { UpdateUserForm } from '../types/user.type'
-import { logger } from '../utils/logger'
 
 export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const id: string = res.locals.user._doc._id
@@ -31,7 +30,6 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     return res.status(200).send({ status: 200, message: 'user update success', data: payload })
   } catch (error: any) {
     if (error.message.includes('has been taken')) {
-      logger.error('user - update - searching in db: ', error.message)
       res.status(400).send({ status: 400, message: error.message })
     } else {
       next(error)

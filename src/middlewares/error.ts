@@ -1,13 +1,10 @@
 import { type Request, type Response, type NextFunction } from 'express'
-import { logger } from '../utils/logger'
 
 export const unknownEndpoint = (request: Request, response: Response) => {
   response.status(404).send({ status: 404, message: 'unknown endpoint' })
 }
 
 export const errorHandlerEndpoint = (error: Error, request: Request, response: Response, next: NextFunction) => {
-  logger.error(error.message)
-
   if (error.name === 'CastError') {
     response.status(400).send({ status: 400, message: 'malformatted id' })
   } else if (error.name === 'ValidationError') {

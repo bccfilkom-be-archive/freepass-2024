@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { createUserValidation, loginValidation } from '../validation/auth.validation'
 import type { RegisterForm, LoginForm } from '../types/auth.type'
-import { logger } from '../utils/logger'
 import { createUser, findUserByUsername } from '../services/auth.service'
 import { checkPassword, hashing } from '../utils/bcrypt'
 import { signJWT } from '../utils/jwt'
@@ -30,7 +29,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     return res.status(201).send({ status: 201, message: `create user success. please login ${user.username}` })
   } catch (error: any) {
     if (error.message.includes('has been taken')) {
-      logger.error('user - update - searching in db: ', error.message)
       res.status(400).send({ status: 400, message: error.message })
     } else {
       next(error)
@@ -54,7 +52,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     return res.status(200).send({ status: 200, message: 'login success', data: token })
   } catch (error: any) {
     if (error.message.includes('is wrong')) {
-      logger.error('user - update - searching in db: ', error.message)
       res.status(400).send({ status: 400, message: error.message })
     } else {
       next(error)
