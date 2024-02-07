@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { findUserById, findUserByIdAndPromote } from '../services/user.service'
+import { createCandidate } from '../services/candidate.service'
 
 export const promoteUser = async (req: Request, res: Response, next: NextFunction) => {
   const id: string = req.params.id
@@ -10,6 +11,7 @@ export const promoteUser = async (req: Request, res: Response, next: NextFunctio
     if (user) {
       if (user.role === 'admin') throw new Error('cannot promote admin')
       await findUserByIdAndPromote(id)
+      await createCandidate(id)
     } else {
       throw new Error('cannot promote user')
     }

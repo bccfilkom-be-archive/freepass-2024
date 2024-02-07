@@ -5,6 +5,8 @@ import { app } from '../app'
 import { User } from '../models/user.model'
 import type { RegisterForm } from '../types/auth.type'
 import { hashing } from '../utils/bcrypt'
+import { findUserByField } from '../services/user.service'
+import { findCandidateByField } from '../services/candidate.service'
 
 describe('adminRoutes', () => {
   beforeAll(async () => {
@@ -49,13 +51,18 @@ describe('adminRoutes', () => {
       const token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin', password: 'password' })).body
         .data
 
-      let user = await User.findOne({ username: newUser.username })
+      let user = await findUserByField('username', newUser.username)
 
       const res = await supertest(app).post(`/v1/admin/${user?._id}`).set('Authorization', `Bearer ${token}`)
       expect(res.body.status).toBe(200)
 
-      user = await User.findOne({ username: newUser.username })
+      user = await findUserByField('username', newUser.username)
       expect(user?.role).toEqual('candidate')
+
+      if (user) {
+        const candidate = await findCandidateByField('userId', user._id.toString())
+        expect(candidate).toBeDefined()
+      }
     })
 
     test('should return 400 if id is wrong', async () => {
