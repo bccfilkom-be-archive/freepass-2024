@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const pool = require('../config/database');
 
 const viewAllUsers = (req, res) => {
-  pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user`, (error, results) => {
+  pool.query(`SELECT * FROM user`, (error, results) => {
     if (error) throw error;
     res.json(results);
   });
@@ -11,7 +11,7 @@ const viewAllUsers = (req, res) => {
 const viewUser = (req, res) => {
   const { username } = req.query;
 
-  pool.query(`SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ?`, [username == null ? req.session.username : username], (error, results) => {
+  pool.query(`SELECT * FROM user WHERE username = ?`, [username == null ? req.session.username : username], (error, results) => {
     if (error) {
       console.error(error);
     }
@@ -92,6 +92,10 @@ const deleteUser = (req, res) => {
 
   if (id && username) {
     return res.status(400).json({ error: 'Provide either id or username, not both' });
+  }
+
+  if (id == req.session.userId || username == req.session.username) {
+    return res.status(403).json({ error: 'You cannot delete your own account' });
   }
 
   if (id) {
