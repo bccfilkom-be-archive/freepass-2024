@@ -59,7 +59,7 @@ const deleteComment = (req, res) => {
 
   executeQuery(query, values)
     .then(() => {
-      res.json({ message: 'Comment deleted successfully successfully' });
+      res.json({ message: 'Comment deleted successfully' });
     })
     .catch((error) => {
       console.error(error);

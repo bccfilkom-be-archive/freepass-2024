@@ -1,19 +1,20 @@
 const pool = require('../config/database');
+const { executeQuery } = require('../services/db');
 
 const checkCommentExistence = (req, res, next) => {
   const { id } = req.query;
 
-  pool.query(`SELECT * FROM comment WHERE id = ?`, [id], (error, results) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
+  executeQuery(`SELECT * FROM comment WHERE id = ?`, [id])
+  .then((results) => {
     if (results.length === 0) {
       return res.status(404).json({ error: 'Comment not found' });
+    } else {
+      next();
     }
-
-    next();
+  })
+  .catch((error) => {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   });
 };
 
