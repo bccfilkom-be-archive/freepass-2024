@@ -10,5 +10,6 @@ router.post('/vote', authMiddleware.authenticateUser, voteMiddleware.checkVote, 
 router.get('/', authMiddleware.authenticateUser, voteController.viewElection);
 router.post('/', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), voteController.createElection);
 router.put('/:id', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), voteController.editElection);
+router.delete('/:id', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), voteController.deleteElection);
 
 module.exports = router;

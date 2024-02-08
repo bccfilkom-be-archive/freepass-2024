@@ -1,3 +1,5 @@
+CREATE DATABASE backend_bcc;
+
 USE backend_bcc;
 
 CREATE TABLE user (

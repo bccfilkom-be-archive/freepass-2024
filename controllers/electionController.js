@@ -24,29 +24,41 @@ const castVote = (req, res) => {
 const createElection = (req, res) => {
   const { name, start_date: startDate, end_date: endDate } = req.body;
 
-  let query = `INSERT INTO election (name, start_date, end_date) VALUES (?, ?, ?)`;
-  let values = [name, startDate, endDate];
+  if (!name || !startDate || !endDate) {
+    return res.status(400).json({ error: 'Provide name, start_date, and end_date in the request body!' });
+  } else {
+    let query = `INSERT INTO election (name, start_date, end_date) VALUES (?, ?, ?)`;
+    let values = [name, startDate, endDate];
 
-  executeQuery(query, values)
-    .then(() => {
-      res.json({ message: 'Election created successfully' });
-    })
-    .catch((error) => {
-      console.error(error);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    });
+    executeQuery(query, values)
+      .then(() => {
+        res.json({ message: 'Election created successfully' });
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      });
+  }
 };
 
 const editElection = (req, res) => {
   const { id } = req.params;
   const { name, start_date: startDate, end_date: endDate } = req.body;
 
+  if (!name || !startDate || !endDate) {
+    return res.status(400).json({ error: 'Provide name, start_date, and end_date in the request body!' });
+  }
+
   let query = `UPDATE election SET name = ?, start_date = ?, end_date = ? WHERE id = ?`;
   let values = [name, startDate, endDate, id];
 
   executeQuery(query, values)
-    .then(() => {
-      res.json({ message: 'Election updated successfully' });
+    .then((results) => {
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'Election not found!' });
+      } else {
+        res.json({ message: 'Election updated successfully' });
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -107,9 +119,29 @@ const viewElection = (req, res) => {
     });
 };
 
+const deleteElection = (req, res) => {
+  const { id } = req.params;
+
+  let query = `DELETE FROM election WHERE id = ?`;
+
+  executeQuery(query, [id])
+    .then((results) => {
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: 'Election not found!' });
+      } else {
+        res.json({ message: 'Election deleted successfully' });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    });
+}
+
 module.exports = {
   castVote,
   createElection,
   editElection,
-  viewElection
+  viewElection,
+  deleteElection
 }

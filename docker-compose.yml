@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db:
+    image: mariadb:10.4.28
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: backend_bcc
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/schema_template.sql
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
