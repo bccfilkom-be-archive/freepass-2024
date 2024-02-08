@@ -190,7 +190,15 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
 
-### Docker
+### Prerequisites
+Before you begin, ensure you have the following installed on your machine:
+
+- Node.js
+- npm
+- MariaDB
+
+### Running with Docker
+These instructions will help you run the project locally using Docker with MariaDB.
 1. Clone the repository or download manually:
 ```
 git clone --branch yoga-raditya-nala https://github.com/yogarn/freepass-2024
@@ -203,12 +211,34 @@ cd freepass-2024
 ```
 docker-compose up -d
 ```
-4. Access the application in your web browser at http://localhost:3000/api/
-5. API documentation can be accessed at http://localhost:3000/api-docs/
-6. To stop the application and shut down the Docker containers, run:
+### Running without Docker (MariaDB)
+If you prefer not to use Docker, you can run the application with a local MariaDB instance.
+1. Make sure your MariaDB/MySQL server is configured correctly
+2. Clone the repository or download manually:
+```
+git clone --branch yoga-raditya-nala https://github.com/yogarn/freepass-2024
+```
+3. Navigate to the project directory:
+```
+cd freepass-2024
+```
+4. Install dependencies:
+```
+npm install
+```
+5. Configure your credentials and database configuration in `config/database.js`.
+6. Start the application:
+```
+npm start
+```
+### Access the aplication and documentations
+You can **access** the application at http://localhost:3000/api/ and the **documentation** can be accessed in your web browser at http://localhost:3000/api-docs/.
+### Stop the application
+To stop the application and shut down the Docker containers, run (if using Docker):
 ```
 docker-compose down
 ```
+If you are not using Docker and using npm, you can simply press `ctrl + c` to kill the application.
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
