@@ -2,9 +2,9 @@ const pool = require('../config/database');
 const { executeQuery } = require('../services/db');
 
 const viewCandidate = (req, res) => {
-  const { username } = req.query;
+  const { username, id } = req.query;
 
-  const getUser = (username) => {
+  const getUser = (username, id) => {
     let userQuery = `SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE status = 'candidate'`;
     const values = [];
 
@@ -13,9 +13,13 @@ const viewCandidate = (req, res) => {
       values.push(username);
     }
 
+    if (id) {
+      userQuery += ` AND id = ?`;
+      values.push(id);
+    }
+
     return executeQuery(userQuery, values);
   };
-
 
   const getPosts = (userId) => {
     const postQuery = `SELECT * FROM post WHERE user_id = ?`;
@@ -31,7 +35,7 @@ const viewCandidate = (req, res) => {
     return executeQuery(commentQuery, [postId]);
   };
 
-  getUser(username)
+  getUser(username, id)
     .then((userResults) => {
       if (userResults.length === 0) {
         return res.status(400).json({ message: 'Candidate not found!' });
