@@ -64,7 +64,7 @@ func (u *PostUsecase) GetPost(postId int) (domain.PostResponse, []domain.Comment
 	postResponse := help.PostResponse(post, "")
 
 	var comments []domain.Comments
-	err = u.commentRepository.GetAllCommentByPostID(&comments, postId)
+	err = u.commentRepository.GetAllCommentByCondition(&comments, "post_id = ?", postId)
 	if err != nil {
 		return domain.PostResponse{}, []domain.CommentResponse{}, help.ErrorObject{
 			Code:    http.StatusInternalServerError,
@@ -176,7 +176,7 @@ func (u *PostUsecase) DeletePost(c *gin.Context, postId int) (domain.PostRespons
 	}
 
 	var comments []domain.Comments
-	err = u.commentRepository.GetAllCommentByPostID(&comments, postId)
+	err = u.commentRepository.GetAllCommentByCondition(&comments, "post_id = ?", postId)
 	if err != nil {
 		return domain.PostResponse{}, help.ErrorObject{
 			Code:    http.StatusInternalServerError,

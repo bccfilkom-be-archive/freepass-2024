@@ -5,6 +5,7 @@ import (
 	comment_repository "freepass-bcc/app/comment/repository"
 	post_repository "freepass-bcc/app/post/repository"
 	user_repository "freepass-bcc/app/user/repository"
+	vote_repository "freepass-bcc/app/vote/repository"
 	"freepass-bcc/domain"
 	"freepass-bcc/help"
 	"net/http"
@@ -26,10 +27,11 @@ type UserUsecase struct {
 	userRepository    user_repository.IUserRepository
 	postRepository    post_repository.IPostRepository
 	commentRepository comment_repository.ICommentRepository
+	voteRepository    vote_repository.IVoteRepository
 }
 
-func NewUserUsecase(userRepository user_repository.IUserRepository, postRepository post_repository.IPostRepository, commentRepository comment_repository.ICommentRepository) *UserUsecase {
-	return &UserUsecase{userRepository, postRepository, commentRepository}
+func NewUserUsecase(userRepository user_repository.IUserRepository, postRepository post_repository.IPostRepository, commentRepository comment_repository.ICommentRepository, voteRepository vote_repository.IVoteRepository) *UserUsecase {
+	return &UserUsecase{userRepository, postRepository, commentRepository, voteRepository}
 }
 
 func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any) {
@@ -239,7 +241,7 @@ func (u *UserUsecase) DeleteAccount(c *gin.Context, userId int) (domain.Users, a
 		if len(posts) != 0 {
 			for _, p := range posts {
 				var comments []domain.Comments
-				err := u.commentRepository.GetAllCommentByPostID(&comments, p.ID)
+				err := u.commentRepository.GetAllCommentByCondition(&comments, "post_id = ?", p.ID)
 				if err != nil {
 					return domain.Users{}, help.ErrorObject{
 						Code:    http.StatusInternalServerError,
@@ -263,14 +265,49 @@ func (u *UserUsecase) DeleteAccount(c *gin.Context, userId int) (domain.Users, a
 			err := u.postRepository.DeleteAllPost(&posts)
 			if err != nil {
 				return domain.Users{}, help.ErrorObject{
-					Code: http.StatusInternalServerError,
+					Code:    http.StatusInternalServerError,
 					Message: "error occured when deleteing all user posts",
-					Err: err,
+					Err:     err,
 				}
 			}
 		}
 	}
 
+	if user.Role == "USER" {
+		var voted domain.Votes
+		err = u.voteRepository.GetVoteByCondition(&voted, "user_id = ?", userId)
+		if err == nil {
+			err = u.voteRepository.DeleteVote(&voted)
+			if err != nil {
+				return domain.Users{}, help.ErrorObject{
+					Code:    http.StatusInternalServerError,
+					Message: "error occured when delete vote",
+					Err:     err,
+				}
+			}
+		}
+
+		var comments []domain.Comments
+		err = u.commentRepository.GetAllCommentByCondition(&comments, "user_id = ?", userId)
+		if err != nil {
+			return domain.Users{}, help.ErrorObject{
+				Code:    http.StatusInternalServerError,
+				Message: "error occured when get all user comments",
+				Err:     err,
+			}
+		}
+
+		if len(comments) != 0 {
+			err = u.commentRepository.DeleteAllComment(&comments)
+			if err != nil {
+				return domain.Users{}, help.ErrorObject{
+					Code:    http.StatusInternalServerError,
+					Message: "error occured when get all user comments",
+					Err:     err,
+				}
+			}
+		}
+	}
 	err = u.userRepository.DeleteAccount(&user)
 	if err != nil {
 		return domain.Users{}, help.ErrorObject{
