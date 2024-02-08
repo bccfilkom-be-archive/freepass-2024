@@ -64,8 +64,8 @@ func (u *CommentUsecase) CreateComment(c *gin.Context, commentRequest domain.Com
 	err = u.commentRepository.GetAllCommentByCondition(&comments, "post_id = ?" , postId)
 	if err != nil {
 		return domain.PostResponse{}, []domain.CommentResponse{}, help.ErrorObject{
-			Code:    http.StatusNotFound,
-			Message: "failed to get all comments",
+			Code:    http.StatusInternalServerError,
+			Message: "error occured when get all comments by post id",
 			Err:     err,
 		}
 	}
@@ -115,8 +115,8 @@ func (u *CommentUsecase) DeleteComment(postId int, commentId int) (domain.PostRe
 	err = u.commentRepository.GetAllCommentByCondition(&comments, "post_id = ?" , postId)
 	if err != nil {
 		return domain.PostResponse{}, []domain.CommentResponse{}, help.ErrorObject{
-			Code:    http.StatusNotFound,
-			Message: "failed to get all comments",
+			Code:    http.StatusInternalServerError,
+			Message: "error occured when get all comments by post id",
 			Err:     err,
 		}
 	}
