@@ -10,10 +10,9 @@ import (
 	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
-
 )
 
-func RegisterController(c *gin.Context) {
+func RegisterUser(c *gin.Context) {
 	var user *models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {

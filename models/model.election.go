@@ -15,9 +15,10 @@ type Election struct {
 	Description   string      `gorm:"not null" json:"description"`
 	StartTime     time.Time   `gorm:"not null" json:"start_time"`
 	EndTime       time.Time   `gorm:"not null" json:"end_time"`
-	Candidates    []Candidate `gorm:"foreignKey:ElectionID"`
 	MakeByAdminID string      `gorm:"not null" json:"admin_id"`
 	Status        string      `gorm:"default:Pending" json:"status"`
+	Candidates    []Candidate `gorm:"foreignKey:ElectionID"`
+	Posts         []Post      `gorm:"foreignKey:ElectionID"`
 }
 
 func (e *Election) BeforeCreate(c *gorm.DB) (err error) {

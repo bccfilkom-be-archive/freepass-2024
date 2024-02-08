@@ -8,10 +8,9 @@ import (
 	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
-
 )
 
-func LoginController(c *gin.Context) {
+func LoginUser(c *gin.Context) {
 	var request *schemas.UserLoginRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {

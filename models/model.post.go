@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-
 )
 
 type Post struct {
@@ -13,6 +12,7 @@ type Post struct {
 	CreatedAt   time.Time `gorm:"not null" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"not null" json:"updatedAt"`
 	CandidateID string    `gorm:"not null" json:"candidate_id"`
+	ElectionID  string    `gorm:"not null" json:"election_id"`
 	PictureUrl  string    `gorm:"not null" json:"picture_url"`
 	Caption     string    `gorm:"not null" json:"caption"`
 	Comments    []Comment `gorm:"foreignKey:PostID"`
