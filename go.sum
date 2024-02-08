@@ -1,3 +1,5 @@
+github.com/bccfilkom-be/freepass-2024 v0.0.0-20240205091417-8d3b354897ef h1:EtGaAruLUu5dY583syoOj/AdcWT08z70o5rtxzJkMdk=
+github.com/bccfilkom-be/freepass-2024 v0.0.0-20240205091417-8d3b354897ef/go.mod h1:vvw+G7dRB7v/a/zW+N2nSf4XLFK03OJUomh3Y8JvN78=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.10.0-rc/go.mod h1:ElCzW+ufi8qKqNW0FY314xriJhyJhuoJ3gFZdAHF7NM=
 github.com/bytedance/sonic v1.10.2 h1:GQebETVBxYB7JGWJtLBi07OVzWwt+8dWA00gEVW2ZFE=

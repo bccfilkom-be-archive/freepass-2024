@@ -7,3 +7,9 @@ type Votes struct {
 	Choice   string    `json:"choice"`
 	VoteTime time.Time `json:"vote_time"`
 }
+
+type VoteResponse struct {
+	User     string    `json:"user"`
+	Choice   string    `json:"choice"`
+	VoteTime time.Time `json:"vote_time"`
+}

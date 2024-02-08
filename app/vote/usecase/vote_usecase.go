@@ -14,7 +14,7 @@ import (
 )
 
 type IVoteUsecase interface {
-	Vote(c *gin.Context, userId int) (domain.Votes, any)
+	Vote(c *gin.Context, userId int) (domain.VoteResponse, any)
 }
 
 type VoteUsecase struct {
@@ -28,10 +28,10 @@ func NewVoteUsecase(voteRepository vote_repository.IVoteRepository, userReposito
 	return &VoteUsecase{voteRepository, userRepository, electionTimeRepository}
 }
 
-func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.Votes, any) {
+func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.VoteResponse, any) {
 	loginUser, err := help.GetLoginUser(c)
 	if err != nil {
-		return domain.Votes{}, help.ErrorObject{
+		return domain.VoteResponse{}, help.ErrorObject{
 			Code:    http.StatusNotFound,
 			Message: "account not found",
 			Err:     err,
@@ -41,7 +41,7 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.Votes, any) {
 	var candidate domain.Users
 	err = u.userRepository.GetUserByCondition(&candidate, "id = ?", userId)
 	if err != nil {
-		return domain.Votes{}, help.ErrorObject{
+		return domain.VoteResponse{}, help.ErrorObject{
 			Code:    http.StatusNotFound,
 			Message: "candidate not found",
 			Err:     err,
@@ -49,7 +49,7 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.Votes, any) {
 	}
 
 	if candidate.Role != "CANDIDATE" {
-		return domain.Votes{}, help.ErrorObject{
+		return domain.VoteResponse{}, help.ErrorObject{
 			Code:    http.StatusBadRequest,
 			Message: "vote declined",
 			Err:     errors.New("only can vote candidate"),
@@ -59,7 +59,7 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.Votes, any) {
 	var electionTime domain.ElectionTimes
 	err = u.electionTimeRepository.GetCurrentElectionTime(&electionTime)
 	if err != nil {
-		return domain.Votes{}, help.ErrorObject{
+		return domain.VoteResponse{}, help.ErrorObject{
 			Code:    http.StatusInternalServerError,
 			Message: "election time has not been set yet",
 			Err:     err,
@@ -69,7 +69,7 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.Votes, any) {
 	currentTime := time.Now()
 
 	if currentTime.Before(electionTime.StartTime) || currentTime.After(electionTime.EndTime){
-		return domain.Votes{}, help.ErrorObject{
+		return domain.VoteResponse{}, help.ErrorObject{
 			Code:    http.StatusBadRequest,
 			Message: "can't vote right now",
 			Err:     errors.New("election not started yet"),
@@ -83,12 +83,18 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.Votes, any) {
 
 	err = u.voteRepository.Vote(&voted)
 	if err != nil {
-		return domain.Votes{}, help.ErrorObject{
+		return domain.VoteResponse{}, help.ErrorObject{
 			Code: http.StatusInternalServerError,
 			Message: "user only can vote 1 time",
 			Err: err,
 		}
 	}
 
-	return voted, nil
+	voteResponse := domain.VoteResponse{
+		User: loginUser.Name,
+		Choice: candidate.Name,
+		VoteTime: voted.VoteTime,
+	}
+
+	return voteResponse, nil
 }

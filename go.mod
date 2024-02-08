@@ -3,6 +3,7 @@ module freepass-bcc
 go 1.21.5
 
 require (
+	github.com/bccfilkom-be/freepass-2024 v0.0.0-20240205091417-8d3b354897ef // indirect
 	github.com/bytedance/sonic v1.10.2 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
