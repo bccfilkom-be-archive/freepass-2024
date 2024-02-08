@@ -1,6 +1,7 @@
 package help
 
 import (
+	"freepass-bcc/domain"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,4 +32,17 @@ type ErrorObject struct {
 	Code    int
 	Message string
 	Err     error
+}
+
+func PostResponse(post domain.Posts, name string) domain.PostResponse {
+	if name == "" {
+		name = post.User.Name
+	}
+	PostResponse := domain.PostResponse{
+		ID: post.ID,
+		Candidate: name,
+		Post: post.Post,
+	}
+
+	return PostResponse
 }

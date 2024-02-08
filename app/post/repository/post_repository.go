@@ -23,7 +23,7 @@ func NewPostRepository(db *gorm.DB) *PostRepository {
 }
 
 func (r *PostRepository) GetAllPost(posts *[]domain.Posts) error {
-	err := r.db.Find(posts).Error
+	err := r.db.Debug().Preload("User").Find(posts).Error
 	return err
 }
 

@@ -33,8 +33,8 @@ func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any)
 	if isUserExist == nil {
 		return domain.Users{}, help.ErrorObject{
 			Code:    http.StatusConflict,
-			Message: "email already used",
-			Err:     errors.New(""),
+			Message: "can't use same email",
+			Err:     errors.New("email already user"),
 		}
 	}
 
