@@ -67,7 +67,7 @@ const viewElection = (req, res) => {
       return fetchElectionInfo().then(elections => {
         const getVoteCountsPromises = elections.map(election => {
           return executeQuery(`
-            SELECT u.username AS username, u.name AS name, candidate_id AS id, COUNT(*) AS vote_count 
+            SELECT candidate_id AS id, u.username AS username, u.name AS name, COUNT(*) AS vote_count 
             FROM vote
             JOIN user u ON candidate_id = u.id
             WHERE election_id = ?

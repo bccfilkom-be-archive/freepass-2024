@@ -1,6 +1,9 @@
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('js-yaml');
+const fs = require('fs');
 
 const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
@@ -19,6 +22,10 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
+
+const swaggerDocument = yaml.load(fs.readFileSync('./api-docs.yaml', 'utf8'));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
