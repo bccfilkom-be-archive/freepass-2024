@@ -1229,7 +1229,32 @@ paths:
                             message:
                               type: string
                               example: Election updated successfully
-  
+    delete:
+      tags:
+        - Elections
+        - Admins
+      summary: Delete an election
+      description: Delete an election and return its status to admin. Only admin can access this endpoint.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of election to delete.
+          schema:
+            type: integer
+            example: 1
+      responses:
+          '200':
+              description: A JSON object of election deletion status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Election deleted successfully
+
   # votes
   /elections/vote:
     post:
