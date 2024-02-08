@@ -107,6 +107,46 @@ THEN  => System will show a deletion status message and delete relevant post
 We want to see your perspective about these problems. You can define various types of entities or actors. One thing for sure, there is no
 true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
 
+```
+user
+  - id	
+  - nim	
+  - username
+  - password
+  - name	
+  - major	
+  - faculty
+  - status (user | candidate | admin)
+  - description
+
+post
+  - id	
+  - user_id	
+  - title	
+  - content	
+  - timestamp
+
+comment
+  - id	
+  - user_id	
+  - post_id	
+  - content	
+  - timestamp	
+
+election
+  - id	
+  - start_date	
+  - end_date	
+  - timestamp
+
+vote
+  - id	
+  - user_id	
+  - election_id	
+  - candidate_id
+  - timestamp	
+```
+
 ## **📘** References
 
 You might be overwhelmed by these requirements. Don’t worry, here’s a list of some tools that you could use (it’s not required to use all of them nor any of them):
