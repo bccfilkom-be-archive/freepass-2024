@@ -29,14 +29,14 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		return
 	}
 
-	comment, errorObject := h.commentUsecase.CreateComment(c, commentRequest, postId)
+	post, comment, errorObject := h.commentUsecase.CreateComment(c, commentRequest, postId)
 	if errorObject != nil {
 		errorObject := errorObject.(help.ErrorObject)
 		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
 		return
 	}
 
-	help.SuccessResponse(c, "success create comment", comment)
+	help.SuccessPostCommentResponse(c, "success create comment", post, comment)
 }
 
 func (h *CommentHandler) DeleteComment(c *gin.Context) {
@@ -46,12 +46,12 @@ func (h *CommentHandler) DeleteComment(c *gin.Context) {
 	commentIdString := c.Param("commentId")
 	commentId, _ := strconv.Atoi(commentIdString)
 
-	deletedComment, errorObject := h.commentUsecase.DeleteComment(postId, commentId)
+	post, comment, errorObject := h.commentUsecase.DeleteComment(postId, commentId)
 	if errorObject != nil {
 		errorObject := errorObject.(help.ErrorObject)
 		help.FailedResponse(c, errorObject.Code, errorObject.Message, errorObject.Err)
 		return
 	}
 
-	help.SuccessResponse(c, "success delete comment", deletedComment)
+	help.SuccessPostCommentResponse(c, "success delete comment", post, comment)
 }

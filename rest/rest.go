@@ -2,9 +2,9 @@ package rest
 
 import (
 	comment_handler "freepass-bcc/app/comment/handler"
+	election_time_handler "freepass-bcc/app/election_time/handler"
 	post_handler "freepass-bcc/app/post/handler"
 	user_handler "freepass-bcc/app/user/handler"
-	election_time_handler "freepass-bcc/app/election_time/handler"
 	vote_handler "freepass-bcc/app/vote/handler"
 	"freepass-bcc/middleware"
 
@@ -50,8 +50,8 @@ func (r *Rest) RouteComment(commentHandler *comment_handler.CommentHandler) {
 	UserOnly := middleware.CheckUser
 	AdminOnly := middleware.CheckAdmin
 
-	r.gin.POST("/posts/:postId/comments", validate, UserOnly, commentHandler.CreateComment)
-	r.gin.DELETE("/posts/:postId/comments/:commentId", validate, AdminOnly, commentHandler.DeleteComment)
+	r.gin.POST("/posts/:postId", validate, UserOnly, commentHandler.CreateComment)
+	r.gin.DELETE("/posts/:postId/:commentId", validate, AdminOnly, commentHandler.DeleteComment)
 }
 
 func (r *Rest) RouteElectionTime(electionTimeHandler *election_time_handler.ElectionTimeHandler) {

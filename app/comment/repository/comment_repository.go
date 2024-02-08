@@ -7,9 +7,11 @@ import (
 )
 
 type ICommentRepository interface {
+	GetAllComment(comments *[]domain.Comments, postId int) error
 	GetCommentByCondition(comment *domain.Comments, condition string, value any) error
 	CreateComment(comment *domain.Comments) error
 	DeleteComment(comment *domain.Comments) error
+	DeleteAllComment(comments *[]domain.Comments) error
 }
 
 type CommentRepository struct {
@@ -18,6 +20,11 @@ type CommentRepository struct {
 
 func NewCommentRepository(db *gorm.DB) *CommentRepository {
 	return &CommentRepository{db}
+}
+
+func(r *CommentRepository) GetAllComment(comments *[]domain.Comments, postId int) error {
+	err := r.db.Debug().Model(domain.Comments{}).Preload("User").Find(comments, "post_id = ?", postId).Error
+	return err
 }
 
 func (r *CommentRepository) GetCommentByCondition(comment *domain.Comments, condition string, value any) error {
@@ -48,5 +55,18 @@ func (r *CommentRepository) DeleteComment(comment *domain.Comments) error {
 	}
 
 	tx.Commit()
-	return err
+	return nil
+}
+
+func (r *CommentRepository) DeleteAllComment(comments *[]domain.Comments) error {
+	tx := r.db.Begin()
+
+	err := r.db.Delete(comments).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
 }

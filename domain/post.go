@@ -20,4 +20,5 @@ type PostResponse struct {
 	ID        int    `json:"id"`
 	Candidate string `json:"candidate"`
 	Post      string `json:"post"`
+	CreatedAt time.Time `json:"created_at"`
 }

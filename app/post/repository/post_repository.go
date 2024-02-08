@@ -28,7 +28,7 @@ func (r *PostRepository) GetAllPost(posts *[]domain.Posts) error {
 }
 
 func (r *PostRepository) GetPostByCondition(post *domain.Posts, condition string, value any) error {
-	err := r.db.First(post, condition, value).Error
+	err := r.db.Preload("User").First(post, condition, value).Error
 	return err
 }
 
