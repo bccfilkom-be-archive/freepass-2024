@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Election API
-  description: This API provides tools that let you manage users, posts, comments, and votes. With this API, selected candidates who have been promoted by the admin can create posts and manage them. Users can view and comment on their perceptions of candidates' posts using comments. Admin can create and start an election by specifying the election name, start date, and end date. On election day, users will be able to cast their votes and see the live count.
+  description: This API provides tools that let user manage users, posts, comments, and votes. With this API, selected candidates who have been promoted by the admin can create posts and manage them. Users can view and comment on their perceptions of candidates' posts using comments. Admin can create and start an election by specifying the election name, start date, and end date. On election day, users will be able to cast their votes and see the live count.
   version: 0.0.1
 servers:
   - url: http://localhost:3000/api
@@ -30,7 +30,7 @@ paths:
          - Authentication
          - Users
         summary: Register a new user to the system
-        description: Return register status and user. Only the username and password key-value pair are required. If you leave other key empty, their values ​​will be stored as null, which you can edit later. You must log out before accessing this endpoint if you have logged in previously.
+        description: Record user credentials and return it's username. Only the username and password key-value pair are required. If user leave other key empty, their values ​​will be stored as null, which user can edit later. User must log out before accessing this endpoint if user have logged in previously.
         requestBody:
           content:
             application/json:
@@ -94,7 +94,7 @@ paths:
       tags:
         - Authentication
       summary: Create a session and log user in
-      description: Return user login status. You must log out before accessing this endpoint if you have logged in previously.
+      description: Authenticate and grant access based on user credentials. Return user login status. User must log out before accessing this endpoint if user have logged in previously.
       requestBody:
         required: true
         content:
@@ -125,8 +125,11 @@ paths:
                             username:
                               type: string
                               example: yogarn
+                            status:
+                                type: string
+                                example: candidate
           '401':
-            description: Incorrect credentials (Unauthorized)
+            description: Incorrect credentials (Unauthorized Response)
             content:
               application/json:
                   schema:
@@ -140,7 +143,7 @@ paths:
       tags:
         - Authentication
       summary: Destroy a session and log user out.
-      description: Return user logout status. You must log in first before logging out.
+      description: Destroy current session and return user logout status. User must log in first before logging out.
       responses:
           '200':
               description: A JSON object of user logout status. (Successful Response)
@@ -274,8 +277,8 @@ paths:
     put:
       tags:
         - Users
-      summary: Update user profiles.
-      description: Return user profile update status. You don't need to send all the fields when accessing this request, just send the fields that need to be changed. (if you try to update your username without any difference to your current username, a conflict may occur)
+      summary: Update user profile.
+      description: Update user profile with new details and return the update status. User don't need to send all the key-value pair when accessing this request. All key-value are editable, except id, and status (only available for admin).
       requestBody:
         required: false
         content:
@@ -317,12 +320,23 @@ paths:
                   message:
                     type: string
                     example: User profile updated successfully
+        '409':
+          description: Username already used by other user. (Conflict Response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Username already used!
   /users/{username}:
     delete:
       summary: Delete a user by username
-      description: Delete a user from database, including their posts, comments, and votes.
+      description: Remove the user/candidate from the system, including their posts, comments, and votes.
       tags:
         - Users
+        - Admins
       parameters:
         - in: path
           name: username
@@ -342,10 +356,20 @@ paths:
                   message: 
                     type: string
                     example: User deleted successfully
+        '404':
+              description: A JSON object of user deletion error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: User not found!
   /users/status/{username}:
     put:
       summary: Edit user status
-      description: Update status of a specific user. Only admins allowed to access this endpoint.
+      description: Update user's status status to candidate or admin, and revert to user otherwise (promote or demote). Only admins are allowed to access this endpoint.
       tags:
         - Users
         - Admins
@@ -381,6 +405,16 @@ paths:
                   message:
                     type: string
                     example: User status updated successfully
+        '422':
+              description: A JSON object of update error. (Invalid Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Provide a valid status!
   
   # posts section
   /posts:
@@ -388,7 +422,7 @@ paths:
       tags:
         - Posts
       summary: Create a post
-      description: Create a post and return creation status to candidate.
+      description: Record post details and return creation status to candidate.
       requestBody:
         required: true
         content:
@@ -418,7 +452,7 @@ paths:
                               example: Post sent successfully
     get:
       summary: View posts
-      description: This request allow you to view posts using parameter. You can use it without parameter to get all posts.
+      description: View candidate post(s) along with its details (including comments). User can use it without parameter to view all posts.
       tags:
         - Posts
       parameters:
@@ -433,12 +467,12 @@ paths:
           name: username
           schema:
             type: string
-          description: The username of the user who sent the posts.
+          description: The username of the user who sent the post(s).
           required: false
           example: yogarn
       responses:
         '200':
-          description: A JSON array of posts with its details. (Successful Response)
+          description: A JSON array of posts along with its details. (Successful Response)
           content:
             application/json:
               schema:
@@ -571,12 +605,22 @@ paths:
                           post_id: 4
                           content: "Yes, Sir!"
                           timestamp: "2024-02-07T11:24:29.000Z"
+        '404':
+              description: A JSON object of post(s) status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Post(s) not found!
   /posts/{id}:
     put:
       tags:
         - Posts
       summary: Update a post
-      description: Update a post and return its status to candidate. The parameters and body of the request are mandatory, even if there are no changes to certain fields.
+      description: Apply changes to a post and return its update status to candidate. The parameters and body of the request are mandatory, even if there are no changes to certain key-value pair.
       parameters:
         - in: path
           name: id
@@ -612,9 +656,20 @@ paths:
                             message:
                               type: string
                               example: Post updated successfully
+          '403':
+              description: A JSON object of post update error status. (Forbidden Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: You do not have permission to edit or delete this post!
     delete:
       tags:
         - Posts
+        - Admins
       summary: Delete a post
       description: Delete a post and return its status to candidate or admin. Admin can also access this endpoint.
       parameters:
@@ -636,6 +691,26 @@ paths:
                             message:
                               type: string
                               example: Post deleted successfully
+          '403':
+              description: A JSON object of post deletion error status. (Forbidden Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: You do not have permission to edit or delete this post!
+          '404':
+              description: A JSON object of post deletion error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Post not found!
 
   # comments section
   /comments:
@@ -643,7 +718,7 @@ paths:
       tags:
         - Comments
       summary: Create a comment
-      description: Create a comment and return creation status to user.
+      description: Record user comment and return creation status to user.
       requestBody:
         required: true
         content:
@@ -671,6 +746,16 @@ paths:
                             message:
                               type: string
                               example: Post sent successfully
+          '404':
+              description: A JSON object of selected post status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Post not found!
     get:
       tags:
         - Comments
@@ -697,7 +782,7 @@ paths:
           required: false
           example: yennefer
       summary: Get comments
-      description: View comments using id, post-id, or username. You can use it without parameter to view all comments.
+      description: View comments using id, post-id, or username. User can use it without parameter to view all comments.
       responses:
         '200':
           description: A JSON object of comment information. (Successful Response)
@@ -791,7 +876,7 @@ paths:
       tags:
         - Comments
       summary: Delete a comment
-      description: Delete a comment and return its status to admin. Only admin can access this endpoint.
+      description: Remove the user comment from the candidate's post and return its status to admin. Only admin can access this endpoint.
       parameters:
         - in: path
           name: id
@@ -833,7 +918,7 @@ paths:
           required: false
           example: yogarn
       summary: View candidates
-      description: View candidates using query parameters. You can use it without parameter to get all candidates information.
+      description: View candidates using query parameters. User can use it without parameter to get all candidates information.
       responses:
         '200':
           description: A JSON array of candidates information.
@@ -1006,8 +1091,9 @@ paths:
     post:
       tags:
         - Elections
+        - Admins
       summary: Create an election
-      description: Create an election and return creation status to admin. Only admin can access this endpoint.
+      description: Create an election with and return creation status to admin. Only admin can access this endpoint.
       requestBody:
         required: true
         content:
@@ -1053,7 +1139,7 @@ paths:
           required: false
           example: 2
       summary: Get elections detail
-      description: View election details with its live count. You can use it without parameter to view all elections.
+      description: View election details with its live count. User can use it without parameter to view all elections.
       responses:
         '200':
           description: A JSON object of elections information. (Successful Response)
@@ -1099,8 +1185,9 @@ paths:
     put:
       tags:
         - Elections
+        - Admins
       summary: Update an election
-      description: Update an election and return update status to admin. Only admin can access this endpoint.
+      description: Set the name, start, and end dates for the selected election, then return its status to admin. Only admin can access this endpoint.
       parameters:
         - in: path
           name: id
@@ -1149,7 +1236,7 @@ paths:
       tags:
         - Elections
       summary: Cast a vote
-      description: Cast a vote and return vote status based on election id and candidate username.
+      description: Register user vote for the selected candidate and return vote status based on election id and candidate username.
       requestBody:
         required: true
         content:
@@ -1177,6 +1264,36 @@ paths:
                             message:
                               type: string
                               example: Vote casted successfully
+          '404 - Election':
+              description: A JSON object of vote election error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Election not found!
+          '404 - Candidate':
+              description: A JSON object of vote candidate error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Candidate not found!
+          '409':
+              description: A JSON object of user vote error status. (Conflict Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: You've already voted in this election!
 components:
   schemas:
     user:

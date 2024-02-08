@@ -33,7 +33,7 @@ const viewPost = (req, res) => {
   executeQuery(query, values)
     .then((posts) => {
       if (posts.length === 0) {
-        return res.status(400).json({ message: 'No result' });
+        return res.status(404).json({ error: 'Post(s) not found!' });
       }
 
       const promises = posts.map((post) => fetchCommentsForPost(post));

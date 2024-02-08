@@ -19,7 +19,7 @@ const checkPostExistence = (req, res, next) => {
     executeQuery(`SELECT * FROM post WHERE id = ?`, [targetId])
       .then((results) => {
         if (results.length === 0) {
-          return res.status(404).json({ error: 'Post not found' });
+          return res.status(404).json({ error: 'Post not found!' });
         } else {
           next();
         }
@@ -43,7 +43,7 @@ const checkPostOwnership = (req, res, next) => {
   executeQuery(`SELECT user_id FROM post WHERE id = ?`, [postId])
     .then((results) => {
       if (results.length === 0 || results[0].user_id !== userId) {
-        return res.status(403).json({ error: 'You do not have permission to edit or delete this post' });
+        return res.status(403).json({ error: 'You do not have permission to edit or delete this post!' });
       } else {
         next();
       }

@@ -122,12 +122,12 @@ const editStatus = (req, res) => {
   const { username } = req.params;
   const { status } = req.body;
 
-  if (!username) {
-    return res.status(400).json({ error: 'Provide username in query!' });
+  if (!username || !status) {
+    return res.status(400).json({ error: 'Provide username and status!' });
   }
 
   if (status != 'user' && status != 'admin' && status != 'candidate') {
-    return res.status(400).json({ error: 'Provide a valid status!' });
+    return res.status(422).json({ error: 'Provide a valid status!' });
   }
 
   if (username == req.session.username) {
