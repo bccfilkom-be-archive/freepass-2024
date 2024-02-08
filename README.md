@@ -191,7 +191,7 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
 
 ### Prerequisites
-Before you begin, ensure you have the following installed on your machine:
+Before you begin, ensure you have the following installed on your machine. If you want to use **Docker** instead of manual installation, you can **skip these prerequisites**.
 
 - Node.js
 - npm
