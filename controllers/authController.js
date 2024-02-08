@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt   = require('bcryptjs');
 const { executeQuery } = require('../services/db');
 const pool = require('../config/database');
 
