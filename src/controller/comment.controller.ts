@@ -36,3 +36,24 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
     }
   }
 }
+
+export const viewPostComments = async (req: Request, res: Response, next: NextFunction) => {
+  const postId = req.params.postId
+
+  try {
+    const post = await findPostById(postId)
+    if (!post) throw new Error('post not found')
+
+    return res.status(200).send({
+      status: 200,
+      message: 'view posts comment success',
+      data: { comments: post.comments, length: post.comments.length }
+    })
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      res.status(400).send({ status: 400, message: error.message })
+    } else {
+      next(error)
+    }
+  }
+}

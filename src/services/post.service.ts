@@ -6,7 +6,7 @@ export const createPostForId = async (payload: CreatePostForm, candidateId: stri
 }
 
 export const findPostById = async (id: string) => {
-  return await Post.findById(id)
+  return await Post.findById(id).populate('comments')
 }
 
 export const findPostByField = async (field: string, value: string) => {
