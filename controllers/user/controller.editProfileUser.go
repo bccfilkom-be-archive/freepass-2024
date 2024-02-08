@@ -8,12 +8,13 @@ import (
 	"github.com/AkbarFikri/freepassBCC-2024/models"
 	profileRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/profile"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
+
 )
 
 func EditProfileUser(c *gin.Context) {
 	var profile *models.Profile
 	getUser, _ := c.Get("user")
-	user := getUser.(schemas.UserResponse)
+	user := getUser.(schemas.UserTokenData)
 
 	if err := c.ShouldBindJSON(&profile); err != nil {
 		res := schemas.ResponeData{Error: true, Message: "No Data Found", Data: nil}

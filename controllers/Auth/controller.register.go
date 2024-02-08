@@ -50,6 +50,6 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	res := schemas.ResponeData{Error: false, Message: "Success to create user", Data: gin.H{"user": newUser}}
-	c.JSON(http.StatusOK, res)
+	res := schemas.ResponeData{Error: false, Message: "Success to register user", Data: gin.H{"user": newUser}}
+	c.JSON(http.StatusCreated, res)
 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
-
 )
 
 func Auth() gin.HandlerFunc {
@@ -32,7 +31,7 @@ func Auth() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, res)
 		} else {
 			claims := token.Claims.(jwt.MapClaims)
-			user := schemas.UserResponse{ID: claims["id"].(string), Email: claims["email"].(string)}
+			user := schemas.UserTokenData{ID: claims["id"].(string), Email: claims["email"].(string)}
 			c.Set("user", user)
 			c.Next()
 		}

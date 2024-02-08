@@ -10,3 +10,8 @@ type UserLoginRequest struct {
 	Email    string
 	Password string
 }
+
+type UserTokenData struct {
+	ID    string
+	Email string
+}
