@@ -34,7 +34,7 @@ func main() {
 	electionTimeRepository := election_time_repository.NewElectionTimeRepository(database.DB)
 	voteRepository := vote_repository.NewVoteRepository(database.DB)
 
-	userUsecase := user_usecase.NewUserUsecase(userRepository)
+	userUsecase := user_usecase.NewUserUsecase(userRepository, postRepository, commentRepository)
 	postUsecase := post_usecase.NewPostUsecase(postRepository, commentRepository)
 	commentUsecase := comment_usecase.NewCommentUsecase(commentRepository, postRepository)
 	electionTimeUsecase := election_time_usecase.NewElectionTimeUsecase(electionTimeRepository)

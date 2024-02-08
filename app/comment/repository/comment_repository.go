@@ -7,7 +7,7 @@ import (
 )
 
 type ICommentRepository interface {
-	GetAllComment(comments *[]domain.Comments, postId int) error
+	GetAllCommentByPostID(comments *[]domain.Comments, postId int) error
 	GetCommentByCondition(comment *domain.Comments, condition string, value any) error
 	CreateComment(comment *domain.Comments) error
 	DeleteComment(comment *domain.Comments) error
@@ -22,8 +22,8 @@ func NewCommentRepository(db *gorm.DB) *CommentRepository {
 	return &CommentRepository{db}
 }
 
-func(r *CommentRepository) GetAllComment(comments *[]domain.Comments, postId int) error {
-	err := r.db.Debug().Model(domain.Comments{}).Preload("User").Find(comments, "post_id = ?", postId).Error
+func(r *CommentRepository) GetAllCommentByPostID(comments *[]domain.Comments, postId int) error {
+	err := r.db.Model(domain.Comments{}).Preload("User").Find(comments, "post_id = ?", postId).Error
 	return err
 }
 

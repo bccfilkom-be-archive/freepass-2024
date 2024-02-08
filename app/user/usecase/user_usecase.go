@@ -2,7 +2,9 @@ package usecase
 
 import (
 	"errors"
-	"freepass-bcc/app/user/repository"
+	comment_repository "freepass-bcc/app/comment/repository"
+	post_repository "freepass-bcc/app/post/repository"
+	user_repository "freepass-bcc/app/user/repository"
 	"freepass-bcc/domain"
 	"freepass-bcc/help"
 	"net/http"
@@ -21,11 +23,13 @@ type IUserUsecase interface {
 }
 
 type UserUsecase struct {
-	userRepository repository.IUserRepository
+	userRepository    user_repository.IUserRepository
+	postRepository    post_repository.IPostRepository
+	commentRepository comment_repository.ICommentRepository
 }
 
-func NewUserUsecase(userRepository repository.IUserRepository) *UserUsecase {
-	return &UserUsecase{userRepository}
+func NewUserUsecase(userRepository user_repository.IUserRepository, postRepository post_repository.IPostRepository, commentRepository comment_repository.ICommentRepository) *UserUsecase {
+	return &UserUsecase{userRepository, postRepository, commentRepository}
 }
 
 func (u *UserUsecase) SignUp(userRequest domain.UserRequest) (domain.Users, any) {
@@ -218,6 +222,52 @@ func (u *UserUsecase) DeleteAccount(c *gin.Context, userId int) (domain.Users, a
 			Code:    http.StatusBadRequest,
 			Message: "admin can't delete other admin account",
 			Err:     errors.New("acces denied"),
+		}
+	}
+
+	if user.Role == "CANDIDATE" {
+		var posts []domain.Posts
+		err := u.postRepository.GetAllPostByUserId(&posts, userId)
+		if err != nil {
+			return domain.Users{}, help.ErrorObject{
+				Code:    http.StatusInternalServerError,
+				Message: "error occured when get all post by user id",
+				Err:     err,
+			}
+		}
+
+		if len(posts) != 0 {
+			for _, p := range posts {
+				var comments []domain.Comments
+				err := u.commentRepository.GetAllCommentByPostID(&comments, p.ID)
+				if err != nil {
+					return domain.Users{}, help.ErrorObject{
+						Code:    http.StatusInternalServerError,
+						Message: "error occured when get all comment by post id",
+						Err:     err,
+					}
+				}
+
+				if len(comments) != 0 {
+					err = u.commentRepository.DeleteAllComment(&comments)
+					if err != nil {
+						return domain.Users{}, help.ErrorObject{
+							Code:    http.StatusInternalServerError,
+							Message: "error occured when delete all comments",
+							Err:     err,
+						}
+					}
+				}
+			}
+
+			err := u.postRepository.DeleteAllPost(&posts)
+			if err != nil {
+				return domain.Users{}, help.ErrorObject{
+					Code: http.StatusInternalServerError,
+					Message: "error occured when deleteing all user posts",
+					Err: err,
+				}
+			}
 		}
 	}
 

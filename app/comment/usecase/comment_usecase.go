@@ -61,7 +61,7 @@ func (u *CommentUsecase) CreateComment(c *gin.Context, commentRequest domain.Com
 	postResponse := help.PostResponse(post, "")
 
 	var comments []domain.Comments
-	err = u.commentRepository.GetAllComment(&comments, postId)
+	err = u.commentRepository.GetAllCommentByPostID(&comments, postId)
 	if err != nil {
 		return domain.PostResponse{}, []domain.CommentResponse{}, help.ErrorObject{
 			Code:    http.StatusNotFound,
@@ -112,7 +112,7 @@ func (u *CommentUsecase) DeleteComment(postId int, commentId int) (domain.PostRe
 	postResponse := help.PostResponse(post, "")
 
 	var comments []domain.Comments
-	err = u.commentRepository.GetAllComment(&comments, postId)
+	err = u.commentRepository.GetAllCommentByPostID(&comments, postId)
 	if err != nil {
 		return domain.PostResponse{}, []domain.CommentResponse{}, help.ErrorObject{
 			Code:    http.StatusNotFound,

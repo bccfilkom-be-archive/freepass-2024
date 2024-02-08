@@ -8,10 +8,12 @@ import (
 
 type IPostRepository interface {
 	GetAllPost(posts *[]domain.Posts) error
+	GetAllPostByUserId(posts *[]domain.Posts, userId int) error
 	GetPostByCondition(post *domain.Posts, condition string, value any) error
 	CreatePost(post *domain.Posts) error
 	UpdatePost(post *domain.Posts) error
 	DeletePost(post *domain.Posts) error
+	DeleteAllPost(posts *[]domain.Posts) error
 }
 
 type PostRepository struct {
@@ -23,7 +25,12 @@ func NewPostRepository(db *gorm.DB) *PostRepository {
 }
 
 func (r *PostRepository) GetAllPost(posts *[]domain.Posts) error {
-	err := r.db.Debug().Preload("User").Find(posts).Error
+	err := r.db.Preload("User").Find(posts).Error
+	return err
+}
+
+func (r *PostRepository) GetAllPostByUserId(posts *[]domain.Posts, userId int) error {
+	err := r.db.Find(posts, "user_id = ?", userId).Error
 	return err
 }
 
@@ -62,6 +69,19 @@ func (r *PostRepository) DeletePost(post *domain.Posts) error {
 	tx := r.db.Begin()
 
 	err := r.db.Delete(post).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func (r *PostRepository) DeleteAllPost(posts *[]domain.Posts) error {
+	tx := r.db.Begin()
+
+	err := r.db.Delete(posts).Error
 	if err != nil {
 		tx.Rollback()
 		return err
