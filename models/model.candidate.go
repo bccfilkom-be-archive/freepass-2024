@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+
 )
 
 type Candidate struct {
@@ -14,8 +15,9 @@ type Candidate struct {
 	UserID       string                 `gorm:"not null" json:"user_id"`
 	ElectionNum  int                    `gorm:"not null" json:"election_number"`
 	ElectionID   string                 `gorm:"not null" json:"election_id"`
+	Vote         int                    `gorm:"not null" json:"vote"`
 	Post         []Post                 `gorm:"foreignKey:CandidateID"`
-	Informations []CandidateInformation `gorm:"foreignKey:CandidateID"`
+	Informations CandidateInformation `gorm:"foreignKey:CandidateID"`
 }
 
 func (cd *Candidate) BeforeCreate(c *gorm.DB) (err error) {
