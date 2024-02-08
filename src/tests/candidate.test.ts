@@ -65,7 +65,7 @@ describe('candidateRoutes', () => {
     })
   })
 
-  describe('get /v1/user/:id', () => {
+  describe('get /v1/candidate/:id', () => {
     let newUser: RegisterForm
     let token: string
     beforeAll(async () => {
