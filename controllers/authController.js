@@ -6,7 +6,11 @@ const register = (req, res) => {
   const { nim, name, username, password, major, faculty, status, description } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'Provide at least username and password' });
+    return res.status(400).json({ error: 'Provide at least username and password!' });
+  }
+
+  if (status != 'user' && status != 'admin' && status != 'candidate') {
+    return res.status(400).json({ error: 'Provide a valid status!' });
   }
 
   bcrypt.hash(password, 10, (err, hash) => {
@@ -53,7 +57,7 @@ const login = (req, res) => {
             req.session.status = status;
             req.session.userId = userId;
 
-            res.json({ message: 'User logged in successfully', username });
+            res.json({ message: 'User logged in successfully', username, status });
           });
         } else {
           res.status(401).json({ error: 'Incorrect Username and/or Password!' });

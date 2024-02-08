@@ -2,7 +2,7 @@ const pool = require('../config/database');
 const { executeQuery } = require('../services/db');
 
 const checkUserExistence = (req, res, next) => {
-  const { username, id } = req.query;
+  const { username, id } = req.params;
 
   if (!username && !id) {
     return next();

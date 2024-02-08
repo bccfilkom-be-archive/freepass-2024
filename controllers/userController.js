@@ -2,26 +2,24 @@ const bcrypt = require('bcrypt');
 const pool = require('../config/database');
 const { executeQuery } = require('../services/db');
 
-const viewAllUsers = (req, res) => {
-  executeQuery(`SELECT id, nim, username, name, major, faculty, status, description FROM user`, [])
-    .then((results) => {
-      return res.json(results);
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).json({ error: 'Internal Server Error' });
-    })
-};
-
 const viewUser = (req, res) => {
-  const { username } = req.query;
+  let query;
+  let params = [];
 
-  let query = `SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ?`;
+  const usernameParams = req.params.username;
+  
+  if (usernameParams) {
+    query = `SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE username = ?`;
+    params.push(usernameParams);
+  } 
+  else {
+    query = `SELECT id, nim, username, name, major, faculty, status, description FROM user`;
+  }
 
-  executeQuery(query, [username == null ? req.session.username : username])
+  executeQuery(query, params)
     .then((results) => {
       if (results.length === 0) {
-        return res.status(404).json({ error: 'User not found!' });
+        return res.status(404).json({ error: 'User(s) not found!' });
       } else {
         return res.json(results);
       }
@@ -94,32 +92,19 @@ const editProfile = (req, res) => {
 };
 
 const deleteUser = (req, res) => {
-  const { id, username } = req.query;
+  const { username } = req.params;
 
-  if (!id && !username) {
-    return res.status(400).json({ error: 'Provide either id or username' });
+  if (!username) {
+    return res.status(400).json({ error: 'Provide username!' });
   }
 
-  if (id && username) {
-    return res.status(400).json({ error: 'Provide either id or username, not both' });
-  }
-
-  if (id == req.session.userId || username == req.session.username) {
+  if (username == req.session.username) {
     return res.status(403).json({ error: 'You cannot delete your own account' });
   }
 
-  let deleteQuery = 'DELETE FROM user WHERE ';
-  let deleteParams = [];
+  let query = 'DELETE FROM user WHERE username = ? ';
 
-  if (id) {
-    deleteQuery += 'id = ?';
-    deleteParams.push(id);
-  } else if (username) {
-    deleteQuery += 'username = ?';
-    deleteParams.push(username);
-  }
-
-  executeQuery(deleteQuery, deleteParams)
+  executeQuery(query, [username])
     .then((results) => {
       if (results.affectedRows === 0) {
         return res.status(404).json({ error: 'User not found!' });
@@ -133,11 +118,15 @@ const deleteUser = (req, res) => {
 };
 
 const editStatus = (req, res) => {
-  const { username } = req.query;
+  const { username } = req.params;
   const { status } = req.body;
 
   if (!username) {
     return res.status(400).json({ error: 'Provide username in query!' });
+  }
+
+  if (status != 'user' && status != 'admin' && status != 'candidate') {
+    return res.status(400).json({ error: 'Provide a valid status!' });
   }
 
   if (username == req.session.username) {
@@ -157,7 +146,6 @@ const editStatus = (req, res) => {
 };
 
 module.exports = {
-  viewAllUsers,
   viewUser,
   editProfile,
   deleteUser,
