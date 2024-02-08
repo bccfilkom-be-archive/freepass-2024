@@ -190,6 +190,26 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
 
+### Docker
+1. Clone the repository or download manually:
+```
+git clone --branch yoga-raditya-nala https://github.com/yogarn/freepass-2024
+```
+2. Navigate to the project directory:
+```
+cd freepass-2024
+```
+3. Run Docker Compose to start the application:
+```
+docker-compose up -d
+```
+4. Access the application in your web browser at http://localhost:3000/api/
+5. API documentation can be accessed at http://localhost:3000/api-docs/
+6. To stop the application and shut down the Docker containers, run:
+```
+docker-compose down
+```
+
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
 Have any questions? You can contact either [Vinncent](https://www.instagram.com/centwong_) or [Izra](https://www.instagram.com/izrarya).
