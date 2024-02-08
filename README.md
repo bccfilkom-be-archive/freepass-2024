@@ -22,7 +22,7 @@ As we have mentioned earlier, we need technology that can support BCC Election i
 - New user can register account to the system ✔️
 - User can login to the system ✔️
 - User can edit their profile account ✔️
-- User can view the candidate's posts
+- User can view the candidate's posts ✔️
 - User can comment on candidate’s posts
 - Users can view information about the candidates
 - Users can cast their votes for candidates during the specified election period
