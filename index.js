@@ -24,7 +24,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/candidates', candidateRoutes);
-app.use('/api/election', electionRoutes);
+app.use('/api/elections', electionRoutes);
 app.use('/api', authRoutes);
 
 app.listen(port, () => {

@@ -41,23 +41,37 @@ const viewCandidate = (req, res) => {
         return res.status(400).json({ message: 'Candidate not found!' });
       }
 
-      const getUsersPostsPromises = userResults.map((user) => {
-        return getPosts(user.id).then((posts) => {
-          const getCommentsPromises = posts.map((post) => {
-            return getComments(post.id);
-          });
+      const candidatesData = userResults.map((user) => {
+        const userData = {
+          id: user.id,
+          nim: user.nim,
+          username: user.username,
+          name: user.name,
+          major: user.major,
+          faculty: user.faculty,
+          status: user.status,
+          description: user.description,
+          posts: []
+        };
 
-          return Promise.all(getCommentsPromises)
-            .then((commentResults) => {
-              posts.forEach((post, index) => {
-                post.comments = commentResults[index];
-              });
-              return { profile: user, posts: posts };
+        return getPosts(user.id)
+          .then((posts) => {
+            const getCommentsPromises = posts.map((post) => {
+              return getComments(post.id);
             });
-        });
+
+            return Promise.all(getCommentsPromises)
+              .then((commentResults) => {
+                posts.forEach((post, index) => {
+                  post.comments = commentResults[index];
+                });
+                userData.posts = posts;
+                return userData;
+              });
+          });
       });
 
-      return Promise.all(getUsersPostsPromises)
+      return Promise.all(candidatesData)
         .then((candidateData) => {
           res.json(candidateData);
         });

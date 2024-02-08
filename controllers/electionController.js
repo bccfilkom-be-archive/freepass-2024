@@ -4,6 +4,10 @@ const { executeQuery } = require('../services/db');
 const castVote = (req, res) => {
   const { election_id: electionId, candidate_username: candidateUsername } = req.body;
 
+  if (!electionId || !candidateUsername) {
+    return res.status(400).json({ error: 'Provide election_id and candidate_username in the request body!' });
+  }
+
   let query = `INSERT INTO vote (user_id, election_id, candidate_id) VALUES (?, ?, (SELECT id FROM user WHERE username = ?))`;
   let values = [req.session.userId, electionId, candidateUsername];
 
@@ -34,7 +38,7 @@ const createElection = (req, res) => {
 };
 
 const editElection = (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
   const { name, start_date: startDate, end_date: endDate } = req.body;
 
   let query = `UPDATE election SET name = ?, start_date = ?, end_date = ? WHERE id = ?`;
@@ -86,11 +90,13 @@ const viewElection = (req, res) => {
   Promise.all([fetchElectionInfo(), fetchVoteCounts()])
     .then(([elections, counts]) => {
       if (electionId && elections.length === 0) {
-        res.status(400).json({ error: 'No election found' });
+        res.status(400).json({ error: 'No election found!' });
       } else {
         const result = elections.map((election, index) => ({
-          information: election,
-          counts: counts[index] || []
+          information: {
+            ...election,
+            counts: counts[index] || [] // Nesting counts under information
+          }
         }));
         res.json(result);
       }
