@@ -20,3 +20,7 @@ export const updatePostById = async (id: string, payload: UpdatePostForm) => {
 export const deletePostById = async (id: string) => {
   return await Post.findByIdAndDelete(id)
 }
+
+export const getAllPosts = async () => {
+  return await Post.find({})
+}

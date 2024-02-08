@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import { createFormValidation, updatePostValidation } from '../validation/post.validation'
 import type { CreatePostForm, UpdatePostForm } from '../types/post.type'
-import { createPostForId, deletePostById, findPostById, updatePostById } from '../services/post.service'
+import { createPostForId, deletePostById, findPostById, updatePostById, getAllPosts } from '../services/post.service'
 import { findCandidateByField } from '../services/candidate.service'
 
 export const createPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -90,4 +90,13 @@ export const viewPost = async (req: Request, res: Response, next: NextFunction) 
       next(error)
     }
   }
+}
+
+export const viewAllPosts = async (req: Request, res: Response, next: NextFunction) => {
+  const posts = await getAllPosts()
+  return res.status(200).send({
+    status: 200,
+    message: 'get all posts success',
+    data: { posts: [...posts], length: posts.length }
+  })
 }
