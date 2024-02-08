@@ -26,3 +26,26 @@ export const viewCandidate = async (req: Request, res: Response, next: NextFunct
     }
   }
 }
+
+export const viewCandidatePosts = async (req: Request, res: Response, next: NextFunction) => {
+  const candidateId = req.params.id
+
+  try {
+    const id = await findCandidateById(candidateId)
+    if (!id) throw new Error('id not found')
+
+    const candidate = await findCandidateById(candidateId)
+    if (candidate) {
+      const posts = candidate.posts
+      return res
+        .status(200)
+        .send({ status: 200, message: "view candidate's posts success", data: { posts, length: posts.length } })
+    }
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      res.status(404).send({ status: 404, message: error.message })
+    } else {
+      next(error)
+    }
+  }
+}
