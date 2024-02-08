@@ -8,5 +8,5 @@
 6. Use `.gitignore`.
 7. Properly sized commits (don’t put the entire project under 1 or 2 huge commits). Try to make smaller but more frequent commits (if possible).
 8. Don’t forget to send your API Docs to us.
-9. The deadline is at `February 10th, 2024 22:00:00` Western Indonesian Time. It is recommended to create the pull request 1 day before the deadline, because you can still add commits after creating the pull request, until the time of the deadline (commits created after the deadline will not be considered).
+9. The deadline is at `February 10th, 2024 20:30:00` Western Indonesian Time. It is recommended to create the pull request 1 day before the deadline, because you can still add commits after creating the pull request, until the time of the deadline (commits created after the deadline will not be considered).
 10. There is an interview after you did a pull request. Please, prepare your self for the interview, our team will contact you immediately. Consider following our social media on [Instagram](https://www.instagram.com/bccfilkom/) for further information.
