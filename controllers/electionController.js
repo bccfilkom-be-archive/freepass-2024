@@ -93,10 +93,11 @@ const viewElection = (req, res) => {
         res.status(400).json({ error: 'No election found!' });
       } else {
         const result = elections.map((election, index) => ({
-          information: {
-            ...election,
-            counts: counts[index] || [] // Nesting counts under information
-          }
+          id: election.id,
+          name: election.name,
+          start_date: election.start_date,
+          end_date: election.end_date,
+          counts: counts[index] || []
         }));
         res.json(result);
       }
