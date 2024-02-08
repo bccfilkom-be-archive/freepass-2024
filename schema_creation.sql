@@ -1,6 +1,6 @@
-CREATE DATABASE backend_bcc;
+CREATE DATABASE backend_bcc_freepass_2024;
 
-USE backend_bcc;
+USE backend_bcc_freepass_2024;
 
 CREATE TABLE user (
     id INT PRIMARY KEY AUTO_INCREMENT,
