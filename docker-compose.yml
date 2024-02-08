@@ -4,10 +4,10 @@ services:
     image: mariadb:10.4.28
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes'
       MYSQL_DATABASE: backend_bcc
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/schema_template.sql
+      - ./schema_template.sql:/docker-entrypoint-initdb.d/schema_template.sql
   app:
     build: .
     ports:
