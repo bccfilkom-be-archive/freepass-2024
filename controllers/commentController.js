@@ -4,28 +4,35 @@ const { executeQuery } = require('../services/db');
 const viewComment = (req, res) => {
   const { id, 'post-id': postId, username } = req.query;
 
-  let query = 'SELECT * FROM comment WHERE';
+  let query = `
+  SELECT c.id, c.user_id, u.username, u.name, c.post_id, c.content, c.timestamp
+  FROM comment AS c
+  JOIN user AS u ON c.user_id = u.id
+  WHERE 1
+  `;
   let values = [];
 
   if (id) {
-    query += ' id = ?';
+    query += ' AND c.id = ?';
     values.push(id);
-  } else if (postId) {
-    query += ' post_id = ?';
+  }
+
+  if (postId) {
+    query += ' AND c.post_id = ?';
     values.push(postId);
-  } else if (username) {
-    query += ' user_id IN (SELECT id FROM user WHERE username = ?)';
+  }
+
+  if (username) {
+    query += ' AND c.user_id = (SELECT id FROM user WHERE username = ?)';
     values.push(username);
-  } else {
-    return res.status(400).json({ error: 'Provide id, postId, or username!' });
   }
 
   executeQuery(query, values)
     .then((results) => {
       if (results.length === 0) {
-        res.status(400).json({ error: 'No results' });
+        return res.status(400).json({ error: 'No results' });
       } else {
-        res.json({ results });
+        res.json(results);
       }
     })
     .catch((error) => {
@@ -35,11 +42,14 @@ const viewComment = (req, res) => {
 };
 
 const addComment = (req, res) => {
-  const { 'post-id': postId } = req.query;
-  const { content } = req.body;
+  const { content, post_id: postId } = req.body;
 
   const query = `INSERT INTO comment (user_id, post_id, content) VALUES (?, ?, ?)`;
   const values = [req.session.userId, postId, content];
+
+  if (!postId || !content) {
+    return res.status(400).json({ error: 'Provide post_id and content in the request body!' });
+  }
 
   executeQuery(query, values)
     .then(() => {
@@ -52,7 +62,7 @@ const addComment = (req, res) => {
 };
 
 const deleteComment = (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
 
   const query = `DELETE FROM comment WHERE id = ?`;
   const values = [id];

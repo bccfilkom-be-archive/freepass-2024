@@ -2,7 +2,7 @@ const pool = require('../config/database');
 const { executeQuery } = require('../services/db');
 
 const checkCommentExistence = (req, res, next) => {
-  const { id } = req.query;
+  const { id } = req.params;
 
   executeQuery(`SELECT * FROM comment WHERE id = ?`, [id])
   .then((results) => {

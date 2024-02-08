@@ -2,7 +2,8 @@ const pool = require('../config/database');
 const { executeQuery } = require('../services/db');
 
 const checkPostExistence = (req, res, next) => {
-  const { id, 'post-id': postId } = req.query;
+  const { id } = req.params;
+  const { 'post_id': postId } = req.body;
 
   if (!id && !postId) {
     return next();
@@ -32,7 +33,7 @@ const checkPostExistence = (req, res, next) => {
 
 
 const checkPostOwnership = (req, res, next) => {
-  const postId = req.query.id;
+  const postId = req.params.id;
   const userId = req.session.userId;
 
   if (req.session.status === 'admin') {

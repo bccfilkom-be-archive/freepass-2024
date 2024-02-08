@@ -4,10 +4,6 @@ const { executeQuery } = require('../services/db');
 const viewPost = (req, res) => {
   const { id, username } = req.query;
 
-  if (id && username) {
-    return res.status(400).json({ error: 'Provide either id or username, not both' });
-  }
-
   function fetchCommentsForPost(post) {
     return executeQuery(
       `SELECT c.id, c.user_id, u.username AS username, u.name AS name, c.post_id, c.content, c.timestamp
@@ -20,15 +16,21 @@ const viewPost = (req, res) => {
 
   let query = `SELECT p.id, p.user_id, u.username AS username, u.name AS name, p.title, p.content, p.timestamp 
     FROM post AS p
-    JOIN user u ON user_id = u.id`;
+    JOIN user AS u ON p.user_id = u.id
+    WHERE 1`;
+
+  const values = [];
 
   if (id) {
-    query += ` WHERE p.id = ?`;
-  } else if (username) {
-    query += ` WHERE p.user_id IN (SELECT id FROM user WHERE username = ?)`;
+    query += ` AND p.id = ?`;
+    values.push(id);
+  }
+  if (username) {
+    query += ` AND p.user_id = (SELECT id FROM user WHERE username = ?)`;
+    values.push(username);
   }
 
-  executeQuery(query, [id || username])
+  executeQuery(query, values)
     .then((posts) => {
       if (posts.length === 0) {
         return res.status(400).json({ message: 'No result' });
@@ -71,37 +73,41 @@ const addPost = (req, res) => {
 };
 
 const editPost = (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
   const { title, content } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Provide post id!' });
+  }
 
   let query = `UPDATE post SET title = ?, content = ? WHERE id = ?`;
   let values = [title, content, id];
 
   executeQuery(query, values)
-  .then(() => {
-    res.json({ message: 'Post updated successfully' });
-  })
-  .catch((error) => {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  })
+    .then(() => {
+      res.json({ message: 'Post updated successfully' });
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    })
 };
 
 const deletePost = (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
 
   if (!id) {
-    return res.status(400).json({ error: 'Provide post id' });
+    return res.status(400).json({ error: 'Provide post id!' });
   }
 
   executeQuery(`DELETE FROM post WHERE id = ?`, [id])
-  .then(() => {
-    res.json({ message: 'Post deleted successfully' });
-  })
-  .catch((error) => {
-    console.error(error);
-    return res.status(500).json({ error: 'Internal Server Error' });
-  })
+    .then(() => {
+      res.json({ message: 'Post deleted successfully' });
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    })
 };
 
 module.exports = {

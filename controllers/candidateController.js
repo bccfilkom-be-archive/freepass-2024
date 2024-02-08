@@ -26,7 +26,7 @@ const viewCandidate = (req, res) => {
     const commentQuery = `
     SELECT c.id, c.user_id, u.username AS username, u.name AS name, c.post_id, c.content, c.timestamp
     FROM comment AS c
-    JOIN user u ON user_id = u.id 
+    JOIN user AS u ON c.user_id = u.id 
     WHERE post_id = ?`;
     return executeQuery(commentQuery, [postId]);
   };
