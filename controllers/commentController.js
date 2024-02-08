@@ -64,17 +64,21 @@ const addComment = (req, res) => {
 const deleteComment = (req, res) => {
   const { id } = req.params;
 
-  const query = `DELETE FROM comment WHERE id = ?`;
-  const values = [id];
+  if (!id) {
+    return res.status(400).json({ error: 'Provide id for the comment in the params!' });
+  } else {
+    const query = `DELETE FROM comment WHERE id = ?`;
+    const values = [id];
 
-  executeQuery(query, values)
-    .then(() => {
-      res.json({ message: 'Comment deleted successfully' });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    });
+    executeQuery(query, values)
+      .then(() => {
+        res.json({ message: 'Comment deleted successfully' });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      });
+  }
 };
 
 module.exports = {
