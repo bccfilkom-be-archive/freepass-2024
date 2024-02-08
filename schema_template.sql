@@ -11,9 +11,9 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
--- CREATE DATABASE backend_bcc;
+-- CREATE DATABASE backend_bcc_freepass_2024;
 
-USE backend_bcc;
+USE backend_bcc_freepass_2024;
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -22,7 +22,7 @@ USE backend_bcc;
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `backend_bcc`
+-- Database: `backend_bcc_freepass_2024`
 --
 
 -- --------------------------------------------------------

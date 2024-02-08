@@ -4,7 +4,7 @@ const pool = mysql.createPool({
   host: 'db',
   user: 'root',
   password: '',
-  database: 'backend_bcc',
+  database: 'backend_bcc_freepass_2024',
 });
 
 module.exports = pool;

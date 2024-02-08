@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes'
-      MYSQL_DATABASE: backend_bcc
+      MYSQL_DATABASE: backend_bcc_freepass_2024
     volumes:
       - ./schema_template.sql:/docker-entrypoint-initdb.d/schema_template.sql
   app:
