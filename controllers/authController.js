@@ -30,7 +30,7 @@ const register = (req, res) => {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });
       });
-});
+  });
 };
 
 const login = (req, res) => {
@@ -51,7 +51,6 @@ const login = (req, res) => {
             if (err || !passwordMatch) {
               return res.status(401).json({ error: 'Incorrect Username and/or Password!' });
             }
-
             req.session.loggedin = true;
             req.session.username = username;
             req.session.status = status;
