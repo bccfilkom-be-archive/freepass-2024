@@ -8,19 +8,20 @@ import (
 	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
+
 )
 
 func LoginUser(c *gin.Context) {
 	var request *schemas.UserLoginRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Email, Name, Password is Required", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Email, Password is Required", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
 	if request.Email == "" || request.Password == "" {
-		res := schemas.ResponeData{Error: true, Message: "Email, Name, Password is Required", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Email, Password is Required", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
@@ -38,7 +39,7 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	accessData := map[string]interface{}{"id": user.ID, "email": user.Email}
+	accessData := map[string]interface{}{"id": user.ID, "email": user.Email, "isAdmin": user.IsAdmin}
 	accessToken, err := utils.SignJWT(accessData, "JWT_SECRET", 24)
 
 	if err != nil {

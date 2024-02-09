@@ -12,6 +12,7 @@ type UserLoginRequest struct {
 }
 
 type UserTokenData struct {
-	ID    string
-	Email string
+	ID      string
+	Email   string
+	IsAdmin bool
 }

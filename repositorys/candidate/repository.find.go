@@ -21,3 +21,14 @@ func FindCandidateInformations(ID string) (*models.CandidateInformation, error) 
 	}
 	return informations, nil
 }
+
+func FindCandidateInElection(userID string, electionID string) (int, error) {
+	var candidate *models.Candidate
+	if err := database.DB.Where("user_id = ? AND election_id = ?", userID, electionID).First(&candidate).Error; err != nil {
+		return 0, err
+	}
+	if candidate.ID == "" {
+		return 0, nil
+	}
+	return 1, nil
+}

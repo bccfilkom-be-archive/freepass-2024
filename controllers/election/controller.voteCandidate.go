@@ -19,6 +19,12 @@ func VoteCandidate(c *gin.Context) {
 	getUser, _ := c.Get("user")
 	user := getUser.(schemas.UserTokenData)
 
+	if user.IsAdmin {
+		res := schemas.ResponeData{Error: true, Message: "Admin is can't vote candidate, Use a user account to vote", Data: nil}
+		c.JSON(http.StatusNotAcceptable, res)
+		return
+	}
+
 	if ElectionID == "" || CandidateID == "" {
 		res := schemas.ResponeData{Error: true, Message: "election_id, candidate_id as a Param is required", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
