@@ -17,6 +17,11 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  next();
+});
+
 app.use(session({
   secret: 'secret',
   resave: true,
@@ -24,7 +29,6 @@ app.use(session({
 }));
 
 const swaggerDocument = yaml.load(fs.readFileSync('./api-docs.yaml', 'utf8'));
-
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use('/api/users', userRoutes);

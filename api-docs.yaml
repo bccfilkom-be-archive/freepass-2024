@@ -21,6 +21,8 @@ tags:
     description: Operations related to elections
   - name: Admins
     description: Operations related to admin access only
+security:
+  - bearerAuth: []
 
 paths:
   # authentication section
@@ -1317,6 +1319,11 @@ paths:
                               type: string
                               example: You've already voted in this election!
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     user:
       type: object
