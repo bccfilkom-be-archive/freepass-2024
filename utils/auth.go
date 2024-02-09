@@ -9,8 +9,8 @@ import (
 	"github.com/rafli5131/freepass-2024/models"
 )
 
-func findUserByEmail(email string) *User {
-	for _, user := range users {
+func findUserByEmail(email string) *models.User {
+	for _, user := range models.Users{
 		if user.Email == email {
 			return &user
 		}
@@ -19,7 +19,7 @@ func findUserByEmail(email string) *User {
 }
 
 func isDuplicate(username, email string) bool {
-	for _, user := range users {
+	for _, user := range models.Users {
 		if user.Name == username || user.Email == email {
 			return true
 		}
@@ -51,8 +51,8 @@ func generateToken(ID int) (string, error) {
 	return signedToken, nil
 }
 
-func findUserByID(userID int) (int, *User) {
-	for i, user := range users {
+func findUserByID(userID int) (int, *models.User) {
+	for i, user := range models.Users {
 		if user.ID == userID {
 			return i, &user
 		}
