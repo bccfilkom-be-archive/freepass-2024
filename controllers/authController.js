@@ -69,19 +69,7 @@ const login = (req, res) => {
   }
 };
 
-const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.json({ message: 'Logout successful' });
-    }
-  });
-};
-
 module.exports = {
   register,
   login,
-  logout,
 };
