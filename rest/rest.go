@@ -51,7 +51,7 @@ func (r *Rest) RouteComment(commentHandler *comment_handler.CommentHandler) {
 	AdminOnly := middleware.CheckAdmin
 
 	r.gin.POST("/posts/:postId", validate, UserOnly, commentHandler.CreateComment)
-	r.gin.DELETE("/posts/:postId/:commentId", validate, AdminOnly, commentHandler.DeleteComment)
+	r.gin.DELETE("/posts/:postId/comments/:commentId", validate, AdminOnly, commentHandler.DeleteComment)
 }
 
 func (r *Rest) RouteElectionTime(electionTimeHandler *election_time_handler.ElectionTimeHandler) {
