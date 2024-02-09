@@ -71,7 +71,7 @@ paths:
                                 example: candidate
                             token:
                                 type: string
-                                example: candidate
+                                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTcwNzQ5MDYzNCwiZXhwIjoxNzA3NDk0MjM0fQ.ICV9BnNncEMw1fQxzAk3k5qoHUB0ULyszlmB8-Hatrk
           '401':
             description: Incorrect credentials (Unauthorized Response)
             content:
@@ -168,6 +168,13 @@ paths:
           description: The username of the user.
           required: false
           example: yogarn
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: The status of the user.
+          required: false
+          example: candidate
       responses:
         '200':
           description: A JSON array containing list of users. (Successful Response)
