@@ -68,11 +68,19 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.VoteResponse, any
 
 	currentTime := time.Now()
 
-	if currentTime.Before(electionTime.StartTime) || currentTime.After(electionTime.EndTime){
+	if currentTime.Before(electionTime.StartTime) {
 		return domain.VoteResponse{}, help.ErrorObject{
 			Code:    http.StatusBadRequest,
 			Message: "can't vote right now",
 			Err:     errors.New("election not started yet"),
+		}
+	}
+
+	if currentTime.After(electionTime.EndTime) {
+		return domain.VoteResponse{}, help.ErrorObject{
+			Code:    http.StatusBadRequest,
+			Message: "can't vote right now",
+			Err:     errors.New("election time has ended"),
 		}
 	}
 
@@ -84,15 +92,15 @@ func (u *VoteUsecase) Vote(c *gin.Context, userId int) (domain.VoteResponse, any
 	err = u.voteRepository.Vote(&voted)
 	if err != nil {
 		return domain.VoteResponse{}, help.ErrorObject{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: "user only can vote 1 time",
-			Err: err,
+			Err:     err,
 		}
 	}
 
 	voteResponse := domain.VoteResponse{
-		User: loginUser.Name,
-		Choice: candidate.Name,
+		User:     loginUser.Name,
+		Choice:   candidate.Name,
 		VoteTime: voted.VoteTime,
 	}
 
