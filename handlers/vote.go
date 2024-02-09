@@ -9,9 +9,9 @@ import (
 	"github.com/rafli5131/freepass-2024/utils"
 )
 
-func vote(c *gin.Context) {
+func Vote(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -22,7 +22,7 @@ func vote(c *gin.Context) {
 	}
 
 	// Pemeriksaan apakah pengguna sudah memberikan vote sebelumnya
-	for _, v := range votes {
+	for _, v := range models.Votes {
 		if v.UserID == userID {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Anda sudah memberikan vote sebelumnya"})
 			return
@@ -37,20 +37,20 @@ func vote(c *gin.Context) {
 	}
 
 	// Membuat objek vote baru
-	var newVote Vote
-	newVote.ID = len(votes) + 1
+	var newVote models.Vote
+	newVote.ID = len(models.Votes) + 1
 	newVote.UserID = userID
 	newVote.CandidateID = candidateID
 
 	// Menyimpan vote ke slice votes
-	votes = append(votes, newVote)
+	models.Votes = append(models.Votes, newVote)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Vote casted successfully", "vote": newVote})
 }
 
-func voteTotal(c *gin.Context) {
+func VoteTotal(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -60,17 +60,11 @@ func voteTotal(c *gin.Context) {
 		return
 	}
 
-	// Pemeriksaan peran admin
-	if getUserRoleFromToken(c) != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin can delete users"})
-		return
-	}
-
 	// Membuat map untuk menyimpan jumlah vote setiap kandidat
 	voteCount := make(map[int]int)
 
 	// Menghitung jumlah vote setiap kandidat
-	for _, v := range votes {
+	for _, v := range models.Votes {
 		voteCount[v.CandidateID]++
 	}
 
@@ -81,7 +75,7 @@ func voteTotal(c *gin.Context) {
 	for candidateID, count := range voteCount {
 		// Mencari nama kandidat berdasarkan ID kandidat
 		var candidateName string
-		for _, user := range users {
+		for _, user := range models.Users {
 			if user.ID == candidateID {
 				candidateName = user.Name
 				break

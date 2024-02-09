@@ -10,11 +10,11 @@ import (
 )
 
 func GetAllUser(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Users retrieved successfully", "users": users})
+	c.JSON(http.StatusOK, gin.H{"message": "Users retrieved successfully", "users": models.Users})
 }
 
-func register(c *gin.Context) {
-	var newUser User
+func Register(c *gin.Context) {
+	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -26,23 +26,23 @@ func register(c *gin.Context) {
 	}
 
 	// Check for duplicate username or email
-	if isDuplicate(newUser.Name, newUser.Email) {
+	if utils.IsDuplicate(newUser.Name, newUser.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Username or email is already in use"})
 		return
 	}
 
 	// Generate ID (you may use a library to generate unique IDs)
-	newUser.ID = len(users) + 1
+	newUser.ID = len(models.Users) + 1
 	if newUser.Role == "" {
 		newUser.Role = "user"
 	}
 
-	users = append(users, newUser)
+	models.Users = append(models.Users, newUser)
 
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully", "user": newUser})
 }
 
-func login(c *gin.Context) {
+func Login(c *gin.Context) {
 	var loginInfo struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -58,7 +58,7 @@ func login(c *gin.Context) {
 		return
 	}
 
-	user := findUserByEmail(loginInfo.Email)
+	user := utils.FindUserByEmail(loginInfo.Email)
 	if user == nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
@@ -71,16 +71,16 @@ func login(c *gin.Context) {
 	}
 
 	// Jika login berhasil, buat token JWT
-	token, err := generateToken(user.ID)
+	token, err := utils.GenerateToken(user.ID)
 	if err != nil {
 		// Handle error
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err})
 		return
 	}
 
-	for i, u := range users {
+	for i, u := range models.Users {
 		if u.ID == user.ID {
-			users[i].Token = token
+			models.Users[i].Token = token
 			break
 		}
 	}
@@ -88,10 +88,10 @@ func login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User logged in successfully", "token": token})
 }
 
-func editProfile(c *gin.Context) {
+func EditProfile(c *gin.Context) {
 	// Pemeriksaan otentikasi
 
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -102,7 +102,7 @@ func editProfile(c *gin.Context) {
 	}
 
 	// Ambil data pengguna yang akan diedit
-	var updatedUser User
+	var updatedUser models.User
 	if err := c.ShouldBindJSON(&updatedUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -114,12 +114,12 @@ func editProfile(c *gin.Context) {
 		return
 	}
 
-	for i, u := range users {
+	for i, u := range models.Users {
 		if u.ID == userID {
-			users[i].Name = updatedUser.Name
-			users[i].Email = updatedUser.Email
-			users[i].Password = updatedUser.Password
-			users[i].PhoneNumber = updatedUser.PhoneNumber
+			models.Users[i].Name = updatedUser.Name
+			models.Users[i].Email = updatedUser.Email
+			models.Users[i].Password = updatedUser.Password
+			models.Users[i].PhoneNumber = updatedUser.PhoneNumber
 			break
 		}
 	}
@@ -127,21 +127,15 @@ func editProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Profile updated successfully", "user": updatedUser})
 }
 
-func deleteUser(c *gin.Context) {
+func DeleteUser(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	if userID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "token tidak valid"})
-		return
-	}
-
-	// Pemeriksaan peran admin
-	if getUserRoleFromToken(c) != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin can delete users"})
 		return
 	}
 
@@ -153,14 +147,14 @@ func deleteUser(c *gin.Context) {
 	}
 
 	// Temukan dan hapus pengguna berdasarkan ID
-	index, existingUser := findUserByID(ID)
+	index, existingUser := utils.FindUserByID(ID)
 	if existingUser == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
 	// Hapus pengguna dari slice users
-	users = append(users[:index], users[index+1:]...)
+	models.Users = append(models.Users[:index], models.Users[index+1:]...)
 
 	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }

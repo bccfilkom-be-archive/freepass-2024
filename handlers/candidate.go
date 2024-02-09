@@ -8,9 +8,9 @@ import (
 	"github.com/rafli5131/freepass-2024/utils"
 )
 
-func viewCandidateInfo(c *gin.Context) {
+func ViewCandidateInfo(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -20,7 +20,7 @@ func viewCandidateInfo(c *gin.Context) {
 		return
 	}
 	var candidates []gin.H
-	for _, u := range users {
+	for _, u := range models.Users {
 		if u.Role == "candidate" {
 			candidate := gin.H{
 				"id":   u.ID,

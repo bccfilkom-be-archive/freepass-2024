@@ -9,9 +9,9 @@ import (
 	"github.com/rafli5131/freepass-2024/utils"
 )
 
-func comment(c *gin.Context) {
+func Comment(c *gin.Context) {
 	// Mendapatkan ID pengguna dari token
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -22,7 +22,7 @@ func comment(c *gin.Context) {
 	}
 
 	// Membaca data komentar dari permintaan
-	var newComment Comment
+	var newComment models.Comment
 	if err := c.ShouldBindJSON(&newComment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -30,7 +30,7 @@ func comment(c *gin.Context) {
 
 	// Menetapkan UserID ke ID pengguna yang ditemukan dari token
 	newComment.UserID = userID
-	newComment.ID = len(comments) + 1
+	newComment.ID = len(models.Comments) + 1
 	postID, err := strconv.Atoi(c.Param("postID"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID pos tidak valid"})
@@ -41,9 +41,9 @@ func comment(c *gin.Context) {
 
 	// Mencari postingan berdasarkan PostID
 	var foundPost bool
-	for _, post := range posts {
+	for _, post := range models.Posts {
 		if post.ID == newComment.PostID {
-			comments = append(comments, newComment)
+			models.Comments = append(models.Comments, newComment)
 			foundPost = true
 			break
 		}
@@ -58,9 +58,9 @@ func comment(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Komentar berhasil ditambahkan"})
 }
 
-func deleteComment(c *gin.Context) {
+func DeleteComment(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -70,21 +70,15 @@ func deleteComment(c *gin.Context) {
 		return
 	}
 
-	// Pemeriksaan peran admin
-	if getUserRoleFromToken(c) != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin can delete users"})
-		return
-	}
-
 	commentID, err := strconv.Atoi(c.Param("commentID")) // Ubah ke "commentID"
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID komentar tidak valid"})
 		return
 	}
 
-	for i, comment := range comments {
+	for i, comment := range models.Comments {
 		if comment.ID == commentID {
-			comments = append(comments[:i], comments[i+1:]...)
+			models.Comments = append(models.Comments[:i], models.Comments[i+1:]...)
 			c.JSON(http.StatusOK, gin.H{"message": "Komentar berhasil dihapus"})
 			return
 		}

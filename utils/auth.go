@@ -9,7 +9,7 @@ import (
 	"github.com/rafli5131/freepass-2024/models"
 )
 
-func findUserByEmail(email string) *models.User {
+func FindUserByEmail(email string) *models.User {
 	for _, user := range models.Users{
 		if user.Email == email {
 			return &user
@@ -18,7 +18,7 @@ func findUserByEmail(email string) *models.User {
 	return nil
 }
 
-func isDuplicate(username, email string) bool {
+func IsDuplicate(username, email string) bool {
 	for _, user := range models.Users {
 		if user.Name == username || user.Email == email {
 			return true
@@ -27,8 +27,8 @@ func isDuplicate(username, email string) bool {
 	return false
 }
 
-func generateToken(ID int) (string, error) {
-	index, user := findUserByID(ID)
+func GenerateToken(ID int) (string, error) {
+	index, user := FindUserByID(ID)
 
 	if index == -1 {
 		// Handle not found
@@ -51,7 +51,7 @@ func generateToken(ID int) (string, error) {
 	return signedToken, nil
 }
 
-func findUserByID(userID int) (int, *models.User) {
+func FindUserByID(userID int) (int, *models.User) {
 	for i, user := range models.Users {
 		if user.ID == userID {
 			return i, &user
@@ -60,7 +60,7 @@ func findUserByID(userID int) (int, *models.User) {
 	return -1, nil
 }
 
-func getUserIDFromToken(c *gin.Context) (int, error) {
+func GetUserIDFromToken(c *gin.Context) (int, error) {
 	tokenHeader := c.GetHeader("Authorization")
 	parts := strings.Split(tokenHeader, " ")
 	if len(parts) == 2 && parts[0] == "Bearer" {
@@ -72,7 +72,7 @@ func getUserIDFromToken(c *gin.Context) (int, error) {
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			if id, ok := claims["id"].(float64); ok {
-				index, user := findUserByID(int(id))
+				index, user := FindUserByID(int(id))
 
 				if index == -1 {
 					return 0, nil
@@ -89,7 +89,7 @@ func getUserIDFromToken(c *gin.Context) (int, error) {
 	return 0, nil
 }
 
-func getUserRoleFromToken(c *gin.Context) string {
+func GetUserRoleFromToken(c *gin.Context) string {
 	// Implementasikan pengambilan peran pengguna dari token di sini
 	// Contoh sederhana, ambil dari header Authorization
 	tokenHeader := c.GetHeader("Authorization")

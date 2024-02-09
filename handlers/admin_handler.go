@@ -9,9 +9,9 @@ import (
 	"github.com/rafli5131/freepass-2024/utils"
 )
 
-func setElectionDates(c *gin.Context) {
+func SetElectionDates(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -21,45 +21,33 @@ func setElectionDates(c *gin.Context) {
 		return
 	}
 
-	// Pemeriksaan peran admin
-	if getUserRoleFromToken(c) != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin can delete users"})
-		return
-	}
-
-	var newSetting Setting
+	var newSetting models.Setting
 	if err := c.ShouldBindJSON(&newSetting); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Jika tidak ada pengaturan tanggal pemilihan, tambahkan satu
-	if len(settings) == 0 {
+	if len(models.Settings) == 0 {
 		newSetting.ID = 1
-		settings = append(settings, newSetting)
+		models.Settings = append(models.Settings, newSetting)
 		c.JSON(http.StatusOK, gin.H{"message": "Election dates set successfully", "newSetting": newSetting})
 		return
 	}
 
 	// Jika ada pengaturan tanggal pemilihan, ganti dengan yang baru
-	settings[0] = newSetting
+	models.Settings[0] = newSetting
 	c.JSON(http.StatusOK, gin.H{"message": "Election dates updated successfully", "newSetting": newSetting})
 }
-func promoteToCandidate(c *gin.Context) {
+func PromoteToCandidate(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if userID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token tidak valid"})
-		return
-	}
-
-	// Pemeriksaan peran admin
-	if getUserRoleFromToken(c) != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin can delete users"})
 		return
 	}
 
@@ -70,14 +58,14 @@ func promoteToCandidate(c *gin.Context) {
 		return
 	}
 
-	var updatedUser User
+	var updatedUser models.User
 	userFound := false
 	// Mencari pengguna dengan ID yang sesuai dan memperbarui perannya menjadi "candidate"
-	for i, u := range users {
+	for i, u := range models.Users {
 		if u.ID == candidateID {
-			users[i].Role = "candidate"
-			users[i].Token = ""
-			updatedUser = users[i]
+			models.Users[i].Role = "candidate"
+			models.Users[i].Token = ""
+			updatedUser = models.Users[i]
 			userFound = true
 			break
 		}

@@ -10,22 +10,16 @@ import (
 	"github.com/rafli5131/freepass-2024/utils"
 )
 
-func createPost(c *gin.Context) {
-	var newPost Post
+func CreatePost(c *gin.Context) {
+	var newPost models.Post
 
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if userID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "token tidak valid"})
-		return
-	}
-
-	// Pemeriksaan peran
-	if getUserRoleFromToken(c) != "candidate" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only candidate can create posts"})
 		return
 	}
 
@@ -39,16 +33,16 @@ func createPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Title and description cannot be empty"})
 		return
 	}
-	if len(settings) == 0 || time.Now().Before(settings[0].Dates) {
+	if len(models.Settings) == 0 || time.Now().Before(models.Settings[0].Dates) {
 
 		// Set timestamp
 		newPost.Dates = time.Now()
 
 		// Inisialisasi ID (contoh sederhana, Anda mungkin membutuhkan mekanisme lain untuk ID)
-		newPost.ID = len(posts) + 1
+		newPost.ID = len(models.Posts) + 1
 
 		// Tambahkan postingan baru ke slice posts
-		posts = append(posts, newPost)
+		models.Posts = append(models.Posts, newPost)
 
 		c.JSON(http.StatusOK, gin.H{"message": "Post created successfully", "post": newPost})
 	} else {
@@ -56,8 +50,8 @@ func createPost(c *gin.Context) {
 	}
 }
 
-func viewPosts(c *gin.Context) {
-	userID, err := getUserIDFromToken(c)
+func ViewPosts(c *gin.Context) {
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -68,14 +62,14 @@ func viewPosts(c *gin.Context) {
 	}
 
 	// Buat map untuk menyimpan komentar berdasarkan ID posnya
-	commentMap := make(map[int][]Comment)
-	for _, comment := range comments {
+	commentMap := make(map[int][]models.Comment)
+	for _, comment := range models.Comments {
 		commentMap[comment.PostID] = append(commentMap[comment.PostID], comment)
 	}
 
 	// Buat slice untuk menyimpan posting dengan komentar
 	var postsWithComments []gin.H
-	for _, post := range posts {
+	for _, post := range models.Posts {
 		postWithComments := gin.H{
 			"id":          post.ID,
 			"title":       post.Title,
@@ -88,9 +82,9 @@ func viewPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"posts": postsWithComments})
 }
 
-func updatePost(c *gin.Context) {
+func UpdatePost(c *gin.Context) {
 	// Pemeriksaan otentikasi
-	userID, err := getUserIDFromToken(c)
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -100,19 +94,12 @@ func updatePost(c *gin.Context) {
 		return
 	}
 
-	// Pemeriksaan peran admin
-	role := getUserRoleFromToken(c)
-	if role != "admin" && role != "candidate" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin or candidate can update posts"})
-		return
-	}
-
 	postID, err := strconv.Atoi(c.Param("postID"))
 
-	var updatedPost *Post
-	for i, post := range posts {
+	var updatedPost *models.Post
+	for i, post := range models.Posts {
 		if post.ID == postID {
-			updatedPost = &posts[i]
+			updatedPost = &models.Posts[i]
 			break
 		}
 	}
@@ -139,8 +126,8 @@ func updatePost(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Post updated successfully"})
 }
 
-func deletePost(c *gin.Context) {
-	userID, err := getUserIDFromToken(c)
+func DeletePost(c *gin.Context) {
+	userID, err := utils.GetUserIDFromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -150,19 +137,12 @@ func deletePost(c *gin.Context) {
 		return
 	}
 
-	// Pemeriksaan peran admin
-	role := getUserRoleFromToken(c)
-	if role != "admin" && role != "candidate" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden. Only admin or candidate can update posts"})
-		return
-	}
-
 	postID, err := strconv.Atoi(c.Param("postID"))
 
 	// Temukan postingan berdasarkan ID dan hapus
-	for i, post := range posts {
+	for i, post := range models.Posts {
 		if post.ID == postID {
-			posts = append(posts[:i], posts[i+1:]...)
+			models.Posts = append(models.Posts[:i], models.Posts[i+1:]...)
 			c.JSON(http.StatusOK, gin.H{"message": "Post deleted successfully"})
 			return
 		}
