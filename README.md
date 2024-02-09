@@ -108,43 +108,49 @@ We want to see your perspective about these problems. You can define various typ
 true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
 
 ```
-user
-  - id	
-  - nim	
-  - username
-  - password
-  - name	
-  - major	
-  - faculty
-  - status (user | candidate | admin)
-  - description
+(Entities)
+User: Represents individuals who interact with the system. They can have different roles such as regular users, candidates, or administrators. Attributes include:
+- id
+- nim (student ID)
+- username
+- password
+- name
+- major
+- faculty
+- status (user | candidate | admin)
+- description
 
-post
-  - id	
-  - user_id	
-  - title	
-  - content	
-  - timestamp
+Post: Represents the content created by users, particularly candidates in this context. Attributes include:
+- id
+- user_id (referring to the creator)
+- title
+- content
+- timestamp
 
-comment
-  - id	
-  - user_id	
-  - post_id	
-  - content	
-  - timestamp	
+Comment: Represents the comments made by users on posts. Attributes include:
+- id
+- user_id (referring to the commenter)
+- post_id (referring to the post being commented on)
+- content
+- timestamp
 
-election
-  - id	
-  - start_date	
-  - end_date	
-  - timestamp
+Election: Represents the election event. Attributes include:
+- id
+- start_date
+- end_date
+- timestamp
 
-vote
-  - id	
-  - user_id	
-  - election_id	
-  - candidate_id
-  - timestamp	
+Vote: Represents the votes cast by users in the election. Attributes include:
+- id
+- user_id (referring to the voter)
+- election_id (referring to the election being voted in)
+- candidate_id (referring to the candidate being voted for)
+- timestamp
+
+(Actors)
+- User: Individuals who interact with the system. They can have different roles such as regular users, candidates, or administrators.
+- Candidate: Users who are running for election. They can create posts to campaign and receive comments from other users.
+- Administrator: Users with special privileges to manage the election system, such as creating or closing elections, managing users, and managing posts.
 ```
 
 ## **📘** References
