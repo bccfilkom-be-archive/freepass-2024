@@ -197,13 +197,13 @@ ORM: GORM
 Database: MySQL
 Authentication: JWT
 
-###Installation Guide
+### Installation Guide
 1. Clone this repository to your local
 2. On file `.env.example` rename this file to `.env`
 3. Fill up `.env` with your credentials
 4. run the program with command `go run main.go`
 
-###API Documentation
+### API Documentation
 https://documenter.getpostman.com/view/32186007/2s9YyzcdBR
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
