@@ -5,18 +5,18 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-
 )
 
 type Candidate struct {
-	ID           string                 `gorm:"primaryKey"`
-	CreatedAt    time.Time              `gorm:"not null" json:"createdAt"`
-	UpdatedAt    time.Time              `gorm:"not null" json:"updatedAt"`
-	UserID       string                 `gorm:"not null" json:"user_id"`
-	ElectionNum  int                    `gorm:"not null" json:"election_number"`
-	ElectionID   string                 `gorm:"not null" json:"election_id"`
-	Vote         int                    `gorm:"not null" json:"vote"`
-	Post         []Post                 `gorm:"foreignKey:CandidateID"`
+	ID           string               `gorm:"primaryKey"`
+	CreatedAt    time.Time            `gorm:"not null" json:"createdAt"`
+	UpdatedAt    time.Time            `gorm:"not null" json:"updatedAt"`
+	UserID       string               `gorm:"not null" json:"user_id"`
+	ElectionNum  int                  `gorm:"not null" json:"election_number"`
+	ElectionID   string               `gorm:"not null" json:"election_id"`
+	Vote         int                  `gorm:"not null" json:"vote"`
+	VoteHistorys []Vote               `gorm:"foreignKey:CandidateID"`
+	Post         []Post               `gorm:"foreignKey:CandidateID"`
 	Informations CandidateInformation `gorm:"foreignKey:CandidateID"`
 }
 

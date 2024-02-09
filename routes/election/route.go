@@ -1,12 +1,13 @@
-package candidateRoute
+package electionRoute
 
 import (
 	"github.com/gin-gonic/gin"
 
-	candidateController "github.com/AkbarFikri/freepassBCC-2024/controllers/candidate"
+	electionController "github.com/AkbarFikri/freepassBCC-2024/controllers/election"
 
 )
 
 func RegisterRoute(route *gin.RouterGroup) {
-	route.POST("/:candidate_id", candidateController.GetOneCandidateInformation)
+	route.GET("/candidate/:candidate_id", electionController.GetOneCandidateInformation)
+	route.POST("/:election_id/candidate/:candidate_id/vote", electionController.VoteCandidate)
 }

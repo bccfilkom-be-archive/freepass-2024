@@ -1,4 +1,4 @@
-package candidateController
+package electionController
 
 import (
 	"net/http"

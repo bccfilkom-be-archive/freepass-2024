@@ -3,11 +3,12 @@ package candidateRepositorys
 import (
 	"github.com/AkbarFikri/freepassBCC-2024/database"
 	"github.com/AkbarFikri/freepassBCC-2024/models"
+
 )
 
 func FindSpecificCandidate(ID string) (*models.Candidate, error) {
 	var candidate *models.Candidate
-	if err := database.DB.First(&candidate).Error; err != nil {
+	if err := database.DB.First(&candidate).Where("id = ?", ID).Error; err != nil {
 		return candidate, err
 	}
 	return candidate, nil

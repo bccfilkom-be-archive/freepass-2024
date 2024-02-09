@@ -25,7 +25,7 @@ As we have mentioned earlier, we need technology that can support BCC Election i
 - User can view the candidate's posts ✔️
 - User can comment on candidate’s posts ✔️
 - Users can view information about the candidates ✔️
-- Users can cast their votes for candidates during the specified election period
+- Users can cast their votes for candidates during the specified election period ✔️
 - Admin can promote user to candidate
 - Admin can view the candidate’s posts
 - Admin can set the start and end dates for the election period
