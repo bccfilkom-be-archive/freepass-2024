@@ -107,6 +107,58 @@ THEN  => System will show a deletion status message and delete relevant post
 We want to see your perspective about these problems. You can define various types of entities or actors. One thing for sure, there is no
 true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
 
+### Entities
+1. Users
+   - Username (unique)
+   - Password   
+   - HasVoted 
+   - IsCandidate 
+   - Votes
+   - ID
+   - CreatedAt
+   - UpdatedAt
+   - DeletedAt
+     
+2. Posts
+   - Author
+   - Title   
+   - Body 
+   - ID
+   - CreatedAt
+   - UpdatedAt
+   - DeletedAt
+       
+3. Comments
+   - PostID
+   - Username  
+   - Body 
+   - ID
+   - CreatedAt
+   - UpdatedAt
+   - DeletedAt
+     
+4. Elections
+   - Year
+   - StartDate 
+   - EndDate
+   - WinnerUsername
+   - ID
+   - CreatedAt
+   - UpdatedAt
+   - DeletedAt
+     
+
+### Actors
+1. Users: Can register, login, edit password, show all post, show specific post, add comment, and vote a candidate.
+2. Candidates: Can create a post, update a post, and delete a post.
+3. Admin: Can promote user to candidate, fetch posts, set election date interval, delete a user, delete a post, and delete a comment.
+   
+   the admin role is accessible by login with:
+   ```
+   username: admin
+   password: freepass2024
+   ```
+
 ## **📘** References
 
 You might be overwhelmed by these requirements. Don’t worry, here’s a list of some tools that you could use (it’s not required to use all of them nor any of them):
@@ -149,6 +201,12 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 ## **🧪** API Installation
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+### Using Google Cloud
+The API is already hosted on google cloud:
+```
+https://freepass-2024-v54ppgzx2a-de.a.run.app/api
+```
+You can send http requests directly to the URL.
 ### Using Docker
 Make sure docker is running and execute these commands:
 ```
@@ -169,6 +227,8 @@ go run main.go
 ```
 A new .env file is needed for this to work.
 You can create the file according to the .env.example.
+
+### API Documentation
 
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
