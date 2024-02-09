@@ -1,11 +1,10 @@
-module rafli5131/freepass-2024
+module freepass-2024
 
 go 1.21.6
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
-	github.com/rafli5131/freepass-2024 v0.0.0-20240209134823-69ca58dd3d02
 )
 
 require (

@@ -5,10 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"rafli5131/freepass-2024/handlers"
-	"rafli5131/freepass-2024/middleware"
-	"rafli5131/freepass-2024/models"
-	"rafli5131/freepass-2024/utils"
+	"github.com/rafli5131/freepass-2024/handler"
+	"github.com/rafli5131/freepass-2024/middleware"
 )
 
 func main() {
