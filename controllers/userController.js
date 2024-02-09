@@ -3,7 +3,7 @@ const pool = require('../config/database');
 const { executeQuery } = require('../services/db');
 
 const viewUser = (req, res) => {
-  const { id, username } = req.query;
+  const { id, username, status } = req.query;
   let query = `SELECT id, nim, username, name, major, faculty, status, description FROM user WHERE 1`;
   let params = [];
 
@@ -15,6 +15,11 @@ const viewUser = (req, res) => {
   if (username) {
     query += ` AND username = ?`;
     params.push(username);
+  }
+
+  if (status) {
+    query += ` AND status = ?`;
+    params.push(status);
   }
 
   executeQuery(query, params)

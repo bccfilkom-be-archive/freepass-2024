@@ -17,11 +17,6 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-// app.use((req, res, next) => {
-//   res.setHeader('Cache-Control', 'public, max-age=3600');
-//   next();
-// });
-
 app.use(session({
   secret: 'secret',
   resave: true,
