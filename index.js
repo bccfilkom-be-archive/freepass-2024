@@ -32,7 +32,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/elections', electionRoutes);
-app.use('/api', authRoutes);
+app.use('/api/auth', authRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

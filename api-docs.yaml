@@ -24,10 +24,76 @@ tags:
 
 paths:
   # authentication section
-  /register:
+  /auth:
+    post:
+      tags:
+        - Authentication
+      summary: Create a session and log user in
+      description: Authenticate and grant access based on user credentials. Return user login status. User must log out before accessing this endpoint if user have logged in previously.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: yogarn
+                password:
+                  type: string
+                  example: root
+      responses:
+          '200':
+              description: A JSON object of user login status and username information. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: User logged in successfully
+                            username:
+                              type: string
+                              example: yogarn
+                            status:
+                                type: string
+                                example: candidate
+          '401':
+            description: Incorrect credentials (Unauthorized Response)
+            content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Incorrect Username and/or Password!
+    delete:
+      tags:
+        - Authentication
+      summary: Destroy a session and log user out.
+      description: Destroy current session and return user logout status. User must log in first before logging out.
+      responses:
+          '200':
+              description: A JSON object of user logout status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Logout successful
+  
+  # users section
+  /users:
     post:
         tags:
-         - Authentication
          - Users
         summary: Register a new user to the system
         description: Record user credentials and return it's username. Only the username and password key-value pair are required. If user leave other key empty, their values ​​will be stored as null, which user can edit later. User must log out before accessing this endpoint if user have logged in previously.
@@ -89,75 +155,6 @@ paths:
                               error:
                                 type: string
                                 example: Username already used!
-  /login:
-    post:
-      tags:
-        - Authentication
-      summary: Create a session and log user in
-      description: Authenticate and grant access based on user credentials. Return user login status. User must log out before accessing this endpoint if user have logged in previously.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - password
-              properties:
-                username:
-                  type: string
-                  example: yogarn
-                password:
-                  type: string
-                  example: root
-      responses:
-          '200':
-              description: A JSON object of user login status and username information. (Successful Response)
-              content:
-                  application/json:
-                      schema:
-                          type: object
-                          properties:
-                            message:
-                              type: string
-                              example: User logged in successfully
-                            username:
-                              type: string
-                              example: yogarn
-                            status:
-                                type: string
-                                example: candidate
-          '401':
-            description: Incorrect credentials (Unauthorized Response)
-            content:
-              application/json:
-                  schema:
-                      type: object
-                      properties:
-                        error:
-                          type: string
-                          example: Incorrect Username and/or Password!
-  /logout:
-    get:
-      tags:
-        - Authentication
-      summary: Destroy a session and log user out.
-      description: Destroy current session and return user logout status. User must log in first before logging out.
-      responses:
-          '200':
-              description: A JSON object of user logout status. (Successful Response)
-              content:
-                  application/json:
-                      schema:
-                          type: object
-                          properties:
-                            message:
-                              type: string
-                              example: Logout successful
-  
-  # users section
-  /users:
     get:
       summary: View users profile
       description: Returns a list of users.

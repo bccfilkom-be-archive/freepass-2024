@@ -8,9 +8,14 @@ services:
       MYSQL_DATABASE: backend_bcc_freepass_2024
     volumes:
       - ./schema_template.sql:/docker-entrypoint-initdb.d/schema_template.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
+      interval: 10s
+      retries: 5
   app:
     build: .
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
