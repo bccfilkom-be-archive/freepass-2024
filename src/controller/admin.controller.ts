@@ -136,3 +136,66 @@ export const deleteCandidate = async (req: Request, res: Response, next: NextFun
     next(error)
   }
 }
+
+export const deletePost = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id
+
+  try {
+    const post = await findPostById(id)
+
+    if (post) {
+      const commentIds = post.comments
+      commentIds.forEach(async (commentId) => {
+        const comment = await findCommentById(commentId._id.toString())
+        if (comment) {
+          const userId = comment.userId
+          const user = await findUserById(userId._id.toString())
+          if (user) {
+            user.comments = user.comments.filter((comment) => comment._id.toString() !== commentId._id.toString())
+            user.commentedPosts = user.commentedPosts.filter(
+              (post) => post._id.toString() !== comment.postId.toString()
+            )
+            await user.save()
+          }
+
+          await deleteCommentById(comment._id.toString())
+        }
+      })
+
+      const candidate = await findCandidateById(post.candidateId.toString())
+      if (candidate) {
+        candidate.posts = candidate.posts.filter((p) => p._id.toString() !== post._id.toString())
+        await candidate.save()
+      }
+
+      await deletePostById(post._id.toString())
+    }
+    return res.status(200).send({ status: 200, message: 'delete post success' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id
+
+  try {
+    const comment = await findCommentById(id)
+
+    if (comment) {
+      const userId = comment.userId
+      const user = await findUserById(userId._id.toString())
+      if (user) {
+        user.comments = user.comments.filter((c) => c._id.toString() !== comment._id.toString())
+        user.commentedPosts = user.commentedPosts.filter((post) => post._id.toString() !== comment.postId.toString())
+        await user.save()
+      }
+
+      await deleteCommentById(comment._id.toString())
+    }
+
+    return res.status(200).send({ status: 200, message: 'delete comment success' })
+  } catch (error) {
+    next(error)
+  }
+}

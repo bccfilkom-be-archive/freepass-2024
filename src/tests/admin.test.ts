@@ -321,7 +321,7 @@ describe('adminRoutes', () => {
       }
     })
 
-    test("should return 200 if id is ok and logged user's role is correct (delete user who is candidate)", async () => {
+    test("should return 200 if id is ok and logged user's role is correct", async () => {
       const user = await findUserByField('username', newCandidate.username)
       if (user) {
         const candidate = await findCandidateByField('userId', user._id.toString())
@@ -352,6 +352,234 @@ describe('adminRoutes', () => {
               expect(checkCandidate).toBe(null)
               const checkUser = await findUserByField('username', newCandidate.username)
               expect(checkUser).toBe(null)
+              const checkCommentedUser = await findUserById(comment.userId.toString())
+              if (checkCommentedUser) {
+                expect(checkCommentedUser.comments).toHaveLength(0)
+                expect(checkCommentedUser.commentedPosts).toHaveLength(0)
+              }
+            }
+          }
+        }
+      }
+    })
+  })
+
+  describe('delete /v1/admin/post/:id', () => {
+    let newUser: RegisterForm
+    let newCandidate: RegisterForm
+    let token: string
+    beforeAll(async () => {
+      newUser = {
+        fullName: 'valid full name',
+        username: 'validusername6',
+        nim: '231502001110116',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail6@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newUser)
+
+      newCandidate = {
+        fullName: 'valid full name',
+        username: 'validusername7',
+        nim: '231502001110117',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail7@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newCandidate)
+
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000004',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin4@gmail.com',
+        username: 'admin4',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+
+      const userCandidate = await findUserByField('username', newCandidate.username)
+      if (userCandidate) {
+        token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin4', password: 'password' })).body
+          .data
+        await supertest(app).post(`/v1/admin/${userCandidate._id}`).set('Authorization', `Bearer ${token}`)
+
+        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        if (candidate) {
+          token = (
+            await supertest(app)
+              .post('/v1/auth/login')
+              .send({ username: newCandidate.username, password: newCandidate.password })
+          ).body.data
+          let payload = {
+            caption: 'valid caption'
+          }
+          await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
+
+          token = (
+            await supertest(app).post('/v1/auth/login').send({ username: newUser.username, password: newUser.password })
+          ).body.data
+          payload = {
+            caption: 'valid caption'
+          }
+          const post = await findPostByField('candidateId', candidate._id.toString())
+          if (post) {
+            await supertest(app)
+              .post(`/v1/post/${post._id}`)
+              .set('Authorization', `Bearer ${token}`)
+              .send(payload)
+              .expect(201)
+          }
+        }
+      }
+    })
+
+    test("should return 200 if id is ok and logged user's role is correct", async () => {
+      const user = await findUserByField('username', newCandidate.username)
+      if (user) {
+        const candidate = await findCandidateByField('userId', user._id.toString())
+        if (candidate) {
+          token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin4', password: 'password' })).body
+            .data
+
+          const postId = candidate.posts.at(0) ?? ''
+          const post = await findPostById(postId.toString())
+          if (post) {
+            const comments = post.comments.at(0)
+
+            let commentId = ''
+            if (comments) {
+              commentId = comments._id.toString()
+            }
+            const comment = await findCommentById(commentId)
+            if (comment) {
+              const res = await supertest(app)
+                .delete(`/v1/admin/post/${postId.toString()}`)
+                .set('Authorization', `Bearer ${token}`)
+              expect(res.body.status).toBe(200)
+              const checkComment = await findCommentById(commentId)
+              expect(checkComment).toBe(null)
+              const checkPost = await findPostById(postId.toString())
+              expect(checkPost).toBe(null)
+              const checkCommentedUser = await findUserById(comment.userId.toString())
+              if (checkCommentedUser) {
+                expect(checkCommentedUser.comments).toHaveLength(0)
+                expect(checkCommentedUser.commentedPosts).toHaveLength(0)
+              }
+            }
+          }
+        }
+      }
+    })
+  })
+
+  describe('delete /v1/admin/comment/:id', () => {
+    let newUser: RegisterForm
+    let newCandidate: RegisterForm
+    let token: string
+    beforeAll(async () => {
+      newUser = {
+        fullName: 'valid full name',
+        username: 'validusername8',
+        nim: '231502001110118',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail8@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newUser)
+
+      newCandidate = {
+        fullName: 'valid full name',
+        username: 'validusername9',
+        nim: '231502001110119',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'validemail9@gmail.com',
+        password: 'validpassword'
+      }
+      await supertest(app).post('/v1/auth/register').send(newCandidate)
+
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000005',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin5@gmail.com',
+        username: 'admin5',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+
+      const userCandidate = await findUserByField('username', newCandidate.username)
+      if (userCandidate) {
+        token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin5', password: 'password' })).body
+          .data
+        await supertest(app).post(`/v1/admin/${userCandidate._id}`).set('Authorization', `Bearer ${token}`)
+
+        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        if (candidate) {
+          token = (
+            await supertest(app)
+              .post('/v1/auth/login')
+              .send({ username: newCandidate.username, password: newCandidate.password })
+          ).body.data
+          let payload = {
+            caption: 'valid caption'
+          }
+          await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
+
+          token = (
+            await supertest(app).post('/v1/auth/login').send({ username: newUser.username, password: newUser.password })
+          ).body.data
+          payload = {
+            caption: 'valid caption'
+          }
+          const post = await findPostByField('candidateId', candidate._id.toString())
+          if (post) {
+            await supertest(app)
+              .post(`/v1/post/${post._id}`)
+              .set('Authorization', `Bearer ${token}`)
+              .send(payload)
+              .expect(201)
+          }
+        }
+      }
+    })
+
+    test("should return 200 if id is ok and logged user's role is correct", async () => {
+      const user = await findUserByField('username', newCandidate.username)
+      if (user) {
+        const candidate = await findCandidateByField('userId', user._id.toString())
+        if (candidate) {
+          token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin4', password: 'password' })).body
+            .data
+
+          const postId = candidate.posts.at(0) ?? ''
+          const post = await findPostById(postId.toString())
+          if (post) {
+            const comments = post.comments.at(0)
+
+            let commentId = ''
+            if (comments) {
+              commentId = comments._id.toString()
+            }
+            const comment = await findCommentById(commentId)
+            if (comment) {
+              const res = await supertest(app)
+                .delete(`/v1/admin/comment/${commentId}`)
+                .set('Authorization', `Bearer ${token}`)
+              expect(res.body.status).toBe(200)
+              const checkComment = await findCommentById(commentId)
+              expect(checkComment).toBe(null)
               const checkCommentedUser = await findUserById(comment.userId.toString())
               if (checkCommentedUser) {
                 expect(checkCommentedUser.comments).toHaveLength(0)
