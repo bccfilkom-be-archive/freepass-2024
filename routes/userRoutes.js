@@ -9,6 +9,6 @@ router.get('/', authMiddleware.authenticateUser, userController.viewUser);
 router.delete('/:username', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), userMiddleware.checkUserExistence, userController.deleteUser);
 router.put('/', authMiddleware.authenticateUser, authMiddleware.checkUsername, userController.editProfile);
 router.put('/status/:username', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), userMiddleware.checkUserExistence, userController.editStatus);
-router.post('/', authMiddleware.checkLogOut, authMiddleware.checkUsername, authController.register);
+router.post('/', authMiddleware.checkUsername, authController.register);
 
 module.exports = router;

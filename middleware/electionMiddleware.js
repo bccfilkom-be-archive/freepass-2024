@@ -55,7 +55,7 @@ const checkElection = (req, res, next) => {
 const checkVote = (req, res, next) => {
   const { election_id: electionId } = req.body;
   executeQuery(`SELECT * FROM vote WHERE user_id = ? AND election_id = ?`,
-    [req.session.userId, electionId])
+    [req.user.userId, electionId])
     .then((results) => {
       if (results.length === 0) {
         next();

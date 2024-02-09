@@ -35,7 +35,7 @@ const checkUserExistence = (req, res, next) => {
 
 const checkUserStatus = (requiredStatus) => {
   return (req, res, next) => {
-    if (!requiredStatus.includes(req.session.status)) {
+    if (!requiredStatus.includes(req.user.status)) {
       return res.status(403).json({
         error: `Insufficient privileges, only ${requiredStatus.join(' or ')} can access`,
       });

@@ -60,7 +60,7 @@ const addPost = (req, res) => {
   const { title, content } = req.body;
 
   let query = `INSERT INTO post (user_id, title, content) VALUES (?, ?, ?)`;
-  let values = [req.session.userId, title, content];
+  let values = [req.user.userId, title, content];
 
   executeQuery(query, values)
     .then(() => {

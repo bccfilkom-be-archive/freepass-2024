@@ -1,6 +1,7 @@
 const bcrypt   = require('bcryptjs');
 const { executeQuery } = require('../services/db');
 const pool = require('../config/database');
+const jwt = require('jsonwebtoken');
 
 const register = (req, res) => {
   const { nim, name, username, password, major, faculty, status, description } = req.body;
@@ -51,12 +52,9 @@ const login = (req, res) => {
             if (err || !passwordMatch) {
               return res.status(401).json({ error: 'Incorrect Username and/or Password!' });
             }
-            req.session.loggedin = true;
-            req.session.username = username;
-            req.session.status = status;
-            req.session.userId = userId;
+            const token = jwt.sign({ userId }, 'secret', { expiresIn: '1h' });
 
-            res.json({ message: 'User logged in successfully', username, status });
+            res.json({ message: 'User logged in successfully', username, status, token });
           });
         } else {
           res.status(401).json({ error: 'Incorrect Username and/or Password!' });

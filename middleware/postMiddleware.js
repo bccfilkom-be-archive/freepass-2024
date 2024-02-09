@@ -34,9 +34,9 @@ const checkPostExistence = (req, res, next) => {
 
 const checkPostOwnership = (req, res, next) => {
   const postId = req.params.id;
-  const userId = req.session.userId;
+  const userId = req.user.userId;
 
-  if (req.session.status === 'admin') {
+  if (req.user.status === 'admin') {
     return next();
   }
 

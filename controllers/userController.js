@@ -49,7 +49,6 @@ const editProfile = (req, res) => {
   if (username) {
     updateFields.username = username;
     updateValues.push(username);
-    req.session.username = username;
   }
 
   if (password) {
@@ -78,7 +77,7 @@ const editProfile = (req, res) => {
     updateValues.push(description);
   }
 
-  updateValues.push(req.session.userId);
+  updateValues.push(req.user.userId);
 
   const updateQuery = `UPDATE user SET ` + Object.keys(updateFields).map(key => `${key} = ?`).join(`, `) + ` WHERE id = ?`;
 
@@ -99,7 +98,7 @@ const deleteUser = (req, res) => {
     return res.status(400).json({ error: 'Provide username!' });
   }
 
-  if (username == req.session.username) {
+  if (username == req.user.username) {
     return res.status(403).json({ error: 'You cannot delete your own account' });
   }
 
@@ -128,10 +127,6 @@ const editStatus = (req, res) => {
 
   if (status != 'user' && status != 'admin' && status != 'candidate') {
     return res.status(422).json({ error: 'Provide a valid status!' });
-  }
-
-  if (username == req.session.username) {
-    req.session.status = status;
   }
 
   let query = `UPDATE user SET status = ? WHERE username = ?`;

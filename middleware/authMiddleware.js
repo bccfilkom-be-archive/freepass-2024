@@ -1,18 +1,43 @@
 const pool = require('../config/database');
-const { executeQuery } = require('../services/db');
+const { executeQuery, getUserInfo } = require('../services/db');
+const jwt = require('jsonwebtoken');
 
 const authenticateUser = (req, res, next) => {
-  if (req.session.loggedin) {
-    next();
-  } else {
-    return res.status(401).json({ error: 'Please log in' });
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
   }
+
+  const token = authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized: Missing token' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, 'secret');
+    req.user = decoded;
+    getUserInfo(req.user.userId)
+      .then(userInfo => {
+        req.user.status = userInfo.status;
+        req.user.username = userInfo.username;
+        next();
+      })
+      .catch(error => {
+        console.error(error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      });
+  } catch (error) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+  }
+
 };
 
 const checkUsername = (req, res, next) => {
   const { username } = req.body;
 
-  if (!username || (req.session.username == username)) {
+  if (!username || (req.user.username == username)) {
     return next();
   }
 
@@ -30,16 +55,7 @@ const checkUsername = (req, res, next) => {
     })
 }
 
-const checkLogOut = (req, res, next) => {
-  if (req.session.loggedin) {
-    return res.status(401).json({ error: 'You must logout before accessing this route!' });
-  } else {
-    next();
-  }
-}
-
 module.exports = {
   authenticateUser,
   checkUsername,
-  checkLogOut
 };

@@ -9,7 +9,7 @@ const castVote = (req, res) => {
   }
 
   let query = `INSERT INTO vote (user_id, election_id, candidate_id) VALUES (?, ?, (SELECT id FROM user WHERE username = ?))`;
-  let values = [req.session.userId, electionId, candidateUsername];
+  let values = [req.user.userId, electionId, candidateUsername];
 
   executeQuery(query, values)
     .then(() => {

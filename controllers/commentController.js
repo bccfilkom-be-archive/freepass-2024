@@ -45,7 +45,7 @@ const addComment = (req, res) => {
   const { content, post_id: postId } = req.body;
 
   const query = `INSERT INTO comment (user_id, post_id, content) VALUES (?, ?, ?)`;
-  const values = [req.session.userId, postId, content];
+  const values = [req.user.userId, postId, content];
 
   if (!postId || !content) {
     return res.status(400).json({ error: 'Provide post_id and content in the request body!' });
