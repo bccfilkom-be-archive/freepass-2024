@@ -55,6 +55,14 @@ func DeleteUser(c *gin.Context) {
 
 		return
 	}
+	
+	if user.Username == "admin" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "cannot delete an admin",
+		})
+
+		return
+	}
 
 	initializers.DB.Delete(&user)
 }
