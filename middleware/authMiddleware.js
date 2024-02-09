@@ -1,5 +1,5 @@
 const pool = require('../config/database');
-const { executeQuery, getUserInfo } = require('../services/db');
+const { executeQuery } = require('../services/db');
 const jwt = require('jsonwebtoken');
 
 const authenticateUser = (req, res, next) => {
@@ -18,20 +18,24 @@ const authenticateUser = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, 'secret');
     req.user = decoded;
-    getUserInfo(req.user.userId)
-      .then(userInfo => {
-        req.user.status = userInfo.status;
-        req.user.username = userInfo.username;
-        next();
-      })
-      .catch(error => {
-        console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      });
+    next();
   } catch (error) {
     return res.status(401).json({ error: 'Unauthorized: Invalid token' });
   }
 
+};
+
+const getUserInfo = async (req, res, next) => {
+  try {
+    const id = req.user.userId;
+    const results = await executeQuery(`SELECT * FROM user WHERE id = ?`, [id]);
+    req.user.status = results[0].status;
+    req.user.username = results[0].username;
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
 const checkUsername = (req, res, next) => {
@@ -62,4 +66,5 @@ const checkUsername = (req, res, next) => {
 module.exports = {
   authenticateUser,
   checkUsername,
+  getUserInfo
 };

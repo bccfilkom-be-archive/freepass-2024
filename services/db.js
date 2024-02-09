@@ -13,17 +13,6 @@ const executeQuery = (query, values) => {
   });
 };
 
-const getUserInfo = async (id) => {
-  try {
-    const results = await executeQuery(`SELECT * FROM user WHERE id = ?`, [id]);
-    return results[0];
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
 module.exports = {
   executeQuery,
-  getUserInfo
 };

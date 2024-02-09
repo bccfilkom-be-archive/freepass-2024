@@ -7,7 +7,7 @@ const commentMiddleware = require('../middleware/commentMiddleware');
 const userMiddleware = require('../middleware/userMiddleware');
 
 router.get('/', authMiddleware.authenticateUser, commentController.viewComment);
-router.post('/', authMiddleware.authenticateUser, postMiddleware.checkPostExistence, commentController.addComment);
-router.delete('/:id', authMiddleware.authenticateUser, userMiddleware.checkUserStatus(["admin"]), commentMiddleware.checkCommentExistence, commentController.deleteComment);
+router.post('/', authMiddleware.authenticateUser, authMiddleware.getUserInfo, postMiddleware.checkPostExistence, commentController.addComment);
+router.delete('/:id', authMiddleware.authenticateUser, authMiddleware.getUserInfo, userMiddleware.checkUserStatus(["admin"]), commentMiddleware.checkCommentExistence, commentController.deleteComment);
 
 module.exports = router;
