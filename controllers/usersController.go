@@ -173,6 +173,52 @@ func ViewPost(c *gin.Context) {
 	})
 }
 
+func FetchCandidates(c *gin.Context) {
+	var candidates []models.User
+	initializers.DB.Where("is_candidate = ?", true).Find(&candidates)
+
+	if len(candidates) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "no candidates found",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"candidates": candidates,
+	})
+}
+
+func ViewCandidatesPosts(c *gin.Context) {
+	var body struct {
+		CandidateUsername string
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to read body",
+		})
+
+		return
+	}
+
+	var posts []models.Post
+	initializers.DB.Where("author = ?", body.CandidateUsername).Find(&posts)
+
+	if len(posts) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to fetch posts",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"posts": posts,
+	})
+}
+
 func AddComment(c *gin.Context) {
 	user, _ := c.Get("user")
 	postID := c.Param("id")

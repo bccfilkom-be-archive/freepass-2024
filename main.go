@@ -25,6 +25,9 @@ func main() {
 	r.POST("/api/posts/:id", middleware.RequireAuth, controllers.AddComment)
 	r.GET("/api/posts/:id", middleware.RequireAuth, controllers.ViewPost)
 	
+	r.GET("/api/candidates", middleware.RequireAuth, controllers.FetchCandidates)
+	r.PUT("/api/candidates", middleware.RequireAuth, controllers.ViewCandidatesPosts)
+
 	r.PUT("/api/vote/:id", middleware.RequireAuth, controllers.CastVote)
 
 	r.PUT("/api/admin/promote/:id", middleware.RequireAuth, controllers.PromoteUser)
