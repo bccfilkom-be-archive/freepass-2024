@@ -15,3 +15,7 @@ export const getAllCandidates = async () => {
 export const findCandidateById = async (id: string) => {
   return await Candidate.findById(id).populate('posts')
 }
+
+export const deleteCandidateById = async (id: string) => {
+  return await Candidate.findByIdAndDelete(id)
+}
