@@ -37,8 +37,12 @@ const authenticateUser = (req, res, next) => {
 const checkUsername = (req, res, next) => {
   const { username } = req.body;
 
-  if (!username || (req.user.username == username)) {
+  if (!username) {
     return next();
+  } else if (req.user) {
+    if (req.user.username == username) {
+      return next();
+    }
   }
 
   executeQuery(`SELECT * FROM user WHERE username = ?`, [username])
