@@ -3,6 +3,10 @@ import { deleteUserById, findUserById, findUserByIdAndPromote } from '../service
 import { createCandidate, deleteCandidateById, findCandidateByField } from '../services/candidate.service'
 import { deleteCommentById } from '../services/comment.service'
 import { deletePostById } from '../services/post.service'
+import type { CreateElectionForm } from '../types/election.type'
+import { createElectionValidation } from '../validation/election.validation'
+import { createElectionService } from '../services/election.service'
+import { stringtoDate } from '../utils/date'
 
 export const promoteUser = async (req: Request, res: Response, next: NextFunction) => {
   const id: string = req.params.id
@@ -74,6 +78,29 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
 
     return res.status(200).send({ status: 200, message: 'delete comment success' })
   } catch (error) {
+    next(error)
+  }
+}
+
+export const createElection = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const startDateString: string = req.body.startDate
+    const endDateString: string = req.body.endDate
+
+    const startDate = stringtoDate(startDateString)
+    const endDate = stringtoDate(endDateString)
+
+    const payload: CreateElectionForm = {
+      startDate,
+      endDate
+    }
+
+    const { error } = createElectionValidation(payload)
+    if (error) throw error
+
+    await createElectionService(payload)
+    return res.status(201).send({ status: 201, message: 'create election success' })
+  } catch (error: any) {
     next(error)
   }
 }

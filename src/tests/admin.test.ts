@@ -9,6 +9,8 @@ import { findUserByField, findUserById } from '../services/user.service'
 import { findCandidateByField } from '../services/candidate.service'
 import { findPostByField, findPostById } from '../services/post.service'
 import { findCommentById } from '../services/comment.service'
+import type { CreateElectionForm } from '../types/election.type'
+import { stringtoDate } from '../utils/date'
 
 describe('adminRoutes', () => {
   beforeAll(async () => {
@@ -589,6 +591,45 @@ describe('adminRoutes', () => {
           }
         }
       }
+    })
+  })
+
+  describe('post /v1/admin/election', () => {
+    beforeAll(async () => {
+      const password = hashing('password')
+      const admin = new User({
+        fullName: 'admin',
+        nim: '0000006',
+        fakultas: 'valid fakultas',
+        prodi: 'valid prodi',
+        email: 'admin6@gmail.com',
+        username: 'admin6',
+        password,
+        role: 'admin'
+      })
+      await admin.save()
+    })
+
+    const payload: CreateElectionForm = {
+      startDate: stringtoDate('2024-01-01'),
+      endDate: stringtoDate('2024-12-31')
+    }
+
+    test("should return 201 if request is ok and logged user's role is correct", async () => {
+      const token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin6', password: 'password' }))
+        .body.data
+      const res = await supertest(app).post('/v1/admin/election').set('Authorization', `Bearer ${token}`).send(payload)
+
+      expect(res.body.status).toBe(201)
+    })
+
+    test('should return 400 if request is not ok', async () => {
+      payload.startDate = stringtoDate('invalid date')
+      const token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin5', password: 'password' }))
+        .body.data
+      const res = await supertest(app).post('/v1/admin/election').set('Authorization', `Bearer ${token}`).send(payload)
+
+      expect(res.body.status).toBe(400)
     })
   })
 })
