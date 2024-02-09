@@ -149,7 +149,7 @@ true or false statement to define the entities. As long as the results are under
      
 
 ### Actors
-1. Users: Can register, login, edit password, show all post, show specific post, add comment, and vote a candidate.
+1. Users: Can register, login, edit password, show all post, show specific post, add comment, fetch candidates, view candidate posts, and vote a candidate.
 2. Candidates: Can create a post, update a post, and delete a post.
 3. Admin: Can promote user to candidate, fetch posts, set election date interval, delete a user, delete a post, and delete a comment.
    
@@ -229,7 +229,7 @@ A new .env file is needed for this to work.
 You can create the file according to the .env.example.
 
 ### API Documentation
-
+[Postman Documentation](https://documenter.getpostman.com/view/32247431/2s9YyzddYm)
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
