@@ -29,7 +29,7 @@ func DeletePost(c *gin.Context) {
 		return
 	}
 
-	if candidate.ID != user.ID {
+	if candidate.UserID != user.ID && !user.IsAdmin {
 		res := schemas.ResponeData{Error: true, Message: "Your not allowed to delete this post", Data: nil}
 		c.JSON(http.StatusNotAcceptable, res)
 		return
