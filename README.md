@@ -106,6 +106,46 @@ THEN  => System will show a deletion status message and delete relevant post
 
 We want to see your perspective about these problems. You can define various types of entities or actors. One thing for sure, there is no
 true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
+```
+Entities!!!
+1. Users:
+-id
+-username
+-email
+-password
+-role -> there are only 3 role ADMIN/CANDIDDATE/USER
+-created_at
+-updated_at
+
+2. Posts:
+-id
+-user_id
+-post
+-created_at
+-updated_at
+
+3. Comments:
+-id
+-user_id
+-post_id
+-comment
+-created_at
+
+4. Election_times:
+-id
+-start_time
+-end_time
+
+5. Votes:
+-user_id
+-choice
+-vote_time
+
+Actorss!!!
+User: a role that allow yoo to vote a candidate. A user can see candidate posts and comment on the post
+Candidate: a role that will be voted. A candidate can create a post, edit a post and delete it too.
+Admin: a role that regulates the course of election. Admin can set the start time and end time for election, promote user to candidate, and others
+```
 
 ## **📘** References
 
@@ -149,6 +189,22 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 ## **🧪** API Installation
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+
+### Tech Stack
+Programming Languange: Go v 1.21.5
+Framework: Gin
+ORM: GORM
+Database: MySQL
+Authentication: JWT
+
+### Installation Guide
+1. Clone this repository to your local
+2. On file `.env.example` rename this file to `.env`
+3. Fill up `.env` with your credentials
+4. run the program with command `go run main.go`
+
+### API Documentation
+https://documenter.getpostman.com/view/32186007/2s9YyzcdBR
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
