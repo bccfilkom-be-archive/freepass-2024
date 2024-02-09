@@ -210,10 +210,10 @@ You can send http requests directly to the URL.
 ### Using Docker
 Make sure docker is running and execute these commands:
 ```
-docker pull kmdavidds/freepass-2024:1.0
+docker pull kmdavidds/freepass-2024:1.1
 ```
 ```
-docker run -p 1945:1945 kmdavidds/freepass-2024:1.0
+docker run -p 1945:1945 kmdavidds/freepass-2024:1.1
 ```
 ### Using .exe
 Alternatively, you can run the server by executing the executable:
