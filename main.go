@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rafli5131/freepass-2024/handler"
+	"github.com/rafli5131/freepass-2024/handlers"
 	"github.com/rafli5131/freepass-2024/middleware"
 )
 
