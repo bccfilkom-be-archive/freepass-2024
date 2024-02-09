@@ -5,6 +5,7 @@ import { userRouter } from './user.route'
 import { adminRouter } from './admin.route'
 import { postRouter } from './post.route'
 import { candidateRouter } from './candidate.route'
+import { voteRouter } from './vote.route'
 
 export const router: Router = express.Router()
 
@@ -37,6 +38,10 @@ const defaultRoutes: Route[] = [
   {
     path: '/candidate',
     route: candidateRouter
+  },
+  {
+    path: '/vote',
+    route: voteRouter
   }
 ]
 
