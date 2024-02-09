@@ -11,7 +11,6 @@ import (
 	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
-
 )
 
 func RegisterAdmin(c *gin.Context) {
@@ -66,6 +65,6 @@ func RegisterAdmin(c *gin.Context) {
 		return
 	}
 
-	res := schemas.ResponeData{Error: false, Message: "Success to register user", Data: gin.H{"user": newUser}}
+	res := schemas.ResponeData{Error: false, Message: "Success to register user", Data: newUser}
 	c.JSON(http.StatusCreated, res)
 }

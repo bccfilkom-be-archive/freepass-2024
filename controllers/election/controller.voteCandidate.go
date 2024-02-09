@@ -11,6 +11,7 @@ import (
 	electionRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/election"
 	voteRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/vote"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
+
 )
 
 func VoteCandidate(c *gin.Context) {
@@ -53,13 +54,13 @@ func VoteCandidate(c *gin.Context) {
 
 	candidate, err := candidateRepositorys.FindSpecificCandidate(CandidateID)
 	if candidate.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "Candidate is not found", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Candidate is not found, Something went wrong", Data: nil}
 		c.JSON(http.StatusNotFound, res)
 		return
 	}
 
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}

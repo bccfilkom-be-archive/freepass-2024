@@ -3,7 +3,6 @@ package postRepositorys
 import (
 	"github.com/AkbarFikri/freepassBCC-2024/database"
 	"github.com/AkbarFikri/freepassBCC-2024/models"
-
 )
 
 func FindAll() ([]models.Post, error) {
@@ -41,7 +40,7 @@ func FindAllByElectionAndCandidate(ElectionID string, CandidateID string) ([]mod
 func FindOne(ID string) (*models.Post, error) {
 	var post *models.Post
 	if err := database.DB.Where("id = ?", ID).First(&post).Error; err != nil {
-		return post, err
+		return nil, err
 	}
 	return post, nil
 }

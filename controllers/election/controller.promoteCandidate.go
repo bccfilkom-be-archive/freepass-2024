@@ -63,13 +63,7 @@ func PromoteCandidate(c *gin.Context) {
 
 	checkUser, err := candidateRepositorys.FindCandidateInElection(userCandidate.ID, election.ID)
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
-		c.JSON(http.StatusInternalServerError, res)
-		return
-	}
-
-	if checkUser == 1 {
-		res := schemas.ResponeData{Error: true, Message: "This user is already become candidate in this election ", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "This user is already become candidate in this election", Data: checkUser}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
@@ -90,7 +84,7 @@ func PromoteCandidate(c *gin.Context) {
 		return
 	}
 
-	res := schemas.ResponeData{Error: false, Message: "Successfully vote candidate", Data: createCandidate}
+	res := schemas.ResponeData{Error: false, Message: "Successfully create candidate", Data: createCandidate}
 	c.JSON(http.StatusOK, res)
 	return
 }

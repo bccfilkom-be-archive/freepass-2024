@@ -8,7 +8,6 @@ import (
 	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
 	"github.com/AkbarFikri/freepassBCC-2024/utils"
-
 )
 
 func LoginAdmin(c *gin.Context) {

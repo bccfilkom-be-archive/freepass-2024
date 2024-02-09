@@ -15,6 +15,7 @@ type Profile struct {
 	Birthdate    time.Time `gorm:"not null" json:"birth_date"`
 	Address      string    `gorm:"not null" json:"address"`
 	ProfileUrl   string    `gorm:"not null" json:"profile_url"`
+	Posts        []Post    `gorm:"foreignKey:UserID"`
 	Comments     []Comment `gorm:"foreignKey:UserID"`
 	VoteHistorys []Vote    `gorm:"foreignKey:UserID"`
 }

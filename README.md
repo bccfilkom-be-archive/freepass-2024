@@ -26,13 +26,13 @@ As we have mentioned earlier, we need technology that can support BCC Election i
 - User can comment on candidate’s posts ✔️
 - Users can view information about the candidates ✔️
 - Users can cast their votes for candidates during the specified election period ✔️
-- Admin can promote user to candidate
-- Admin can view the candidate’s posts
+- Admin can promote user to candidate ✔️
+- Admin can view the candidate’s posts ✔️
 - Admin can set the start and end dates for the election period
 - Admin can delete the user/candidate
 - Admin can delete the candidate's posts
 - Admin can delete user comment
-- Candidate can create, update, delete a post
+- Candidate can create, update, delete a post ✔️
 
 ## **[🌎](https://emojipedia.org/globe-showing-americas)** Service Implementation
 

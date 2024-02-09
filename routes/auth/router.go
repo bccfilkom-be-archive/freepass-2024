@@ -5,8 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	authController "github.com/AkbarFikri/freepassBCC-2024/controllers/Auth"
-
+	authController "github.com/AkbarFikri/freepassBCC-2024/controllers/auth"
 )
 
 func RegisterRoute(route *gin.RouterGroup) {
