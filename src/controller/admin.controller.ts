@@ -5,7 +5,7 @@ import { deleteCommentById } from '../services/comment.service'
 import { deletePostById } from '../services/post.service'
 import type { CreateElectionForm } from '../types/election.type'
 import { createElectionValidation } from '../validation/election.validation'
-import { createElectionService } from '../services/election.service'
+import { createElectionService, findElectionById, getAllElections } from '../services/election.service'
 import { stringtoDate } from '../utils/date'
 
 export const promoteUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -102,5 +102,31 @@ export const createElection = async (req: Request, res: Response, next: NextFunc
     return res.status(201).send({ status: 201, message: 'create election success' })
   } catch (error: any) {
     next(error)
+  }
+}
+
+export const viewAllElections = async (req: Request, res: Response, next: NextFunction) => {
+  const elections = await getAllElections()
+  return res.status(200).send({
+    status: 200,
+    message: 'get all elections success',
+    data: { elections: [...elections], length: elections.length }
+  })
+}
+
+export const viewElection = async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id
+
+  try {
+    const election = await findElectionById(id)
+    if (!election) throw new Error('election not found')
+
+    return res.status(200).send({ status: 200, message: 'view election success', data: election })
+  } catch (error: any) {
+    if (error.message.includes('not found')) {
+      res.status(404).send({ status: 404, message: error.message })
+    } else {
+      next(error)
+    }
   }
 }
