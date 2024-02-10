@@ -3,6 +3,7 @@ package main
 import (
 	"bcc-be-freepass-2024/database"
 	"bcc-be-freepass-2024/handler"
+	"bcc-be-freepass-2024/middleware"
 	"bcc-be-freepass-2024/repository"
 	"bcc-be-freepass-2024/service"
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,8 @@ func main() {
 
 	v1.POST("/register", userHandler.Register)
 	v1.POST("/login", userHandler.Login)
+
+	v1.GET("/users", middleware.Auth, userHandler.Get)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

@@ -33,3 +33,11 @@ func (repo *UserRepository) FindByUsername(username string) (*entity.User, error
 	}
 	return &user, nil
 }
+
+func (repo *UserRepository) FindById(id uint) (*entity.User, error) {
+	var user entity.User
+	if err := repo.db.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

@@ -132,3 +132,38 @@ func (service *UserService) Login(request *model.LoginUserRequest) (*model.Login
 		Token: jwtToken,
 	}, nil
 }
+
+func (service *UserService) get(user *entity.User, err error) (*model.GetUserResponse, *errortypes.ApiError) {
+	if user == nil {
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusNotFound,
+			Message: "user not found",
+			Data:    gin.H{},
+		}
+	}
+	if err != nil {
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "error when finding user",
+			Data:    err,
+		}
+	}
+	return &model.GetUserResponse{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Name:      user.Name,
+		Username:  user.Username,
+		Bio:       user.Bio,
+		Role:      user.Role,
+		CanVote:   user.CanVote,
+	}, nil
+}
+
+func (service *UserService) GetByUsername(username string) (*model.GetUserResponse, *errortypes.ApiError) {
+	return service.get(service.UserRepo.FindByUsername(username))
+}
+
+func (service *UserService) GetById(id uint) (*model.GetUserResponse, *errortypes.ApiError) {
+	return service.get(service.UserRepo.FindById(id))
+}

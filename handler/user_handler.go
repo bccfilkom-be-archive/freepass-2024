@@ -5,6 +5,7 @@ import (
 	"bcc-be-freepass-2024/service"
 	"bcc-be-freepass-2024/util/apiresponse"
 	"bcc-be-freepass-2024/util/binding"
+	"bcc-be-freepass-2024/util/errortypes"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -47,4 +48,28 @@ func (handler *UserHandler) Login(ctx *gin.Context) {
 	}
 
 	apiresponse.Success(ctx, http.StatusOK, "successfully logged in", response)
+}
+
+func (handler *UserHandler) Get(ctx *gin.Context) {
+	var response *model.GetUserResponse
+	var apiErr *errortypes.ApiError
+	if userId, err := binding.ShouldUintQuery(ctx, "userId"); err == nil {
+		response, apiErr = handler.UserService.GetById(userId)
+	} else if username, err := binding.ShouldQueryExist(ctx, "username"); err == nil {
+		response, apiErr = handler.UserService.GetByUsername(username)
+	} else {
+		apiresponse.ApiError(ctx, &errortypes.ApiError{
+			Code:    http.StatusBadRequest,
+			Message: "invalid/missing query",
+			Data:    gin.H{},
+		})
+		return
+	}
+
+	if apiErr != nil {
+		apiresponse.ApiError(ctx, apiErr)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusOK, "successfully retrieved user data", response)
 }
