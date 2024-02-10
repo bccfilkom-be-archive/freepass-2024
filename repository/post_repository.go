@@ -38,3 +38,7 @@ func (repo *PostRepository) Create(post *entity.Post) error {
 func (repo *PostRepository) Update(post *entity.Post, updates *model.UpdatePostRequest) error {
 	return repo.db.Model(post).Updates(updates).UpdateColumn("updated_at", time.Now()).Error
 }
+
+func (repo *PostRepository) Delete(post *entity.Post) error {
+	return repo.db.Delete(post).Error
+}

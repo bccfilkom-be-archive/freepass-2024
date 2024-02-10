@@ -7,6 +7,7 @@ import (
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/apiresponse"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/binding"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/roles"
 	"net/http"
 )
 
@@ -86,4 +87,30 @@ func (handler *PostHandler) Update(ctx *gin.Context) {
 	}
 
 	apiresponse.Success(ctx, http.StatusCreated, "successfully edited post", gin.H{})
+}
+
+func (handler *PostHandler) Delete(ctx *gin.Context) {
+	postId, err := binding.ShouldUintQuery(ctx, "postId")
+	if err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	role, _ := ctx.Get("role")
+	role = role.(string)
+	isAdmin := role == roles.Admin
+
+	var issuerId uint
+	if !isAdmin {
+		claimsTemp, _ := ctx.Get("user")
+		claims := claimsTemp.(model.UserClaims)
+		issuerId = claims.ID
+	}
+
+	if err := handler.PostService.DeleteById(postId, issuerId, isAdmin); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusOK, "successfully deleted post", gin.H{})
 }

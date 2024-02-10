@@ -171,3 +171,38 @@ func (service *PostService) Update(postId, candidateId uint, request *model.Upda
 	}
 	return nil
 }
+
+func (service *PostService) DeleteById(postId, candId uint, isAdmin bool) *errortypes.ApiError {
+	post, err := service.PostRepo.FindById(postId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &errortypes.ApiError{
+				Code:    http.StatusNotFound,
+				Message: "post not found",
+				Data:    err,
+			}
+		}
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to delete user data",
+			Data:    err,
+		}
+	}
+
+	if !isAdmin && (post.CandidateID != candId) {
+		return &errortypes.ApiError{
+			Code:    http.StatusForbidden,
+			Message: "not your post",
+			Data:    gin.H{},
+		}
+	}
+
+	if err := service.PostRepo.Delete(post); err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to delete post data",
+			Data:    err,
+		}
+	}
+	return nil
+}
