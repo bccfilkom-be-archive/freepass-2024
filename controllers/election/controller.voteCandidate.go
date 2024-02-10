@@ -19,6 +19,7 @@ func VoteCandidate(c *gin.Context) {
 	CandidateID := c.Param("candidate_id")
 	getUser, _ := c.Get("user")
 	user := getUser.(schemas.UserTokenData)
+	var data models.Vote
 
 	if user.IsAdmin {
 		res := schemas.ResponeData{Error: true, Message: "Admin is can't vote candidate, Use a user account to vote", Data: nil}
@@ -33,50 +34,70 @@ func VoteCandidate(c *gin.Context) {
 	}
 
 	election, err := electionRepositorys.FindSpecificElection(ElectionID)
-	if election.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "Election is not found", Data: nil}
-		c.JSON(http.StatusNotFound, res)
+	if err != nil {
+		res := schemas.ResponeData{Error: true, Message: "Election is not found, Something went wrong", Data: nil}
+		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
+	startTime, err := time.Parse("2006-01-02T15:04:05-07:00", election.StartTime)
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Wrong start_time format", Data: election}
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+
+	endTime, err := time.Parse("2006-01-02T15:04:05-07:00", election.EndTime)
+	if err != nil {
+		res := schemas.ResponeData{Error: true, Message: "Wrong end_time format", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
 	timeNow := time.Now().Local()
-	if election.StartTime.After(timeNow) || election.EndTime.Before(timeNow) {
+	if startTime.After(timeNow) || endTime.Before(timeNow) {
 		res := schemas.ResponeData{Error: true, Message: "You can just vote during the election period", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
 	candidate, err := candidateRepositorys.FindSpecificCandidate(CandidateID)
-	if candidate.ID == "" {
+	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Candidate is not found, Something went wrong", Data: nil}
 		c.JSON(http.StatusNotFound, res)
 		return
 	}
 
+	vote, err := voteRepositorys.FindUserVoteForCandidate(user.ID, candidate.ID)
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "", Data: nil}
-		c.JSON(http.StatusInternalServerError, res)
-		return
-	}
-
-	var vote *models.Vote
-	vote.ElectionID = election.ID
-	vote.CandidateID = candidate.ID
-	vote.UserID = user.ID
-
-	if err := voteRepositorys.CreateNewVote(vote); err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Failed to vote, Something went wrong", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
-	res := schemas.ResponeData{Error: false, Message: "Successfully vote candidate", Data: vote}
+	if vote.ID == 0 {
+		res := schemas.ResponeData{Error: true, Message: "You're already voted, Something went wrong", Data: nil}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	data.CandidateID = candidate.ID
+	data.ElectionID = election.ID
+	data.UserID = user.ID
+
+	if err := voteRepositorys.CreateNewVote(&data); err != nil {
+		res := schemas.ResponeData{Error: true, Message: "Failed to vote, Something went wrong", Data: nil}
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+
+	if err := candidateRepositorys.VoteCandidate(candidate.ID, candidate.Vote); err != nil {
+		res := schemas.ResponeData{Error: true, Message: "Failed to vote, Something went wrong", Data: nil}
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+
+	res := schemas.ResponeData{Error: false, Message: "Successfully vote candidate", Data: data}
 	c.JSON(http.StatusOK, res)
 	return
 }

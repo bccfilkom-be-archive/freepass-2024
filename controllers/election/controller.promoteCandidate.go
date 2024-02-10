@@ -10,14 +10,13 @@ import (
 	electionRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/election"
 	userRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/user"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func PromoteCandidate(c *gin.Context) {
 	electionID := c.Param("election_id")
-	var candidate *models.Candidate
+	var data *models.Candidate
 
-	if err := c.ShouldBindJSON(&candidate); err != nil {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Candidate data is Required", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -29,13 +28,13 @@ func PromoteCandidate(c *gin.Context) {
 		return
 	}
 
-	if candidate.UserID == "" || candidate.ElectionNum == 0 {
+	if data.UserID == "" || data.ElectionNum == 0 {
 		res := schemas.ResponeData{Error: true, Message: "user_id, election_number is Required", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
-	userCandidate, err := userRepositorys.FindOne(candidate.UserID)
+	userCandidate, err := userRepositorys.FindOne(data.UserID)
 	if userCandidate.ID == "" {
 		res := schemas.ResponeData{Error: true, Message: "User is not found", Data: nil}
 		c.JSON(http.StatusNotFound, res)
@@ -61,25 +60,31 @@ func PromoteCandidate(c *gin.Context) {
 		return
 	}
 
-	checkUser, err := candidateRepositorys.FindCandidateInElection(userCandidate.ID, election.ID)
-	if err != nil {
+	checkUser, _ := candidateRepositorys.FindCandidateInElection(userCandidate.ID, election.ID)
+	if checkUser != nil {
 		res := schemas.ResponeData{Error: true, Message: "This user is already become candidate in this election", Data: checkUser}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
-	if err := electionRepositorys.FindElectionNumber(candidate.ElectionNum, election.ID); err != nil {
+	if err := electionRepositorys.FindElectionNumber(data.ElectionNum, election.ID); err == nil {
 		res := schemas.ResponeData{Error: true, Message: "Election number is already used", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 
-	candidate.ElectionID = election.ID
-	candidate.UserID = userCandidate.ID
+	data.ElectionID = election.ID
+	data.UserID = userCandidate.ID
 
-	createCandidate, err := candidateRepositorys.CreatCandidate(candidate)
+	createCandidate, err := candidateRepositorys.CreatCandidate(data)
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Failed to promote user to candidate, Something went wrong", Data: nil}
+		c.JSON(http.StatusInternalServerError, res)
+		return
+	}
+
+	if err := candidateRepositorys.CreateCandidateInformation(createCandidate.ID); err != nil {
+		res := schemas.ResponeData{Error: true, Message: "Failed to create candidate information, Something went wrong", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}

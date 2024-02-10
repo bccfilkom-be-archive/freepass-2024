@@ -7,6 +7,7 @@ import (
 
 	candidateRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/candidate"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
+
 )
 
 func GetOneCandidateInformation(c *gin.Context) {
@@ -19,32 +20,13 @@ func GetOneCandidateInformation(c *gin.Context) {
 	}
 
 	candidate, err := candidateRepositorys.FindSpecificCandidate(candidateID)
-	if candidate.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "Candidate is not found", Data: nil}
-		c.JSON(http.StatusNotFound, res)
-		return
-	}
-
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Candidate is not found, Something went wrong", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
-	informations, err := candidateRepositorys.FindCandidateInformations(candidate.ID)
-	if informations.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "Candidate Informations is not found", Data: nil}
-		c.JSON(http.StatusNotFound, res)
-		return
-	}
-
-	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
-		c.JSON(http.StatusInternalServerError, res)
-		return
-	}
-
-	res := schemas.ResponeData{Error: false, Message: "Successfully find candidate informations", Data: informations}
+	res := schemas.ResponeData{Error: false, Message: "Successfully find candidate informations", Data: candidate}
 	c.JSON(http.StatusOK, res)
 	return
 

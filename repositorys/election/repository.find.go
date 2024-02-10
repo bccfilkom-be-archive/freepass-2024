@@ -9,7 +9,7 @@ import (
 func FindSpecificElection(ID string) (*models.Election, error) {
 	var election *models.Election
 	if err := database.DB.First(&election).Where("id = ?", ID).Error; err != nil {
-		return election, err
+		return nil, err
 	}
 	return election, nil
 }
@@ -20,4 +20,12 @@ func FindElectionNumber(num int, electionID string) error {
 		return err
 	}
 	return nil
+}
+
+func FindAllElection() ([]models.Election, error) {
+	var elections []models.Election
+	if err := database.DB.Find(&elections).Error; err != nil {
+		return nil, err
+	}
+	return elections, nil
 }
