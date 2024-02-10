@@ -190,3 +190,29 @@ func (service *UserService) Update(id uint, request *model.UpdateUserRequest) *e
 	}
 	return nil
 }
+
+func (service *UserService) DeleteById(id uint) *errortypes.ApiError {
+	isUserExist, err := service.UserRepo.ExistsId(id)
+	if err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to check user data",
+			Data:    err,
+		}
+	}
+	if !isUserExist {
+		return &errortypes.ApiError{
+			Code:    http.StatusNotFound,
+			Message: "user not found",
+			Data:    gin.H{},
+		}
+	}
+	if err := service.UserRepo.Delete(&entity.User{Model: gorm.Model{ID: id}}); err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "error when deleting user",
+			Data:    err,
+		}
+	}
+	return nil
+}

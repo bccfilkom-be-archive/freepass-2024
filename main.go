@@ -8,6 +8,7 @@ import (
 	"github.com/nathakusuma/bcc-be-freepass-2024/middleware"
 	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
 	"github.com/nathakusuma/bcc-be-freepass-2024/service"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/roles"
 	"log"
 	"os"
 )
@@ -33,6 +34,8 @@ func main() {
 
 	userService := service.NewUserService(userRepo)
 
+	roleMid := middleware.NewRoleMiddleware(userRepo)
+
 	userHandler := handler.NewUserHandler(userService)
 
 	gin.SetMode(os.Getenv("GIN_MODE"))
@@ -46,6 +49,7 @@ func main() {
 
 	v1.GET("/users", middleware.Auth, userHandler.Get)
 	v1.PATCH("/users", middleware.Auth, userHandler.Update)
+	v1.DELETE("/users", middleware.Auth, roleMid.RequireRole(roles.Admin), userHandler.Delete)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

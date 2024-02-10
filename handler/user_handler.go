@@ -92,3 +92,18 @@ func (handler *UserHandler) Update(ctx *gin.Context) {
 
 	apiresponse.Success(ctx, http.StatusCreated, "successfully edited user", gin.H{})
 }
+
+func (handler *UserHandler) Delete(ctx *gin.Context) {
+	userId, err := binding.ShouldUintQuery(ctx, "userId")
+	if err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	if err := handler.UserService.DeleteById(userId); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusOK, "successfully deleted user", gin.H{})
+}

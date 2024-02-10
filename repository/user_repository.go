@@ -27,6 +27,15 @@ func (repo *UserRepository) ExistsUsername(username string) (bool, error) {
 	return count > 0, nil
 }
 
+func (repo *UserRepository) ExistsId(id uint) (bool, error) {
+	var count int64
+	err := repo.db.Model(&entity.User{}).Where("id = ?", id).Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (repo *UserRepository) FindByUsername(username string) (*entity.User, error) {
 	var user entity.User
 	if err := repo.db.First(&user, "username = ?", username).Error; err != nil {
@@ -45,4 +54,8 @@ func (repo *UserRepository) FindById(id uint) (*entity.User, error) {
 
 func (repo *UserRepository) Update(user *entity.User, updates *model.UpdateUserRequest) error {
 	return repo.db.Model(user).Updates(updates).Error
+}
+
+func (repo *UserRepository) Delete(user *entity.User) error {
+	return repo.db.Delete(user).Error
 }
