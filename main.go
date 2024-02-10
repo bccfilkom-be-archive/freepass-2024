@@ -73,6 +73,7 @@ func main() {
 	v1.PUT("/votes", middleware.Auth, voteHandler.AddVote)
 
 	v1.GET("/posts", middleware.Auth, postHandler.Get)
+	v1.POST("/posts", middleware.Auth, roleMid.RequireRole(roles.Candidate), postHandler.Create)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

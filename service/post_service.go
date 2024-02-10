@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
 	"github.com/nathakusuma/bcc-be-freepass-2024/model"
 	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
@@ -113,4 +114,24 @@ func (service *PostService) GetByCandidateId(candidateId uint) ([]model.GetPostR
 	}
 
 	return postResponses, nil
+}
+
+func (service *PostService) Create(request *model.CreatePostRequest, candidateId uint) (uint, *errortypes.ApiError) {
+	candidate, _ := service.CandidateRepo.FindById(candidateId)
+	post := entity.Post{
+		Title:       request.Title,
+		Content:     request.Content,
+		CandidateID: candidateId,
+		Candidate:   *candidate,
+	}
+	err := service.PostRepo.Create(&post)
+	if err != nil {
+		return 0, &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to save post",
+			Data:    err,
+		}
+	}
+
+	return post.ID, nil
 }

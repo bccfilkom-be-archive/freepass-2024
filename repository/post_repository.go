@@ -28,3 +28,7 @@ func (repo *PostRepository) FindByCandidateId(candId uint) ([]entity.Post, error
 	}
 	return posts, nil
 }
+
+func (repo *PostRepository) Create(post *entity.Post) error {
+	return repo.db.Create(&post).Error
+}
