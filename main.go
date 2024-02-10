@@ -33,11 +33,15 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	candidateRepo := repository.NewCandidateRepository(db, userRepo)
 	periodRepo := repository.NewElectionPeriodRepository(db)
+	commentRepo := repository.NewCommentRepository(db)
+	postRepo := repository.NewPostRepository(db)
 
 	userService := service.NewUserService(userRepo)
 	candidateService := service.NewCandidateService(userRepo, candidateRepo)
 	periodService := service.NewElectionPeriodService(periodRepo)
 	voteService := service.NewVoteService(userRepo, candidateRepo, periodService)
+	commentService := service.NewCommentService(commentRepo, postRepo, userRepo)
+	postService := service.NewPostService(postRepo, candidateRepo, commentService)
 
 	roleMid := middleware.NewRoleMiddleware(userRepo)
 
@@ -45,6 +49,7 @@ func main() {
 	candidateHandler := handler.NewCandidateHandler(candidateService)
 	periodHandler := handler.NewElectionPeriodHandler(periodService)
 	voteHandler := handler.NewVoteHandler(voteService)
+	postHandler := handler.NewPostHandler(postService)
 
 	gin.SetMode(os.Getenv("GIN_MODE"))
 
@@ -66,6 +71,8 @@ func main() {
 	v1.POST("/electionPeriod", middleware.Auth, roleMid.RequireRole(roles.Admin), periodHandler.Set)
 
 	v1.PUT("/votes", middleware.Auth, voteHandler.AddVote)
+
+	v1.GET("/posts", middleware.Auth, postHandler.Get)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)
