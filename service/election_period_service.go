@@ -41,3 +41,15 @@ func (service *ElectionPeriodService) SetPeriod(start, end time.Time) *errortype
 	}
 	return nil
 }
+
+func (service *ElectionPeriodService) IsInPeriod() (bool, error) {
+	start, end, err := service.PeriodRepo.GetPeriod()
+	if err != nil {
+		return false, err
+	}
+	now := time.Now()
+	if now.Before(start) || now.After(end) {
+		return false, nil
+	}
+	return true, nil
+}

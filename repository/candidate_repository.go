@@ -15,6 +15,14 @@ func NewCandidateRepository(db *gorm.DB, userRepo *UserRepository) *CandidateRep
 	return &CandidateRepository{db, userRepo}
 }
 
+func (repo *CandidateRepository) FindById(id uint) (*entity.Candidate, error) {
+	var candidate entity.Candidate
+	if err := repo.db.First(&candidate, id).Error; err != nil {
+		return nil, err
+	}
+	return &candidate, nil
+}
+
 func (repo *CandidateRepository) FindAll() ([]entity.Candidate, error) {
 	var candidates []entity.Candidate
 	if err := repo.db.Find(&candidates).Error; err != nil {
@@ -33,5 +41,14 @@ func (repo *CandidateRepository) Promote(user *entity.User) (uint, error) {
 			return err
 		}
 		return nil
+	})
+}
+
+func (repo *CandidateRepository) AddVote(candidate *entity.Candidate, voter *entity.User) error {
+	return repo.db.Transaction(func(tx *gorm.DB) error {
+		if err := repo.UserRepo.DisableVoter(voter); err != nil {
+			return err
+		}
+		return repo.db.Model(&candidate).Update("vote_count", gorm.Expr("vote_count + ?", 1)).Error
 	})
 }

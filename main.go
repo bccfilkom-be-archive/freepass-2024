@@ -37,12 +37,14 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	candidateService := service.NewCandidateService(userRepo, candidateRepo)
 	periodService := service.NewElectionPeriodService(periodRepo)
+	voteService := service.NewVoteService(userRepo, candidateRepo, periodService)
 
 	roleMid := middleware.NewRoleMiddleware(userRepo)
 
 	userHandler := handler.NewUserHandler(userService)
 	candidateHandler := handler.NewCandidateHandler(candidateService)
 	periodHandler := handler.NewElectionPeriodHandler(periodService)
+	voteHandler := handler.NewVoteHandler(voteService)
 
 	gin.SetMode(os.Getenv("GIN_MODE"))
 
@@ -62,6 +64,8 @@ func main() {
 
 	v1.GET("/electionPeriod", middleware.Auth, periodHandler.Get)
 	v1.POST("/electionPeriod", middleware.Auth, roleMid.RequireRole(roles.Admin), periodHandler.Set)
+
+	v1.PUT("/votes", middleware.Auth, voteHandler.AddVote)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

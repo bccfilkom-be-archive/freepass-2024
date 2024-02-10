@@ -63,3 +63,7 @@ func (repo *UserRepository) Delete(user *entity.User) error {
 func (repo *UserRepository) SetRole(user *entity.User, role string) error {
 	return repo.db.Model(&user).Update("role", role).Error
 }
+
+func (repo *UserRepository) DisableVoter(user *entity.User) error {
+	return repo.db.Model(&user).Update("can_vote", false).Error
+}
