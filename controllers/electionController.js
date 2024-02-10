@@ -102,7 +102,7 @@ const viewElection = (req, res) => {
   Promise.all([fetchElectionInfo(), fetchVoteCounts()])
     .then(([elections, counts]) => {
       if (electionId && elections.length === 0) {
-        res.status(400).json({ error: 'No election found!' });
+        res.status(404).json({ error: 'Election not found!' });
       } else {
         const result = elections.map((election, index) => ({
           id: election.id,

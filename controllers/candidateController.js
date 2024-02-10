@@ -38,7 +38,7 @@ const viewCandidate = (req, res) => {
   getUser(username, id)
     .then((userResults) => {
       if (userResults.length === 0) {
-        return res.status(400).json({ message: 'Candidate not found!' });
+        return res.status(404).json({ message: 'Candidate not found!' });
       }
 
       const candidatesData = userResults.map((user) => {

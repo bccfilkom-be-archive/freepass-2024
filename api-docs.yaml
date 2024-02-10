@@ -35,7 +35,7 @@ paths:
       tags:
         - Authentication
       summary: Generate a JWT token
-      description: Authenticate and grant access based on user credentials. Return user login status along with its detail and token.
+      description: Authenticate and grant access based on user credentials. Return user login status along with its detail and token as response.
       requestBody:
         required: true
         content:
@@ -89,7 +89,7 @@ paths:
         tags:
          - Users
         summary: Register a new user to the system
-        description: Record user credentials and return it's username. Only the username and password key-value pair are required. If user leave other key empty, their values ​​will be stored as null, which user can edit later. User must log out before accessing this endpoint if user have logged in previously.
+        description: Record user credentials and return it's username. Only the username and password key-value pair are required. If user leave other key empty, their values ​​will be stored as null, which user can edit later.
         requestBody:
           content:
             application/json:
@@ -150,7 +150,7 @@ paths:
                                 example: Username already used!
     get:
       summary: View users profile
-      description: Returns a list of users. User can use it without parameter to view all users profile.
+      description: Returns a list of users along with its details. User can use it without parameter to view all users profile.
       tags:
         - Users
       parameters:
@@ -271,6 +271,16 @@ paths:
                     faculty: Faculty of Computer Science
                     status: candidate
                     description: Make Earth Great Again!
+        '404':
+          description: A JSON object of user status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: User(s) not found!
     put:
       tags:
         - Users
@@ -330,7 +340,7 @@ paths:
   /users/{username}:
     delete:
       summary: Delete a user by username
-      description: Remove the user/candidate from the system, including their posts, comments, and votes.
+      description: Remove the user/candidate from the system, including their posts, comments, and votes (if exists).
       tags:
         - Users
         - Admins
@@ -353,6 +363,16 @@ paths:
                   message: 
                     type: string
                     example: User deleted successfully
+        '403':
+          description: A JSON object of user deletion error status. (Forbidden Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Insufficient privileges, only admin can access
         '404':
               description: A JSON object of user deletion error status. (Not Found Response)
               content:
@@ -402,8 +422,18 @@ paths:
                   message:
                     type: string
                     example: User status updated successfully
+        '403':
+          description: A JSON object of user update error. (Forbidden Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Insufficient privileges, only admin can access
         '422':
-              description: A JSON object of update error. (Invalid Response)
+              description: A JSON object of user update error. (Invalid Response)
               content:
                   application/json:
                       schema:
@@ -447,6 +477,16 @@ paths:
                             message:
                               type: string
                               example: Post sent successfully
+          '403':
+            description: A JSON object of post creation error. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only candidate can access
     get:
       summary: View posts
       description: View candidate post(s) along with its details (including comments). User can use it without parameter to view all posts.
@@ -868,6 +908,16 @@ paths:
                     post_id: 4
                     content: "Yes, Sir!"
                     timestamp: "2024-02-07T11:24:29.000Z"
+        '404':
+          description: A JSON object of comment get status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Comment(s) not found!
   /comments/{id}:
     delete:
       tags:
@@ -893,6 +943,16 @@ paths:
                             message:
                               type: string
                               example: Comment deleted successfully successfully
+          '404':
+            description: A JSON object of comment get status. (Not Found Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Comment not found!
 
   # candidates section
   /candidates:
@@ -1082,6 +1142,16 @@ paths:
                               post_id: 4
                               content: Yes, Sir!
                               timestamp: "2024-02-07T11:24:29.000Z"
+        '404':
+          description: A JSON object of candidate get status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Candidate not found!
 
   # elections section
   /elections:
@@ -1124,6 +1194,16 @@ paths:
                             message:
                               type: string
                               example: Election created successfully
+          '403':
+            description: A JSON object of user election creation error. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only admin can access
     get:
       tags:
         - Elections
@@ -1178,6 +1258,16 @@ paths:
                       start_date: "2024-02-13T01:00:00.000Z"
                       end_date: "2024-02-23T13:00:00.000Z"
                       counts: []
+        '404':
+          description: A JSON object of election get status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Election found!
   /elections/{id}:
     put:
       tags:
@@ -1226,6 +1316,26 @@ paths:
                             message:
                               type: string
                               example: Election updated successfully
+          '403':
+            description: A JSON object of election update error status. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only admin can access
+          '404':
+            description: A JSON object of election update status. (Not Found Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Election not found!
     delete:
       tags:
         - Elections
@@ -1251,6 +1361,16 @@ paths:
                             message:
                               type: string
                               example: Election deleted successfully
+          '403':
+            description: A JSON object of election update error status. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only admin can access
 
   # votes
   /elections/vote:
