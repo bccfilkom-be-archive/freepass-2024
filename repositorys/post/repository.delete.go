@@ -30,7 +30,12 @@ func DeleteCandidatePost(ID string) error {
 		ids = append(ids, b.ID)
 	}
 
-	if err := database.DB.Model(&models.Comment{}).Where("post_id = ?", ids).Delete(&models.Comment{}).Error; err != nil {
+	idsInterface := make([]interface{}, len(ids))
+	for i, id := range ids {
+		idsInterface[i] = id
+	}
+
+	if err := database.DB.Model(&models.Comment{}).Where("post_id IN ?", idsInterface).Delete(&models.Comment{}).Error; err != nil {
 		return err
 	}
 
@@ -53,7 +58,12 @@ func DeleteUserPost(ID string) error {
 		ids = append(ids, b.ID)
 	}
 
-	if err := database.DB.Model(&models.Comment{}).Where("post_id = ?", ids).Delete(&models.Comment{}).Error; err != nil {
+	idsInterface := make([]interface{}, len(ids))
+	for i, id := range ids {
+		idsInterface[i] = id
+	}
+
+	if err := database.DB.Model(&models.Comment{}).Where("post_id IN ?", idsInterface).Delete(&models.Comment{}).Error; err != nil {
 		return err
 	}
 
