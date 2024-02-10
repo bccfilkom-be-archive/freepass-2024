@@ -4,4 +4,4 @@ import { createVote } from '../../controller/vote.controller'
 
 export const voteRouter: Router = Router()
 
-voteRouter.post('/:id', requireUser, createVote)
+voteRouter.post('/:electionId', requireUser, createVote)

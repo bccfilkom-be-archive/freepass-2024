@@ -1,14 +1,14 @@
 import supertest from 'supertest'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
-import { app } from '../app'
-import { User } from '../models/user.model'
-import type { RegisterForm } from '../types/auth.type'
-import { hashing } from '../utils/bcrypt'
-import { findUserByField } from '../services/user.service'
-import { findPostByField } from '../services/post.service'
-import { findCandidateByField } from '../services/candidate.service'
-import type { CreateCommentForm } from '../types/comment.type'
+import { app } from '../../app'
+import { User } from '../../models/user.model'
+import type { RegisterForm } from '../../types/auth.type'
+import { hashing } from '../../utils/bcrypt'
+import { findUserByField } from '../../services/user.service'
+import { findPostByField } from '../../services/post.service'
+import { findCandidateByField } from '../../services/candidate.service'
+import type { CreateCommentForm } from '../../types/comment.type'
 
 describe('commentRoutes', () => {
   beforeAll(async () => {
@@ -31,8 +31,8 @@ describe('commentRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -42,8 +42,8 @@ describe('commentRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername2',
         nim: '2315020011101112',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail2@gmail.com',
         password: 'validpassword'
       }
@@ -53,8 +53,8 @@ describe('commentRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000001',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin@gmail.com',
         username: 'admin',
         password,
@@ -76,9 +76,9 @@ describe('commentRoutes', () => {
       ).body.data
       await supertest(app).post('/v1/post/').set('Authorization', `Bearer ${token}`).send(payload)
       if (user) {
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) postId = post._id.toString()
         }
       }
@@ -102,9 +102,9 @@ describe('commentRoutes', () => {
 
       let user = await findUserByField('username', newCandidate.username)
       if (user) {
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             user = await findUserByField('username', newUser.username)
             if (user) {
@@ -128,9 +128,9 @@ describe('commentRoutes', () => {
 
       const user = await findUserByField('username', newCandidate.username)
       if (user) {
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             expect(res.body.status).toBe(403)
             expect(candidate.posts).not.toStrictEqual([post._id.toString()])
@@ -151,8 +151,8 @@ describe('commentRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername3',
         nim: '231502001110113',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail3@gmail.com',
         password: 'validpassword'
       }
@@ -162,8 +162,8 @@ describe('commentRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername4',
         nim: '2315020011101114',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail4@gmail.com',
         password: 'validpassword'
       }
@@ -173,8 +173,8 @@ describe('commentRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000002',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin2@gmail.com',
         username: 'admin2',
         password,
@@ -199,10 +199,12 @@ describe('commentRoutes', () => {
       }
       await supertest(app).post('/v1/post/').set('Authorization', `Bearer ${token}`).send(payload)
       if (user) {
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
-          if (post) postId = post._id.toString()
+          const post = await findPostByField('candidate', candidate._id.toString())
+          if (post) {
+            postId = post._id.toString()
+          }
         }
       }
 
@@ -213,7 +215,7 @@ describe('commentRoutes', () => {
           .expect(200)
       ).body.data
 
-      await supertest(app).post(`/v1/post/:${postId}`).set('Authorization', `Bearer ${token}`).send(payload)
+      await supertest(app).post(`/v1/post/${postId}`).set('Authorization', `Bearer ${token}`).send(payload)
     })
 
     test("should return 200 if logged user's role is correct", async () => {

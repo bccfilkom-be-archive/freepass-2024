@@ -1,12 +1,12 @@
 import supertest from 'supertest'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
-import { app } from '../app'
-import { User } from '../models/user.model'
-import type { RegisterForm } from '../types/auth.type'
-import { hashing } from '../utils/bcrypt'
-import { findUserByField } from '../services/user.service'
-import { findCandidateByField } from '../services/candidate.service'
+import { app } from '../../app'
+import { User } from '../../models/user.model'
+import type { RegisterForm } from '../../types/auth.type'
+import { hashing } from '../../utils/bcrypt'
+import { findUserByField } from '../../services/user.service'
+import { findCandidateByField } from '../../services/candidate.service'
 
 describe('candidateRoutes', () => {
   beforeAll(async () => {
@@ -27,8 +27,8 @@ describe('candidateRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername2',
         nim: '231502001110112',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail2@gmail.com',
         password: 'validpassword'
       }
@@ -38,8 +38,8 @@ describe('candidateRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000002',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin2@gmail.com',
         username: 'admin2',
         password,
@@ -74,8 +74,8 @@ describe('candidateRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -85,8 +85,8 @@ describe('candidateRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000001',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin@gmail.com',
         username: 'admin',
         password,
@@ -101,7 +101,7 @@ describe('candidateRoutes', () => {
       const user = await findUserByField('username', newUser.username)
       if (user) {
         await supertest(app).post(`/v1/admin/${user._id.toString()}`).set('Authorization', `Bearer ${token}`)
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
           const res = await supertest(app)
             .get(`/v1/candidate/${candidate._id.toString()}`)
@@ -139,8 +139,8 @@ describe('candidateRoutes', () => {
         fullName: 'valid full name',
         username: 'validusernam3',
         nim: '231502001110113',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemai3@gmail.com',
         password: 'validpassword'
       }
@@ -150,8 +150,8 @@ describe('candidateRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000003',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin3@gmail.com',
         username: 'admin3',
         password,
@@ -170,7 +170,7 @@ describe('candidateRoutes', () => {
           caption: 'valid caption'
         }
         await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload)
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) candidateId = candidate._id.toString()
       }
       token = (await supertest(app).post('/v1/auth/login').send({ username: 'admin', password: 'password' })).body.data

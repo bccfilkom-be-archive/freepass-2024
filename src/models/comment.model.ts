@@ -1,18 +1,19 @@
 import mongoose from 'mongoose'
+import type { CommentDocument } from '../types/comment.type'
 
-const commentSchema = new mongoose.Schema(
+const commentSchema = new mongoose.Schema<CommentDocument>(
   {
     caption: {
       type: String,
       required: true,
       trim: true
     },
-    postId: {
+    post: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Post',
       required: true
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true
@@ -32,6 +33,6 @@ commentSchema.set('toJSON', {
 })
 
 /**
- * @typedef Post
+ * @typedef Comment
  */
 export const Comment = mongoose.model('Comment', commentSchema)

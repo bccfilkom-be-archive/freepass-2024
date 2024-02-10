@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import type { CreateCommentForm, UpdateCommentForm } from '../types/comment.type'
 
-export const createFormValidation = (payload: CreateCommentForm) => {
+export const createCommentValidation = (payload: CreateCommentForm) => {
   const schema = Joi.object({
     caption: Joi.string().required()
   })
@@ -9,7 +9,7 @@ export const createFormValidation = (payload: CreateCommentForm) => {
   return schema.validate(payload)
 }
 
-export const updateFormValidation = (payload: UpdateCommentForm) => {
+export const updateCommentValidation = (payload: UpdateCommentForm) => {
   const schema = Joi.object({
     caption: Joi.string().required()
   })

@@ -1,14 +1,14 @@
 import supertest from 'supertest'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
-import { app } from '../app'
-import { User } from '../models/user.model'
-import type { RegisterForm } from '../types/auth.type'
-import { hashing } from '../utils/bcrypt'
-import { findUserByField } from '../services/user.service'
-import { findPostByField, findPostById } from '../services/post.service'
-import { findCandidateByField } from '../services/candidate.service'
-import type { CreatePostForm, UpdatePostForm } from '../types/post.type'
+import { app } from '../../app'
+import { User } from '../../models/user.model'
+import type { RegisterForm } from '../../types/auth.type'
+import { hashing } from '../../utils/bcrypt'
+import { findUserByField } from '../../services/user.service'
+import { findPostByField, findPostById } from '../../services/post.service'
+import { findCandidateByField } from '../../services/candidate.service'
+import type { CreatePostForm, UpdatePostForm } from '../../types/post.type'
 
 describe('postRoutes', () => {
   beforeAll(async () => {
@@ -30,8 +30,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -41,8 +41,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername2',
         nim: '2315020011101112',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail2@gmail.com',
         password: 'validpassword'
       }
@@ -52,8 +52,8 @@ describe('postRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000001',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin@gmail.com',
         username: 'admin',
         password,
@@ -87,9 +87,9 @@ describe('postRoutes', () => {
 
       const user = await findUserByField('username', newCandidate.username)
       if (user) {
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             expect(post).toBeDefined()
             expect(candidate.posts).toEqual([post._id])
@@ -110,9 +110,9 @@ describe('postRoutes', () => {
 
       const user = await findUserByField('username', newCandidate.username)
       if (user) {
-        const candidate = await findCandidateByField('userID', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate.userId.toString())
+          const post = await findPostByField('candidate', candidate.user.toString())
           if (post) {
             expect(post).not.toBeDefined()
             expect(candidate.posts).not.toContain(post._id.toString())
@@ -133,8 +133,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername3',
         nim: '2315020011101113',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail3@gmail.com',
         password: 'validpassword'
       }
@@ -144,8 +144,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername4',
         nim: '2315020011101114',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail4@gmail.com',
         password: 'validpassword'
       }
@@ -155,8 +155,8 @@ describe('postRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000002',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin2@gmail.com',
         username: 'admin2',
         password,
@@ -185,9 +185,9 @@ describe('postRoutes', () => {
       await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
 
       if (userCandidate) {
-        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        const candidate = await findCandidateByField('user', userCandidate._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             postId = post._id.toString()
           }
@@ -228,8 +228,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername5',
         nim: '2315020011101115',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail5@gmail.com',
         password: 'validpassword'
       }
@@ -239,8 +239,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername6',
         nim: '2315020011101116',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail6@gmail.com',
         password: 'validpassword'
       }
@@ -250,8 +250,8 @@ describe('postRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000003',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin3@gmail.com',
         username: 'admin3',
         password,
@@ -280,9 +280,9 @@ describe('postRoutes', () => {
       await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
 
       if (userCandidate) {
-        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        const candidate = await findCandidateByField('user', userCandidate._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             postId = post._id.toString()
           }
@@ -296,9 +296,9 @@ describe('postRoutes', () => {
 
       const user = await findUserByField('username', newCandidate.username)
       if (user) {
-        const candidate = await findCandidateByField('userId', user._id.toString())
+        const candidate = await findCandidateByField('user', user._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             expect(post).not.toBeDefined()
             expect(candidate.posts).not.toEqual([post._id])
@@ -325,8 +325,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername7',
         nim: '2315020011101117',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail7@gmail.com',
         password: 'validpassword'
       }
@@ -336,8 +336,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername8',
         nim: '2315020011101118',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail8@gmail.com',
         password: 'validpassword'
       }
@@ -347,8 +347,8 @@ describe('postRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000004',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin4@gmail.com',
         username: 'admin4',
         password,
@@ -377,9 +377,9 @@ describe('postRoutes', () => {
       await supertest(app).post('/v1/post').set('Authorization', `Bearer ${token}`).send(payload).expect(201)
 
       if (userCandidate) {
-        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        const candidate = await findCandidateByField('user', userCandidate._id.toString())
         if (candidate) {
-          const post = await findPostByField('candidateId', candidate._id.toString())
+          const post = await findPostByField('candidate', candidate._id.toString())
           if (post) {
             postId = post._id.toString()
           }
@@ -407,8 +407,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername10',
         nim: '23150200111011110',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail10@gmail.com',
         password: 'validpassword'
       }
@@ -418,8 +418,8 @@ describe('postRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername9',
         nim: '231502001110119',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail9@gmail.com',
         password: 'validpassword'
       }
@@ -429,8 +429,8 @@ describe('postRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000005',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin5@gmail.com',
         username: 'admin5',
         password,

@@ -9,6 +9,6 @@ export const getAllElections = async () => {
   return await Election.find({})
 }
 
-export const findElectionById = async (id: string) => {
-  return await Election.findById(id)
+export const findElectionById = async (electionId: string) => {
+  return await Election.findById(electionId)
 }

@@ -1,14 +1,14 @@
 import supertest from 'supertest'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
-import { app } from '../app'
-import { User } from '../models/user.model'
-import type { RegisterForm } from '../types/auth.type'
-import { checkPassword, hashing } from '../utils/bcrypt'
-import { findUserByField } from '../services/user.service'
-import { findCandidateByField } from '../services/candidate.service'
-import { findElectionById, getAllElections } from '../services/election.service'
-import { findVoteById } from '../services/vote.service'
+import { app } from '../../app'
+import { User } from '../../models/user.model'
+import type { RegisterForm } from '../../types/auth.type'
+import { checkPassword, hashing } from '../../utils/bcrypt'
+import { findUserByField } from '../../services/user.service'
+import { findCandidateByField } from '../../services/candidate.service'
+import { findElectionById, getAllElections } from '../../services/election.service'
+import { findVoteById } from '../../services/vote.service'
 
 describe('voteRoutes', () => {
   beforeAll(async () => {
@@ -30,8 +30,8 @@ describe('voteRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -41,8 +41,8 @@ describe('voteRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername2',
         nim: '2315020011101112',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail2@gmail.com',
         password: 'validpassword'
       }
@@ -52,8 +52,8 @@ describe('voteRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000001',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin@gmail.com',
         username: 'admin',
         password,
@@ -83,7 +83,7 @@ describe('voteRoutes', () => {
 
       const userCandidate = await findUserByField('username', newCandidate.username)
       if (userCandidate) {
-        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        const candidate = await findCandidateByField('user', userCandidate._id.toString())
         if (candidate) {
           const elections = await getAllElections()
           if (elections) {
@@ -92,7 +92,7 @@ describe('voteRoutes', () => {
               const res = await supertest(app)
                 .post(`/v1/vote/${newElection._id.toString()}`)
                 .set('Authorization', `Bearer ${token}`)
-                .send({ candidateId: candidate._id.toString() })
+                .send({ candidate: candidate._id.toString() })
               expect(res.body.status).toBe(201)
 
               const election = await findElectionById(newElection._id.toString())
@@ -104,7 +104,7 @@ describe('voteRoutes', () => {
                 if (newVote) {
                   const vote = await findVoteById(newVote._id.toString())
                   if (vote) {
-                    expect(vote.candidateId._id.toString()).toBe(candidate._id.toString())
+                    expect(vote.candidate._id.toString()).toBe(candidate._id.toString())
 
                     const user = await findUserByField('username', newUser.username)
                     if (user) {
@@ -130,7 +130,7 @@ describe('voteRoutes', () => {
 
       const userCandidate = await findUserByField('username', newCandidate.username)
       if (userCandidate) {
-        const candidate = await findCandidateByField('userId', userCandidate._id.toString())
+        const candidate = await findCandidateByField('user', userCandidate._id.toString())
         if (candidate) {
           const elections = await getAllElections()
           if (elections) {

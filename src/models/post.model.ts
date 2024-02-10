@@ -1,13 +1,14 @@
 import mongoose from 'mongoose'
+import type { PostDocument } from '../types/post.type'
 
-const postSchema = new mongoose.Schema(
+const postSchema = new mongoose.Schema<PostDocument>(
   {
     caption: {
       type: String,
       required: true,
       trim: true
     },
-    candidateId: {
+    candidate: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Candidate',
       required: true

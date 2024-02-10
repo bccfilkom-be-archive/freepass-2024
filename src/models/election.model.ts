@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
+import type { ElectionType } from '../types/election.type'
 
-const electionSchema = new mongoose.Schema(
+const electionSchema = new mongoose.Schema<ElectionType>(
   {
     startDate: {
       type: Date,

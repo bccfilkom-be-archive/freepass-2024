@@ -1,11 +1,11 @@
 import type { NextFunction, Request, Response } from 'express'
-import { createUserValidation, loginValidation } from '../validation/auth.validation'
 import type { RegisterForm, LoginForm } from '../types/auth.type'
+import { findUserByField } from '../services/user.service'
 import { createUser, findUserByUsername } from '../services/auth.service'
+import { createUserValidation, loginValidation } from '../validation/auth.validation'
 import { checkPassword, hashing } from '../utils/bcrypt'
 import { signJWT } from '../utils/jwt'
 import { config } from '../utils/config'
-import { findUserByField } from '../services/user.service'
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {

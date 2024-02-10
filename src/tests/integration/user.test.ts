@@ -1,12 +1,12 @@
 import supertest from 'supertest'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
-import { app } from '../app'
-import { User } from '../models/user.model'
-import type { UpdateUserForm } from '../types/user.type'
-import type { RegisterForm } from '../types/auth.type'
-import { hashing } from '../utils/bcrypt'
-import { findUserByField } from '../services/user.service'
+import { app } from '../../app'
+import { User } from '../../models/user.model'
+import type { UpdateUserForm } from '../../types/user.type'
+import type { RegisterForm } from '../../types/auth.type'
+import { hashing } from '../../utils/bcrypt'
+import { findUserByField } from '../../services/user.service'
 
 describe('userRoutes', () => {
   beforeAll(async () => {
@@ -28,8 +28,8 @@ describe('userRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -44,8 +44,8 @@ describe('userRoutes', () => {
         fullName: 'valid full name',
         username: 'othervalidusername',
         nim: '231502001110112',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'othervalidemail@gmail.com',
         password: 'validpassword'
       }
@@ -57,8 +57,8 @@ describe('userRoutes', () => {
       request = {
         fullName: 'valid new full name',
         nim: '235150200111012',
-        fakultas: 'valid new fakultas',
-        prodi: 'valid new prodi',
+        faculty: 'valid new faculty',
+        major: 'valid new major',
         username: 'validnewusername',
         email: 'validnewemail@gmail.com',
         password: 'validnewpassword'
@@ -100,8 +100,8 @@ describe('userRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -111,8 +111,8 @@ describe('userRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000001',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin@gmail.com',
         username: 'admin',
         password,
@@ -144,8 +144,8 @@ describe('userRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername2',
         nim: '231502001110112',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail2@gmail.com',
         password: 'validpassword'
       }
@@ -155,8 +155,8 @@ describe('userRoutes', () => {
       const admin = new User({
         fullName: 'admin',
         nim: '0000002',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'admin2@gmail.com',
         username: 'admin2',
         password,

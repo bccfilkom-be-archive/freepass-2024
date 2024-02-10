@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
+import type { UserDocument } from '../types/user.type'
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<UserDocument>(
   {
     fullName: {
       type: String,
@@ -13,12 +14,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
-    fakultas: {
+    faculty: {
       type: String,
       required: true,
       trim: true
     },
-    prodi: {
+    major: {
       type: String,
       required: true,
       trim: true

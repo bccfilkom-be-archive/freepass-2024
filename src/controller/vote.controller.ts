@@ -8,7 +8,7 @@ import { createVoteService, findVoteById } from '../services/vote.service'
 
 export const createVote = async (req: Request, res: Response, next: NextFunction) => {
   const payload: CreateVoteForm = req.body
-  const electionId: string = req.params.id
+  const electionId: string = req.params.electionId
   const userId: string = res.locals.user._doc._id
 
   try {
@@ -16,7 +16,7 @@ export const createVote = async (req: Request, res: Response, next: NextFunction
     if (error) throw error
 
     const election = await findElectionById(electionId)
-    if (!election) throw new Error('candidate not found')
+    if (!election) throw new Error('election not found')
 
     const now = new Date()
     if (election.startDate >= now || election.endDate <= now) throw new Error('cannot vote today')

@@ -6,7 +6,7 @@ import { createComment, viewPostComments } from '../../controller/comment.contro
 export const postRouter: Router = Router()
 
 postRouter.get('/', requireAdmin, viewAllPosts)
-postRouter.get('/:id', viewPost)
+postRouter.get('/:postId', viewPost)
 postRouter.post('/', requireCandidate, createPost)
 postRouter.patch('/:postId', requireCandidate, updatePost)
 postRouter.delete('/:postId', requireCandidate, deletePost)

@@ -5,8 +5,8 @@ export const createUserValidation = (payload: RegisterForm) => {
   const schema = Joi.object({
     fullName: Joi.string().required(),
     nim: Joi.string().required(),
-    fakultas: Joi.string().required(),
-    prodi: Joi.string().required(),
+    faculty: Joi.string().required(),
+    major: Joi.string().required(),
     username: Joi.string().required(),
     email: Joi.string().required().email(),
     password: Joi.string().required()

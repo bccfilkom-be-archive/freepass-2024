@@ -5,8 +5,8 @@ export const updateUserValidation = (payload: UpdateUserForm) => {
   const schema = Joi.object({
     fullName: Joi.string(),
     nim: Joi.string(),
-    fakultas: Joi.string(),
-    prodi: Joi.string(),
+    faculty: Joi.string(),
+    major: Joi.string(),
     username: Joi.string(),
     email: Joi.string().email(),
     password: Joi.string()

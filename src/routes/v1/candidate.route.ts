@@ -1,10 +1,9 @@
 import { Router } from 'express'
-
 import { viewAllCandidates, viewCandidate, viewCandidatePosts } from '../../controller/candidate.controller'
-import { requireAdmin } from '../../middlewares/auth'
+import { requireAdmin, requireUser } from '../../middlewares/auth'
 
 export const candidateRouter: Router = Router()
 
-candidateRouter.get('/', requireAdmin, viewAllCandidates)
-candidateRouter.get('/:id', requireAdmin, viewCandidate)
-candidateRouter.get('/:id/post', requireAdmin, viewCandidatePosts)
+candidateRouter.get('/', requireUser, viewAllCandidates)
+candidateRouter.get('/:candidateId', requireAdmin, viewCandidate)
+candidateRouter.get('/:candidateId/post', requireUser, viewCandidatePosts)

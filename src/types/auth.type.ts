@@ -1,8 +1,8 @@
 export interface RegisterForm {
   fullName: string
   nim: string
-  fakultas: string
-  prodi: string
+  faculty: string
+  major: string
   username: string
   email: string
   password: string

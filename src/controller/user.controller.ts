@@ -13,18 +13,17 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
     if (error) throw error
 
     const user = await findUserById(id)
+    if (!user) throw new Error('user not found')
 
-    if (user) {
-      let foundUser: boolean = false
-      if (payload.nim) foundUser = !!(await findUserByField('nim', payload.nim))
-      if (foundUser) throw Error('nim has been taken')
+    let foundUser: boolean = false
+    if (payload.nim) foundUser = !!(await findUserByField('nim', payload.nim))
+    if (foundUser) throw Error('nim has been taken')
 
-      if (payload.username) foundUser = !!(await findUserByField('username', payload.username))
-      if (foundUser) throw Error('username has been taken')
+    if (payload.username) foundUser = !!(await findUserByField('username', payload.username))
+    if (foundUser) throw Error('username has been taken')
 
-      if (payload.email) foundUser = !!(await findUserByField('email', payload.email))
-      if (foundUser) throw new Error('email has been taken')
-    }
+    if (payload.email) foundUser = !!(await findUserByField('email', payload.email))
+    if (foundUser) throw new Error('email has been taken')
 
     await updateUserById(id, payload)
     return res.status(200).send({ status: 200, message: 'user update success', data: payload })
@@ -39,22 +38,20 @@ export const updateUser = async (req: Request, res: Response, next: NextFunction
 
 export const viewAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   const users = await getAllUsers()
-  return res
-    .status(200)
-    .send({ status: 200, message: 'get all users success', data: { ...users, length: users.length } })
+  return res.status(200).send({ status: 200, message: 'get all users success', data: { users, length: users.length } })
 }
 
 export const viewUser = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.params.id
+  const userId = req.params.userId
 
   try {
-    const id = await findUserById(userId)
-    if (!id) throw new Error('id not found')
+    const user = await findUserById(userId)
+    if (!user) throw new Error('user not found')
 
-    return res.status(200).send({ status: 200, message: 'view user by id success', data: id })
+    return res.status(200).send({ status: 200, message: 'view user by id success', data: user })
   } catch (error: any) {
     if (error.message.includes('not found')) {
-      res.status(404).send({ status: 404, message: error.message })
+      res.status(400).send({ status: 400, message: error.message })
     } else {
       next(error)
     }

@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import type { CreateCommentForm } from '../types/comment.type'
-import { createFormValidation } from '../validation/comment.validation'
+import { createCommentValidation } from '../validation/comment.validation'
 import { findPostById } from '../services/post.service'
 import { createCommentForId } from '../services/comment.service'
 import { findUserById } from '../services/user.service'
@@ -14,19 +14,20 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
     if (!post) throw new Error('post not found')
 
     const payload: CreateCommentForm = req.body
-    const { error } = createFormValidation(payload)
+    const { error } = createCommentValidation(payload)
     if (error) throw error
 
     const comment = await createCommentForId(payload, postId, userId)
     const user = await findUserById(userId)
-    if (user) {
-      user.commentedPosts = user.commentedPosts.concat(post._id)
-      user.comments = user.comments.concat(comment._id)
-      await user.save()
+    if (!user) throw new Error('user not found')
 
-      post.comments = post.comments.concat(comment._id)
-      await post.save()
-    }
+    user.commentedPosts = user.commentedPosts.concat(post._id)
+    user.comments = user.comments.concat(comment._id)
+    await user.save()
+
+    post.comments = post.comments.concat(comment._id)
+    await post.save()
+
     return res.status(201).send({ status: 201, message: 'create comment success' })
   } catch (error: any) {
     if (error.message.includes('not found')) {
@@ -44,10 +45,12 @@ export const viewPostComments = async (req: Request, res: Response, next: NextFu
     const post = await findPostById(postId)
     if (!post) throw new Error('post not found')
 
+    const comments = post.comments
+
     return res.status(200).send({
       status: 200,
       message: 'view posts comment success',
-      data: { comments: post.comments, length: post.comments.length }
+      data: { comments, length: comments.length }
     })
   } catch (error: any) {
     if (error.message.includes('not found')) {

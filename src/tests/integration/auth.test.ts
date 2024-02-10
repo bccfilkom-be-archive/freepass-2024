@@ -1,9 +1,9 @@
 import supertest from 'supertest'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
-import { app } from '../app'
-import { User } from '../models/user.model'
-import type { RegisterForm, LoginForm } from '../types/auth.type'
+import { app } from '../../app'
+import { User } from '../../models/user.model'
+import type { RegisterForm, LoginForm } from '../../types/auth.type'
 
 describe('authRoutes', () => {
   beforeAll(async () => {
@@ -23,8 +23,8 @@ describe('authRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }
@@ -62,8 +62,8 @@ describe('authRoutes', () => {
         fullName: 'valid full name',
         username: 'validusername',
         nim: '231502001110111',
-        fakultas: 'valid fakultas',
-        prodi: 'valid prodi',
+        faculty: 'valid faculty',
+        major: 'valid major',
         email: 'validemail@gmail.com',
         password: 'validpassword'
       }

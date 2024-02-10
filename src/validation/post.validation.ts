@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import type { CreatePostForm, UpdatePostForm } from '../types/post.type'
 
-export const createFormValidation = (payload: CreatePostForm) => {
+export const createPostValidation = (payload: CreatePostForm) => {
   const schema = Joi.object({
     caption: Joi.string().required()
   })

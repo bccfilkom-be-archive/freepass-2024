@@ -1,12 +1,13 @@
 import mongoose from 'mongoose'
+import type { VoteType } from '../types/vote.type'
 
-const voteSchema = new mongoose.Schema(
+const voteSchema = new mongoose.Schema<VoteType>(
   {
     hashedUserId: {
       type: String,
       required: true
     },
-    candidateId: {
+    candidate: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Candidate',
       required: true
