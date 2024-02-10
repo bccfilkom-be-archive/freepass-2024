@@ -32,3 +32,19 @@ func (handler *UserHandler) Register(ctx *gin.Context) {
 
 	apiresponse.Success(ctx, http.StatusCreated, "user successfully registered", response)
 }
+
+func (handler *UserHandler) Login(ctx *gin.Context) {
+	var request model.LoginUserRequest
+	if err := binding.ShouldBindJSON(ctx, &request); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	response, err := handler.UserService.Login(&request)
+	if err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusOK, "successfully logged in", response)
+}

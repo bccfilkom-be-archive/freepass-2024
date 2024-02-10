@@ -4,10 +4,13 @@ import (
 	"bcc-be-freepass-2024/entity"
 	"bcc-be-freepass-2024/model"
 	"bcc-be-freepass-2024/repository"
+	"bcc-be-freepass-2024/util/auth"
 	"bcc-be-freepass-2024/util/crypto"
 	"bcc-be-freepass-2024/util/errortypes"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"regexp"
 )
@@ -88,5 +91,44 @@ func (service *UserService) Register(request *model.RegisterUserRequest) (*model
 	}
 	return &model.RegisterUserResponse{
 		ID: user.ID,
+	}, nil
+}
+
+func (service *UserService) Login(request *model.LoginUserRequest) (*model.LoginUserResponse, *errortypes.ApiError) {
+	user, err := service.UserRepo.FindByUsername(request.Username)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, &errortypes.ApiError{
+				Code:    http.StatusNotFound,
+				Message: "username not found",
+				Data:    err,
+			}
+		}
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to check username data",
+			Data:    err,
+		}
+	}
+
+	if err := crypto.ValidateHash(request.Password, user.Password); err != nil {
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusUnauthorized,
+			Message: "wrong password",
+			Data:    err,
+		}
+	}
+
+	jwtToken, err := auth.GenerateToken(*user)
+	if err != nil {
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to generate token",
+			Data:    err,
+		}
+	}
+	return &model.LoginUserResponse{
+		ID:    user.ID,
+		Token: jwtToken,
 	}, nil
 }

@@ -41,6 +41,7 @@ func main() {
 	v1 := router.Group("/v1")
 
 	v1.POST("/register", userHandler.Register)
+	v1.POST("/login", userHandler.Login)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
 
@@ -41,4 +42,18 @@ type UpdateUserRequest struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Bio      string `json:"bio"`
+}
+
+type UserClaims struct {
+	ID uint `json:"id"`
+	jwt.RegisteredClaims
+}
+
+func NewUserClaims(id uint, exp time.Duration) UserClaims {
+	return UserClaims{
+		ID: id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(exp)),
+		},
+	}
 }

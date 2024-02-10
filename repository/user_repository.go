@@ -25,3 +25,11 @@ func (repo *UserRepository) ExistsUsername(username string) (bool, error) {
 	}
 	return count > 0, nil
 }
+
+func (repo *UserRepository) FindByUsername(username string) (*entity.User, error) {
+	var user entity.User
+	if err := repo.db.First(&user, "username = ?", username).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
