@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/rafli5131/freepass-2024/handlers"
-	"github.com/rafli5131/freepass-2024/middleware"
+	"freepass-2024/handlers"
+	"freepass-2024/middleware"
 )
 
 func main() {

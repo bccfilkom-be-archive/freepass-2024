@@ -6,7 +6,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/rafli5131/freepass-2024/models"
+	"freepass-2024/models"
 )
 
 func FindUserByEmail(email string) *models.User {

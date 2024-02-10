@@ -1,4 +1,4 @@
-module github.com/rafli5131/freepass-2024
+module freepass-2024
 
 go 1.21.6
 

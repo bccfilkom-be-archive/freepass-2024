@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rafli5131/freepass-2024/models"
-	"github.com/rafli5131/freepass-2024/utils"
+	"freepass-2024/models"
+	"freepass-2024/utils"
 )
 
 func CreatePost(c *gin.Context) {
