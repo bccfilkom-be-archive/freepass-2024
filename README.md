@@ -232,23 +232,23 @@ JWT_ACCESS_EXPIRATION=30m
 ```
 
 Running localy:
-```
-// Build the application
+```bash
+# Build the application
 npm run build
 
-// Start the application
+# Start the application
 npm run start
 ```
 
 Testing:
-```
-// Run all tests
+```bash
+# Run all tests
 npm run test
 ```
 
 Linting:
-```
-// Run ESlint
+```bash
+# Run ESlint
 npm run format
 ```
 
