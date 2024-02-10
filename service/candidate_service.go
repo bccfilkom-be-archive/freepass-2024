@@ -1,6 +1,8 @@
 package service
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
 	"github.com/nathakusuma/bcc-be-freepass-2024/model"
 	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
@@ -36,4 +38,38 @@ func (service *CandidateService) GetAll() ([]model.GetCandidateResponse, *errort
 	}
 
 	return response, nil
+}
+
+func (service *CandidateService) Promote(target *entity.User) (*model.PromoteCandidateResponse, *errortypes.ApiError) {
+	isUserExist, err := service.UserRepo.ExistsId(target.ID)
+	if err != nil {
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to check user data",
+			Data:    err,
+		}
+	}
+	if !isUserExist {
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusNotFound,
+			Message: "user not found",
+			Data:    gin.H{},
+		}
+	}
+	candId, err := service.CandidateRepo.Promote(target)
+	if err != nil {
+		if errortypes.IsMySqlError(err, errortypes.MySQLDuplicateKey) {
+			return nil, &errortypes.ApiError{
+				Code:    http.StatusConflict,
+				Message: "target is already a candidate",
+				Data:    err,
+			}
+		}
+		return nil, &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to add new candidate",
+			Data:    err,
+		}
+	}
+	return &model.PromoteCandidateResponse{ID: candId}, nil
 }

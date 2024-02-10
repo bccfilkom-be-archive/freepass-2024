@@ -55,6 +55,7 @@ func main() {
 	v1.DELETE("/users", middleware.Auth, roleMid.RequireRole(roles.Admin), userHandler.Delete)
 
 	v1.GET("/candidates", middleware.Auth, candidateHandler.Get)
+	v1.POST("/candidates", middleware.Auth, roleMid.RequireRole(roles.Admin), candidateHandler.Promote)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

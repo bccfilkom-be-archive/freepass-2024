@@ -59,3 +59,7 @@ func (repo *UserRepository) Update(user *entity.User, updates *model.UpdateUserR
 func (repo *UserRepository) Delete(user *entity.User) error {
 	return repo.db.Delete(user).Error
 }
+
+func (repo *UserRepository) SetRole(user *entity.User, role string) error {
+	return repo.db.Model(&user).Update("role", role).Error
+}
