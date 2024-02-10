@@ -61,6 +61,7 @@ func main() {
 	v1.POST("/candidates", middleware.Auth, roleMid.RequireRole(roles.Admin), candidateHandler.Promote)
 
 	v1.GET("/electionPeriod", middleware.Auth, periodHandler.Get)
+	v1.POST("/electionPeriod", middleware.Auth, roleMid.RequireRole(roles.Admin), periodHandler.Set)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

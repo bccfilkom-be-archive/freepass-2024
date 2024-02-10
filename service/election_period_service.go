@@ -5,6 +5,7 @@ import (
 	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
 	"net/http"
+	"time"
 )
 
 type ElectionPeriodService struct {
@@ -28,4 +29,15 @@ func (service *ElectionPeriodService) GetPeriod() (*model.GetElectionPeriodRespo
 		Start: start,
 		End:   end,
 	}, nil
+}
+
+func (service *ElectionPeriodService) SetPeriod(start, end time.Time) *errortypes.ApiError {
+	if err := service.PeriodRepo.SetPeriod(start, end); err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to save election period",
+			Data:    err,
+		}
+	}
+	return nil
 }
