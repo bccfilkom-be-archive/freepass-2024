@@ -32,6 +32,7 @@ paths:
   # authentication section
   /auth:
     post:
+      security: []
       tags:
         - Authentication
       summary: Generate a JWT token
@@ -86,6 +87,7 @@ paths:
   # users section
   /users:
     post:
+        security: []
         tags:
          - Users
         summary: Register a new user to the system
@@ -966,7 +968,7 @@ paths:
             type: integer
           description: The id of the candidate.
           required: false
-          example: 2
+          example: 1
         - in: query
           name: username
           schema:
@@ -1214,7 +1216,7 @@ paths:
             type: integer
           description: The id of the election.
           required: false
-          example: 2
+          example: 1
       summary: Get elections detail
       description: View election details with its live count. User can use it without parameter to view all elections.
       responses:
