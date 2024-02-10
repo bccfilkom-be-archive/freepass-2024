@@ -2,6 +2,9 @@ package main
 
 import (
 	"bcc-be-freepass-2024/database"
+	"bcc-be-freepass-2024/handler"
+	"bcc-be-freepass-2024/repository"
+	"bcc-be-freepass-2024/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -24,14 +27,20 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error when connecting to database: " + err.Error())
 	}
-	log.Println(db) //TODO: Implement db
+
+	userRepo := repository.NewUserRepository(db)
+
+	userService := service.NewUserService(userRepo)
+
+	userHandler := handler.NewUserHandler(userService)
 
 	gin.SetMode(os.Getenv("GIN_MODE"))
 
 	router := gin.Default()
 
 	v1 := router.Group("/v1")
-	log.Println(v1) //TODO: Implement v1
+
+	v1.POST("/register", userHandler.Register)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)
