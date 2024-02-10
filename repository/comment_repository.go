@@ -24,3 +24,15 @@ func (repo *CommentRepository) FindByPostId(postId uint) ([]entity.Comment, erro
 func (repo *CommentRepository) Add(comment *entity.Comment) error {
 	return repo.db.Create(&comment).Error
 }
+
+func (repo *CommentRepository) FindById(id uint) (*entity.Comment, error) {
+	var comment entity.Comment
+	if err := repo.db.First(&comment, id).Error; err != nil {
+		return nil, err
+	}
+	return &comment, nil
+}
+
+func (repo *CommentRepository) Delete(comment *entity.Comment) error {
+	return repo.db.Delete(comment).Error
+}

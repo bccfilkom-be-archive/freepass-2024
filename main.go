@@ -79,6 +79,7 @@ func main() {
 	v1.DELETE("/posts", middleware.Auth, roleMid.RequireRole(roles.Admin, roles.Candidate), postHandler.Delete)
 
 	v1.POST("/comments", middleware.Auth, roleMid.RequireRole(roles.User), commentHandler.Add)
+	v1.DELETE("/comments", middleware.Auth, roleMid.RequireRole(roles.Admin, roles.User), commentHandler.Delete)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

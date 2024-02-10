@@ -6,6 +6,7 @@ import (
 	"github.com/nathakusuma/bcc-be-freepass-2024/service"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/apiresponse"
 	"github.com/nathakusuma/bcc-be-freepass-2024/util/binding"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/roles"
 	"net/http"
 )
 
@@ -41,4 +42,30 @@ func (handler *CommentHandler) Add(ctx *gin.Context) {
 	}
 
 	apiresponse.Success(ctx, http.StatusOK, "comment added", response)
+}
+
+func (handler *CommentHandler) Delete(ctx *gin.Context) {
+	commentId, err := binding.ShouldUintQuery(ctx, "commentId")
+	if err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	role, _ := ctx.Get("role")
+	role = role.(string)
+	isAdmin := role == roles.Admin
+
+	var issuerId uint
+	if !isAdmin {
+		claimsTemp, _ := ctx.Get("user")
+		claims := claimsTemp.(model.UserClaims)
+		issuerId = claims.ID
+	}
+
+	if err := handler.CommentService.DeleteById(commentId, issuerId, isAdmin); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusOK, "successfully deleted comment", gin.H{})
 }

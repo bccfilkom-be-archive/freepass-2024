@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
 	"github.com/nathakusuma/bcc-be-freepass-2024/model"
 	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
@@ -65,4 +66,39 @@ func (service *CommentService) Add(request *model.AddCommentRequest, postId uint
 	}
 
 	return &model.AddCommentResponse{ID: comment.ID}, nil
+}
+
+func (service *CommentService) DeleteById(commentId, userId uint, isAdmin bool) *errortypes.ApiError {
+	comment, err := service.CommentRepo.FindById(commentId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &errortypes.ApiError{
+				Code:    http.StatusNotFound,
+				Message: "comment not found",
+				Data:    err,
+			}
+		}
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to update comment data",
+			Data:    err,
+		}
+	}
+
+	if !isAdmin && (comment.UserID != userId) {
+		return &errortypes.ApiError{
+			Code:    http.StatusForbidden,
+			Message: "not your comment",
+			Data:    gin.H{},
+		}
+	}
+
+	if err := service.CommentRepo.Delete(&entity.Comment{Model: gorm.Model{ID: commentId}}); err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "error when deleting comment",
+			Data:    err,
+		}
+	}
+	return nil
 }
