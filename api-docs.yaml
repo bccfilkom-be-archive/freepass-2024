@@ -1,0 +1,1594 @@
+openapi: 3.0.0
+info:
+  title: Election API
+  description: |
+    This API provides tools that let user manage users, posts, comments, and votes. With this API, selected candidates who have been promoted by the admin can create posts and manage them. Users can view and comment on their perceptions of candidates' posts using comments. Admin can create and start an election by specifying the election name, start date, and end date. On election day, users will be able to cast their votes and see the live count.
+    
+    To use this API you need to obtain a JWT Token by logging in and entering it on the authorization button below. For development purposes, you are allowed to use our predefined user data with admin privileges. You can use 'admin' as the username and 'root' as the password when logging in. Alternatively, you can register as a new user with your own credentials.
+
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Main sever
+tags:
+  - name: Authentication
+    description: Operations related to users authentication
+  - name: Users
+    description: Operations related to users managements
+  - name: Posts
+    description: Operations related to posts managements
+  - name: Comments
+    description: Operations related to comments managements
+  - name: Candidates
+    description: Operations related to candidates
+  - name: Elections
+    description: Operations related to elections
+  - name: Admins
+    description: Operations related to admin access only
+security:
+  - bearerAuth: []
+
+paths:
+  # authentication section
+  /auth:
+    post:
+      security: []
+      tags:
+        - Authentication
+      summary: Generate a JWT token
+      description: Authenticate and grant access based on user credentials. Return user login status along with its detail and token as response.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: yogarn
+                password:
+                  type: string
+                  example: root
+      responses:
+          '200':
+              description: A JSON object of user login status and username information. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: User logged in successfully
+                            username:
+                              type: string
+                              example: yogarn
+                            status:
+                                type: string
+                                example: candidate
+                            token:
+                                type: string
+                                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTcwNzQ5MDYzNCwiZXhwIjoxNzA3NDk0MjM0fQ.ICV9BnNncEMw1fQxzAk3k5qoHUB0ULyszlmB8-Hatrk
+          '401':
+            description: Incorrect credentials (Unauthorized Response)
+            content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Incorrect Username and/or Password!
+  
+  # users section
+  /users:
+    post:
+        security: []
+        tags:
+         - Users
+        summary: Register a new user to the system
+        description: Record user credentials and return it's username. Only the username and password key-value pair are required. If user leave other key empty, their values ​​will be stored as null, which user can edit later.
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - username
+                  - password
+                properties:
+                  nim:
+                    type: integer
+                    example: 12345678
+                  name:
+                    type: string
+                    example: John Doe
+                  username:
+                    type: string
+                    example: john
+                  password:
+                    type: string
+                    example: root
+                  major:
+                    type: string
+                    example: Computer Science
+                  faculty:
+                    type: string
+                    example: Faculty of Computer Science
+                  status:
+                    type: string
+                    enum: ["user", "candidate", "admin"]
+                    example: candidate
+                  description:
+                    type: string
+                    example: Make Earth great again!
+        responses:
+            '200':
+                description: A JSON object of user registration status and its username. (Successful Response)
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                              message:
+                                type: string
+                                example: User registered successfully
+                              username:
+                                type: string
+                                example: john
+            '409':
+                description: Username already used by another user (Conflict Response)
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                              error:
+                                type: string
+                                example: Username already used!
+    get:
+      summary: View users profile
+      description: Returns a list of users along with its details. User can use it without parameter to view all users profile.
+      tags:
+        - Users
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: The id of the user.
+          required: false
+          example: 1
+        - in: query
+          name: username
+          schema:
+            type: string
+          description: The username of the user.
+          required: false
+          example: yogarn
+        - in: query
+          name: status
+          schema:
+            type: string
+          description: The status of the user.
+          required: false
+          example: candidate
+      responses:
+        '200':
+          description: A JSON array containing list of users. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/user'
+              examples:
+                Empty Params:
+                  value:
+                  - id: 1
+                    nim: 12345678
+                    username: yogarn
+                    name: Yoga Raditya Nala
+                    major: Computer Science
+                    faculty: Faculty of Computer Science
+                    status: candidate
+                    description: Make Earth Great Again!
+                  - id: 2
+                    nim: 11234567
+                    username: gandalf
+                    name: Olorin Gandalf
+                    major: Magic
+                    faculty: Faculty of Witchcraft and Magic
+                    status: candidate
+                    description: Make Middle Earth Great Again!
+                  - id: 3
+                    nim: 12234567
+                    username: dumbledore
+                    name: Albus Percival Wulfric Brian Dumbledore
+                    major: Magic
+                    faculty: Faculty of Witchcraft and Magic
+                    status: candidate
+                    description: Make Hogwarts Great Again!
+                  - id: 4
+                    nim: 21234567
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    major: Magic
+                    faculty: Faculty of Witchcraft and Magic
+                    status: user
+                    description: Uhm, what is this?!
+                  - id: 5
+                    nim: 22234567
+                    username: am
+                    name: Alex Turner
+                    major: Music
+                    faculty: Faculty of Fine Arts and Music
+                    status: user
+                    description: Oh, when you look at me like that my darling, what did you expect?!
+                  - id: 6
+                    nim: 23234567
+                    username: elon
+                    name: Musk Elon
+                    major: Computer Science
+                    faculty: Faculty of Computer Science
+                    status: user
+                    description: To the Mars!
+                  - id: 7
+                    nim: 24234567
+                    username: turing
+                    name: Turing Alan
+                    major: Electrical Engineering
+                    faculty: Faculty of Electrical Engineering
+                    status: user
+                    description: For the future!
+                  - id: 8
+                    nim: 88888888
+                    username: admin
+                    name: admin
+                    major: Administration
+                    faculty: Faculty of Administration
+                    status: admin
+                    description: God Mode!
+                Using ID:
+                  value:
+                  - id: 2
+                    nim: 11234567
+                    username: gandalf
+                    name: Olorin Gandalf
+                    major: Magic
+                    faculty: Faculty of Witchcraft and Magic
+                    status: candidate
+                    description: Make Middle Earth Great Again!
+                Using Username:
+                  value:
+                  - id: 1
+                    nim: 12345678
+                    username: yogarn
+                    name: Yoga Raditya Nala
+                    major: Computer Science
+                    faculty: Faculty of Computer Science
+                    status: candidate
+                    description: Make Earth Great Again!
+        '404':
+          description: A JSON object of user status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: User(s) not found!
+    put:
+      tags:
+        - Users
+      summary: Update user profile.
+      description: Update user profile with new details and return the update status. User don't need to send all the key-value pair when accessing this request. All key-value are editable, except id, and status (only available for admin).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nim:
+                  $ref: '#/components/schemas/user/properties/nim'
+                username:
+                  $ref: '#/components/schemas/user/properties/username'
+                password:
+                  type: string
+                  description: The user's password.
+                name:
+                  $ref: '#/components/schemas/user/properties/name'
+                major:
+                  $ref: '#/components/schemas/user/properties/major'
+                faculty:
+                  $ref: '#/components/schemas/user/properties/faculty'
+                description:
+                  $ref: '#/components/schemas/user/properties/description'
+            example:
+              nim: 123345678
+              username: yogarn
+              password: root
+              name: Yoga Raditya Nala
+              major: Computer Science
+              faculty: Faculty of Computer Science
+              description: Make Earth Great Again!
+      responses:
+        '200':
+          description: A JSON object of user profile update status. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User profile updated successfully
+        '409':
+          description: Username already used by other user. (Conflict Response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Username already used!
+  /users/{username}:
+    delete:
+      summary: Delete a user by username
+      description: Remove the user/candidate from the system, including their posts, comments, and votes (if exists).
+      tags:
+        - Users
+        - Admins
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: The username of the user to delete.
+          schema:
+            type: string
+            example: turing
+      responses:
+        '200':
+          description: A JSON object of user deletion status. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: User deleted successfully
+        '403':
+          description: A JSON object of user deletion error status. (Forbidden Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Insufficient privileges, only admin can access
+        '404':
+              description: A JSON object of user deletion error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: User not found!
+  /users/status/{username}:
+    put:
+      summary: Edit user status
+      description: Update user's status status to candidate or admin, and revert to user otherwise (promote or demote). Only admins are allowed to access this endpoint.
+      tags:
+        - Users
+        - Admins
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: The username of the user to update.
+          schema:
+            type: string
+            example: elon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [user, candidate, admin]
+                  example: candidate
+      responses:
+        '200':
+          description: A JSON object of user update status. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User status updated successfully
+        '403':
+          description: A JSON object of user update error. (Forbidden Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Insufficient privileges, only admin can access
+        '422':
+              description: A JSON object of user update error. (Invalid Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Provide a valid status!
+  
+  # posts section
+  /posts:
+    post:
+      tags:
+        - Posts
+      summary: Create a post
+      description: Record post details and return creation status to candidate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+              properties:
+                title:
+                  type: string
+                  example: My First Post
+                content:
+                  type: string
+                  example: Hello all, this is my first time building a REST API in node.js!
+      responses:
+          '200':
+              description: A JSON object of post creation status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Post sent successfully
+          '403':
+            description: A JSON object of post creation error. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only candidate can access
+    get:
+      summary: View posts
+      description: View candidate post(s) along with its details (including comments). User can use it without parameter to view all posts.
+      tags:
+        - Posts
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: The id of the post.
+          required: false
+          example: 1
+        - in: query
+          name: username
+          schema:
+            type: string
+          description: The username of the user who sent the post(s).
+          required: false
+          example: yogarn
+      responses:
+        '200':
+          description: A JSON array of posts along with its details. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/post'
+              examples:
+                Empty Params:
+                  value:
+                    - id: 1
+                      user_id: 1
+                      username: yogarn
+                      name: Yoga Raditya Nala
+                      title: My First API
+                      content: "Hello world!"
+                      timestamp: "2024-02-07T10:54:35.000Z"
+                      comments:
+                        - id: 4
+                          user_id: 5
+                          username: am
+                          name: Alex Turner
+                          post_id: 1
+                          content: "You look good!"
+                          timestamp: "2024-02-07T11:25:46.000Z"
+                        - id: 5
+                          user_id: 7
+                          username: turing
+                          name: Turing Alan
+                          post_id: 1
+                          content: "You're the best."
+                          timestamp: "2024-02-07T11:52:19.000Z"
+                    - id: 2
+                      user_id: 2
+                      username: gandalf
+                      name: Olorin Gandalf
+                      title: The Greatest Middle Earth!
+                      content: "I promise to restore our golden era if I am elected!"
+                      timestamp: "2024-02-07T10:59:02.000Z"
+                      comments:
+                        - id: 1
+                          user_id: 4
+                          username: yennefer
+                          name: Yennefer of Vengerberg
+                          post_id: 2
+                          content: "I think I'll vote you."
+                          timestamp: "2024-02-07T11:12:44.000Z"
+                    - id: 3
+                      user_id: 3
+                      username: dumbledore
+                      name: Albus Percival Wulfric Brian Dumbledore
+                      title: For Peace and Hogwarts!
+                      content: "I'll bring glory to our beloved Hogwarts if I'm elected!"
+                      timestamp: "2024-02-07T11:02:46.000Z"
+                      comments:
+                        - id: 2
+                          user_id: 4
+                          username: yennefer
+                          name: Yennefer of Vengerberg
+                          post_id: 3
+                          content: "well, I hope you keep your promise after being elected."
+                          timestamp: "2024-02-07T11:13:21.000Z"
+                    - id: 4
+                      user_id: 1
+                      username: yogarn
+                      name: Yoga Raditya Nala
+                      title: For Democracy!
+                      content: "Cast your vote on February 31, 2099! Don't forget the date!"
+                      timestamp: "2024-02-07T11:23:49.000Z"
+                      comments:
+                        - id: 3
+                          user_id: 4
+                          username: yennefer
+                          name: Yennefer of Vengerberg
+                          post_id: 4
+                          content: "Yes, Sir!"
+                          timestamp: "2024-02-07T11:24:29.000Z"
+                Using ID:
+                  value:
+                    - id: 2
+                      user_id: 2
+                      username: gandalf
+                      name: Olorin Gandalf
+                      title: The Greatest Middle Earth!
+                      content: "I promise to restore our golden era if I am elected!"
+                      timestamp: "2024-02-07T10:59:02.000Z"
+                      comments:
+                        - id: 1
+                          user_id: 4
+                          username: yennefer
+                          name: Yennefer of Vengerberg
+                          post_id: 2
+                          content: "I think I'll vote you."
+                          timestamp: "2024-02-07T11:12:44.000Z"
+                Using Username:
+                  value:
+                    - id: 1
+                      user_id: 1
+                      username: yogarn
+                      name: Yoga Raditya Nala
+                      title: My First API
+                      content: "Hello world!"
+                      timestamp: "2024-02-07T10:54:35.000Z"
+                      comments:
+                        - id: 4
+                          user_id: 5
+                          username: am
+                          name: Alex Turner
+                          post_id: 1
+                          content: "You look good!"
+                          timestamp: "2024-02-07T11:25:46.000Z"
+                        - id: 5
+                          user_id: 7
+                          username: turing
+                          name: Turing Alan
+                          post_id: 1
+                          content: "You're the best."
+                          timestamp: "2024-02-07T11:52:19.000Z"
+                    - id: 4
+                      user_id: 1
+                      username: yogarn
+                      name: Yoga Raditya Nala
+                      title: For Democracy!
+                      content: "Cast your vote on February 31, 2099! Don't forget the date!"
+                      timestamp: "2024-02-07T11:23:49.000Z"
+                      comments:
+                        - id: 3
+                          user_id: 4
+                          username: yennefer
+                          name: Yennefer of Vengerberg
+                          post_id: 4
+                          content: "Yes, Sir!"
+                          timestamp: "2024-02-07T11:24:29.000Z"
+        '404':
+              description: A JSON object of post(s) status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Post(s) not found!
+  /posts/{id}:
+    put:
+      tags:
+        - Posts
+      summary: Update a post
+      description: Apply changes to a post and return its update status to candidate. The parameters and body of the request are mandatory, even if there are no changes to certain key-value pair.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of posts to update.
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                title:
+                  type: string
+                  example: My First Post
+                content:
+                  type: string
+                  example: Hello all, this is my first time building a REST API in node.js!
+      responses:
+          '200':
+              description: A JSON object of post update status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Post updated successfully
+          '403':
+              description: A JSON object of post update error status. (Forbidden Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: You do not have permission to edit or delete this post!
+    delete:
+      tags:
+        - Posts
+        - Admins
+      summary: Delete a post
+      description: Delete a post and return its status to candidate or admin. Admin can also access this endpoint.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of posts to delete.
+          schema:
+            type: integer
+            example: 1
+      responses:
+          '200':
+              description: A JSON object of post deletion status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Post deleted successfully
+          '403':
+              description: A JSON object of post deletion error status. (Forbidden Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: You do not have permission to edit or delete this post!
+          '404':
+              description: A JSON object of post deletion error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Post not found!
+
+  # comments section
+  /comments:
+    post:
+      tags:
+        - Comments
+      summary: Create a comment
+      description: Record user comment and return creation status to user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - post_id
+                - content
+              properties:
+                post_id:
+                  type: integer
+                  example: 1
+                content:
+                  type: string
+                  example: Wow, this is very nice!
+      responses:
+          '200':
+              description: A JSON object of comment creation status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Post sent successfully
+          '404':
+              description: A JSON object of selected post status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Post not found!
+    get:
+      tags:
+        - Comments
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: The id of the comment.
+          required: false
+          example: 2
+        - in: query
+          name: post-id
+          schema:
+            type: string
+          description: The post's id where the comment is sent.
+          required: false
+          example: 3
+        - in: query
+          name: username
+          schema:
+            type: string
+          description: The username who sent the comment.
+          required: false
+          example: yennefer
+      summary: Get comments
+      description: View comments using id, post-id, or username. User can use it without parameter to view all comments.
+      responses:
+        '200':
+          description: A JSON object of comment information. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/comment'
+              examples:
+                Empty Params:
+                  value:
+                  - id: 1
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 2
+                    content: "I think I'll vote you."
+                    timestamp: "2024-02-07T11:12:44.000Z"
+                  - id: 2
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 3
+                    content: "well, I hope you keep your promise after being elected."
+                    timestamp: "2024-02-07T11:13:21.000Z"
+                  - id: 3
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 4
+                    content: "Yes, Sir!"
+                    timestamp: "2024-02-07T11:24:29.000Z"
+                  - id: 4
+                    user_id: 5
+                    username: am
+                    name: Alex Turner
+                    post_id: 1
+                    content: "You look good!"
+                    timestamp: "2024-02-07T11:25:46.000Z"
+                  - id: 5
+                    user_id: 7
+                    username: turing
+                    name: Turing Alan
+                    post_id: 1
+                    content: "You're the best."
+                    timestamp: "2024-02-07T11:52:19.000Z"
+                Using ID:
+                  value:
+                  - id: 2
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 3
+                    content: "well, I hope you keep your promise after being elected."
+                    timestamp: "2024-02-07T11:13:21.000Z"
+                Using Post ID:
+                  value:
+                  - id: 2
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 3
+                    content: "well, I hope you keep your promise after being elected."
+                    timestamp: "2024-02-07T11:13:21.000Z"
+                Using username:
+                  value:
+                  - id: 1
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 2
+                    content: "I think I'll vote you."
+                    timestamp: "2024-02-07T11:12:44.000Z"
+                  - id: 2
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 3
+                    content: "well, I hope you keep your promise after being elected."
+                    timestamp: "2024-02-07T11:13:21.000Z"
+                  - id: 3
+                    user_id: 4
+                    username: yennefer
+                    name: Yennefer of Vengerberg
+                    post_id: 4
+                    content: "Yes, Sir!"
+                    timestamp: "2024-02-07T11:24:29.000Z"
+        '404':
+          description: A JSON object of comment get status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Comment(s) not found!
+  /comments/{id}:
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment
+      description: Remove the user comment from the candidate's post and return its status to admin. Only admin can access this endpoint.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of comment to delete.
+          schema:
+            type: integer
+            example: 1
+      responses:
+          '200':
+              description: A JSON object of comment deletion status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Comment deleted successfully successfully
+          '404':
+            description: A JSON object of comment get status. (Not Found Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Comment not found!
+
+  # candidates section
+  /candidates:
+    get:
+      tags:
+        - Candidates
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: The id of the candidate.
+          required: false
+          example: 1
+        - in: query
+          name: username
+          schema:
+            type: string
+          description: The username of the candidate.
+          required: false
+          example: yogarn
+      summary: View candidates
+      description: View candidates using query parameters. User can use it without parameter to get all candidates information.
+      responses:
+        '200':
+          description: A JSON array of candidates information.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/candidate'
+              examples:
+                Empty Params:
+                  value:
+                    - id: 1
+                      nim: 12345678
+                      username: yogarn
+                      name: Yoga Raditya Nala
+                      major: Computer Science
+                      faculty: Faculty of Computer Science
+                      status: candidate
+                      description: Make Earth Great Again!
+                      posts:
+                        - id: 1
+                          user_id: 1
+                          title: A Promise
+                          content: I know that I might not be the best candidate here, but I promise you one thing, I will try my best if I get elected!
+                          timestamp: "2024-02-07T10:54:35.000Z"
+                          comments:
+                            - id: 4
+                              user_id: 5
+                              username: am
+                              name: Alex Turner
+                              post_id: 1
+                              content: You look good!
+                              timestamp: "2024-02-07T11:25:46.000Z"
+                            - id: 5
+                              user_id: 7
+                              username: turing
+                              name: Turing Alan
+                              post_id: 1
+                              content: You're the best.
+                              timestamp: "2024-02-07T11:52:19.000Z"
+                        - id: 4
+                          user_id: 1
+                          title: For Democracy!
+                          content: I call all of you to cast your vote on February 31, 2099! Don't forget the date!
+                          timestamp: "2024-02-07T11:23:49.000Z"
+                          comments:
+                            - id: 3
+                              user_id: 4
+                              username: yennefer
+                              name: Yennefer of Vengerberg
+                              post_id: 4
+                              content: Yes, Sir!
+                              timestamp: "2024-02-07T11:24:29.000Z"
+                    - id: 2
+                      nim: 11234567
+                      username: gandalf
+                      name: Olorin Gandalf
+                      major: Magic
+                      faculty: Faculty of Witchcraft and Magic
+                      status: candidate
+                      description: Make Middle Earth Great Again!
+                      posts:
+                        - id: 2
+                          user_id: 2
+                          title: The Greatest Middle Earth!
+                          content: To everyone in middle earth, I promise to restore our golden era if I am elected!
+                          timestamp: "2024-02-07T10:59:02.000Z"
+                          comments:
+                            - id: 1
+                              user_id: 4
+                              username: yennefer
+                              name: Yennefer of Vengerberg
+                              post_id: 2
+                              content: I think I'll vote you.
+                              timestamp: "2024-02-07T11:12:44.000Z"
+                    - id: 3
+                      nim: 12234567
+                      username: dumbledore
+                      name: Albus Percival Wulfric Brian Dumbledore
+                      major: Magic
+                      faculty: Faculty of Witchcraft and Magic
+                      status: candidate
+                      description: Make Hogwarts Great Again!
+                      posts:
+                        - id: 3
+                          user_id: 3
+                          title: For Peace and Hogwarts!
+                          content: To everyone in London, I promise to bring back peace to our beloved Hogwarts if I'm elected!
+                          timestamp: "2024-02-07T11:02:46.000Z"
+                          comments:
+                            - id: 2
+                              user_id: 4
+                              username: yennefer
+                              name: Yennefer of Vengerberg
+                              post_id: 3
+                              content: well, I hope you keep your promise after being elected.
+                              timestamp: "2024-02-07T11:13:21.000Z"
+                Using ID:
+                  value:
+                    - id: 2
+                      nim: 11234567
+                      username: gandalf
+                      name: Olorin Gandalf
+                      major: Magic
+                      faculty: Faculty of Witchcraft and Magic
+                      status: candidate
+                      description: Make Middle Earth Great Again!
+                      posts:
+                        - id: 2
+                          user_id: 2
+                          title: The Greatest Middle Earth!
+                          content: To everyone in middle earth, I promise to restore our golden era if I am elected!
+                          timestamp: "2024-02-07T10:59:02.000Z"
+                          comments:
+                            - id: 1
+                              user_id: 4
+                              username: yennefer
+                              name: Yennefer of Vengerberg
+                              post_id: 2
+                              content: I think I'll vote you.
+                              timestamp: "2024-02-07T11:12:44.000Z"
+                Using Username:
+                  value:
+                    - id: 1
+                      nim: 12345678
+                      username: yogarn
+                      name: Yoga Raditya Nala
+                      major: Computer Science
+                      faculty: Faculty of Computer Science
+                      status: candidate
+                      description: Make Earth Great Again!
+                      posts:
+                        - id: 1
+                          user_id: 1
+                          title: A Promise
+                          content: I know that I might not be the best candidate here, but I promise you one thing, I will try my best if I get elected!
+                          timestamp: "2024-02-07T10:54:35.000Z"
+                          comments:
+                            - id: 4
+                              user_id: 5
+                              username: am
+                              name: Alex Turner
+                              post_id: 1
+                              content: You look good!
+                              timestamp: "2024-02-07T11:25:46.000Z"
+                            - id: 5
+                              user_id: 7
+                              username: turing
+                              name: Turing Alan
+                              post_id: 1
+                              content: You're the best.
+                              timestamp: "2024-02-07T11:52:19.000Z"
+                        - id: 4
+                          user_id: 1
+                          title: For Democracy!
+                          content: I call all of you to cast your vote on February 31, 2099! Don't forget the date!
+                          timestamp: "2024-02-07T11:23:49.000Z"
+                          comments:
+                            - id: 3
+                              user_id: 4
+                              username: yennefer
+                              name: Yennefer of Vengerberg
+                              post_id: 4
+                              content: Yes, Sir!
+                              timestamp: "2024-02-07T11:24:29.000Z"
+        '404':
+          description: A JSON object of candidate get status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Candidate not found!
+
+  # elections section
+  /elections:
+    post:
+      tags:
+        - Elections
+        - Admins
+      summary: Create an election
+      description: Create an election with and return creation status to admin. Only admin can access this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - start_date
+                - end_date
+              properties:
+                name:
+                  type: string
+                  example: 1st Election
+                start_date:
+                  type: string
+                  format: datetime
+                  example: 2024-02-07T08:00:00.000Z
+                end_date:
+                  type: string
+                  format: datetime
+                  example: 2024-02-10T20:00:00.000Z
+      responses:
+          '200':
+              description: A JSON object of election creation status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Election created successfully
+          '403':
+            description: A JSON object of user election creation error. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only admin can access
+    get:
+      tags:
+        - Elections
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: The id of the election.
+          required: false
+          example: 1
+      summary: Get elections detail
+      description: View election details with its live count. User can use it without parameter to view all elections.
+      responses:
+        '200':
+          description: A JSON object of elections information. (Successful Response)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/election'
+              examples:
+                Empty Params:
+                  value:
+                    - id: 1
+                      name: "1st Election"
+                      start_date: "2024-02-06T01:00:00.000Z"
+                      end_date: "2025-02-10T13:00:00.000Z"
+                      counts:
+                        - id: 1
+                          username: "yogarn"
+                          name: "Yoga Raditya Nala"
+                          vote_count: 3
+                        - id: 2
+                          username: "gandalf"
+                          name: "Olorin Gandalf"
+                          vote_count: 1
+                        - id: 3
+                          username: "dumbledore"
+                          name: "Albus Percival Wulfric Brian Dumbledore"
+                          vote_count: 1
+                    - id: 2
+                      name: "2nd Election"
+                      start_date: "2024-02-13T01:00:00.000Z"
+                      end_date: "2024-02-23T13:00:00.000Z"
+                      counts: []
+                Using ID:
+                  value:
+                    - id: 2
+                      name: "2nd Election"
+                      start_date: "2024-02-13T01:00:00.000Z"
+                      end_date: "2024-02-23T13:00:00.000Z"
+                      counts: []
+        '404':
+          description: A JSON object of election get status. (Not Found Response)
+          content:
+              application/json:
+                  schema:
+                      type: object
+                      properties:
+                        error:
+                          type: string
+                          example: Election found!
+  /elections/{id}:
+    put:
+      tags:
+        - Elections
+        - Admins
+      summary: Update an election
+      description: Set the name, start, and end dates for the selected election, then return its status to admin. Only admin can access this endpoint.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of election to update.
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - start_date
+                - end_date
+              properties:
+                name:
+                  type: string
+                  example: 1st Election
+                start_date:
+                  type: string
+                  format: datetime
+                  example: 2024-02-07T08:00:00.000Z
+                end_date:
+                  type: string
+                  format: datetime
+                  example: 2025-02-10T20:00:00.000Z
+      responses:
+          '200':
+              description: A JSON object of election update status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Election updated successfully
+          '403':
+            description: A JSON object of election update error status. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only admin can access
+          '404':
+            description: A JSON object of election update status. (Not Found Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Election not found!
+    delete:
+      tags:
+        - Elections
+        - Admins
+      summary: Delete an election
+      description: Delete an election and return its status to admin. Only admin can access this endpoint.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of election to delete.
+          schema:
+            type: integer
+            example: 1
+      responses:
+          '200':
+              description: A JSON object of election deletion status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Election deleted successfully
+          '403':
+            description: A JSON object of election update error status. (Forbidden Response)
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          error:
+                            type: string
+                            example: Insufficient privileges, only admin can access
+
+  # votes
+  /elections/vote:
+    post:
+      tags:
+        - Elections
+      summary: Cast a vote
+      description: Register user vote for the selected candidate and return vote status based on election id and candidate username.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - election_id
+                - candidate_username
+              properties:
+                election_id:
+                  type: integer
+                  example: 1
+                candidate_username:
+                  type: string
+                  example: yogarn
+      responses:
+          '200':
+              description: A JSON object of user vote status. (Successful Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            message:
+                              type: string
+                              example: Vote casted successfully
+          '404 - Election':
+              description: A JSON object of vote election error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Election not found!
+          '404 - Candidate':
+              description: A JSON object of vote candidate error status. (Not Found Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: Candidate not found!
+          '409':
+              description: A JSON object of user vote error status. (Conflict Response)
+              content:
+                  application/json:
+                      schema:
+                          type: object
+                          properties:
+                            error:
+                              type: string
+                              example: You've already voted in this election!
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the user.
+        nim:
+          type: integer
+          description: The user's NIM.
+        username:
+          type: string
+          description: The user's username.
+        name:
+          type: string
+          description: The user's name.
+        major:
+          type: string
+          description: The user's major.
+        faculty:
+          type: string
+          description: The user's faculty.
+        status:
+          type: string
+          description: The user's status.
+        description:
+          type: string
+          description: Additional description about the user.
+    
+    post:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the post.
+        user_id:
+          type: integer
+          description: The user's id who sent the post.
+        username:
+          type: string
+          description: The user's username who sent the post.
+        name:
+          type: string
+          description: The user's name who sent the post.
+        title:
+          type: string
+          description: The post's title.
+        content:
+          type: string
+          description: The post's content.
+        timestamp:
+          type: string
+          format: datetime
+          description: The post's creation datetime.
+        comments:
+          type: array
+          description: The post's comments.
+          items: 
+            $ref: '#/components/schemas/comment'
+    
+    comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the comment.
+        user_id:
+          type: integer
+          description: The user's id who sent the comment.
+        username:
+          type: string
+          description: The user's username who sent the comment.
+        name:
+          type: string
+          description: The user's name who sent the comment.
+        post_id:
+          type: integer
+          description: The post's id where user sent the comment.
+        content:
+          type: string
+          description: The comment's content.
+        timestamp:
+          type: string
+          format: datetime
+          description: The comment's creation datetime.
+
+    candidate:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/user/properties/id'
+        nim:
+          $ref: '#/components/schemas/user/properties/nim'
+        username:
+          $ref: '#/components/schemas/user/properties/username'
+        name:
+          $ref: '#/components/schemas/user/properties/name'
+        major:
+          $ref: '#/components/schemas/user/properties/major'
+        faculty:
+          $ref: '#/components/schemas/user/properties/faculty'
+        status:
+          $ref: '#/components/schemas/user/properties/status'
+        description:
+          $ref: '#/components/schemas/user/properties/description'
+        posts:
+          type: array
+          description: The user's posts.
+          items:
+            $ref: '#/components/schemas/post'
+            
+    election:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the election.
+        name:
+          type: string
+          description: The name of the election.
+        start_date:
+          type: string
+          format: dateformat
+          description: The start date of the election.
+        end-date:
+          type: string
+          format: dateformat
+          description: The end date of the election.
+        counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/vote'
+    
+    vote:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The candidate's id.
+        username:
+          type: string
+          description: The candidate's username.
+        name:
+          type: string
+          description: The candidate's name.
+        vote_count:
+          type: integer
+          description: The number of user who voted for the candidate.

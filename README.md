@@ -107,6 +107,52 @@ THEN  => System will show a deletion status message and delete relevant post
 We want to see your perspective about these problems. You can define various types of entities or actors. One thing for sure, there is no
 true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
 
+```
+(Entities)
+User: Represents individuals who interact with the system. They can have different roles such as regular users, candidates, or administrators. Attributes include:
+- id
+- nim (student ID)
+- username
+- password
+- name
+- major
+- faculty
+- status (user | candidate | admin)
+- description
+
+Post: Represents the content created by users, particularly candidates in this context. Attributes include:
+- id
+- user_id (referring to the creator)
+- title
+- content
+- timestamp
+
+Comment: Represents the comments made by users on posts. Attributes include:
+- id
+- user_id (referring to the commenter)
+- post_id (referring to the post being commented on)
+- content
+- timestamp
+
+Election: Represents the election event. Attributes include:
+- id
+- start_date
+- end_date
+- timestamp
+
+Vote: Represents the votes cast by users in the election. Attributes include:
+- id
+- user_id (referring to the voter)
+- election_id (referring to the election being voted in)
+- candidate_id (referring to the candidate being voted for)
+- timestamp
+
+(Actors)
+- User: Individuals who interact with the system. They can have different roles such as regular users, candidates, or administrators.
+- Candidate: Users who are running for election. They can create posts to campaign and receive comments from other users.
+- Administrator: Users with special privileges to manage the election system, such as creating or closing elections, managing users, and managing posts.
+```
+
 ## **📘** References
 
 You might be overwhelmed by these requirements. Don’t worry, here’s a list of some tools that you could use (it’s not required to use all of them nor any of them):
@@ -149,6 +195,56 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 ## **🧪** API Installation
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+
+### Prerequisites
+Before you begin, ensure you have the following installed on your machine. If you want to use **Docker** instead of manual installation, you can **skip these prerequisites**.
+
+- Node.js
+- npm
+- MariaDB
+
+### Running with Docker
+These instructions will help you run the project locally using Docker with MariaDB.
+1. Clone the repository or download manually:
+```
+git clone --branch yoga-raditya-nala https://github.com/yogarn/freepass-2024
+```
+2. Navigate to the project directory:
+```
+cd freepass-2024
+```
+3. Run Docker Compose to start the application:
+```
+docker-compose up -d
+```
+### Running without Docker (MariaDB)
+If you prefer not to use Docker, you can run the application with a local MariaDB instance.
+1. Make sure your MariaDB/MySQL server is configured correctly
+2. Clone the repository or download manually:
+```
+git clone --branch yoga-raditya-nala https://github.com/yogarn/freepass-2024
+```
+3. Navigate to the project directory:
+```
+cd freepass-2024
+```
+4. Install dependencies:
+```
+npm install
+```
+5. Configure your credentials and database configuration in `config/database.js`.
+6. Start the application:
+```
+npm start
+```
+### Access the aplication and documentations
+You can **access** the application at http://localhost:3000/api/ and the **documentation** can be accessed in your web browser at http://localhost:3000/api-docs/.
+### Stop the application
+To stop the application and shut down the Docker containers, run (if using Docker):
+```
+docker-compose down
+```
+If you are not using Docker and using npm, you can simply press `ctrl + c` to kill the application.
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
