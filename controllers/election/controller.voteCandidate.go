@@ -40,14 +40,14 @@ func VoteCandidate(c *gin.Context) {
 		return
 	}
 
-	startTime, err := time.Parse("2006-01-02T15:04:05-07:00", election.StartTime)
+	startTime, err := time.Parse(time.RFC3339, election.StartTime)
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Wrong start_time format", Data: election}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
 
-	endTime, err := time.Parse("2006-01-02T15:04:05-07:00", election.EndTime)
+	endTime, err := time.Parse(time.RFC3339, election.EndTime)
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Wrong end_time format", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
@@ -68,15 +68,9 @@ func VoteCandidate(c *gin.Context) {
 		return
 	}
 
-	vote, err := voteRepositorys.FindUserVoteForCandidate(user.ID, candidate.ID)
-	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Failed to vote, Something went wrong", Data: nil}
-		c.JSON(http.StatusInternalServerError, res)
-		return
-	}
-
-	if vote.ID == 0 {
-		res := schemas.ResponeData{Error: true, Message: "You're already voted, Something went wrong", Data: nil}
+	vote , err := voteRepositorys.FindUserVoteForCandidate(user.ID, candidate.ID)
+	if err == nil {
+		res := schemas.ResponeData{Error: true, Message: "You're already voted, Something went wrong", Data: vote}
 		c.JSON(http.StatusBadRequest, res)
 		return
 	}

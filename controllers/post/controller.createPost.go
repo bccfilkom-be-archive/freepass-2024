@@ -10,6 +10,7 @@ import (
 	electionRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/election"
 	postRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/post"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
+
 )
 
 func CreateNewCandidatePost(c *gin.Context) {
@@ -44,7 +45,7 @@ func CreateNewCandidatePost(c *gin.Context) {
 	}
 
 	candidate, err := candidateRepositorys.FindCandidateInElection(user.ID, election.ID)
-	if err != nil {
+	if candidate.ID == "" {
 		res := schemas.ResponeData{Error: true, Message: "Your not allowed to create a post in this election", Data: nil}
 		c.JSON(http.StatusAccepted, res)
 		return

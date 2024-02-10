@@ -8,7 +8,7 @@ import (
 
 func FindSpecificElection(ID string) (*models.Election, error) {
 	var election *models.Election
-	if err := database.DB.First(&election).Where("id = ?", ID).Error; err != nil {
+	if err := database.DB.Where("id = ?", ID).Find(&election).Error; err != nil {
 		return nil, err
 	}
 	return election, nil

@@ -24,8 +24,8 @@ func FindCandidateInformations(ID string) (*models.CandidateInformation, error) 
 
 func FindCandidateInElection(userID string, electionID string) (*models.Candidate, error) {
 	var candidate *models.Candidate
-	if err := database.DB.Where("user_id = ? AND election_id = ?", userID, electionID).First(&candidate).Error; err != nil {
-		return nil, err
+	if err := database.DB.Where("user_id = ? AND election_id = ?", userID, electionID).Find(&candidate).Error; err != nil {
+		return candidate, err
 	}
 	return candidate, nil
 }
