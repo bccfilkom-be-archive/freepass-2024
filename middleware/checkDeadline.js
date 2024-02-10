@@ -2,7 +2,7 @@ const { time } = require('../models');
 
 exports.checkDeadline = async (req, res, next) => {
     try {
-        const currentTime = new Date(); // Mendapatkan waktu saat ini
+        const currentTime = new Date(); 
 
         // Mendapatkan data waktu dari database
         const deadline = await time.findOne();

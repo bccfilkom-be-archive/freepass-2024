@@ -46,7 +46,7 @@ exports.registerUser = async (req, res) => {
 
   if (!image) {
     return res.status(400).json({
-      message: image
+      message: "image tidak ada"
     })
   }
 

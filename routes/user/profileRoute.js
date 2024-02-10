@@ -29,39 +29,16 @@ const imageFilter = function (req, file, cb) {
     }
 };
 
-// UPLOAD PRODUCTS dengan filter
-// const uploadProducts = multer({
-//     storage: storageProducts,
-//     fileFilter: imageFilter
-// }).single('image');
-
-// router.post('/', (req, res, next) => {
-//     uploadProducts(req, res, function (err) {
-//         if (err instanceof multer.MulterError) {
-//             return res.status(400).json({
-//                 message: "Error during file upload",
-//                 error: err.message
-//             });
-//         } else if (err) {
-//             return res.status(500).json({
-//                 message: "Internal server error",
-//                 error: err.message
-//             });
-//         }
-//         // Jika tidak ada kesalahan, lanjut ke controller
-//         next();
-//     });
-// }, addProduct);
 
 
-const uploadProducts = multer({
+const uploadImage = multer({
     storage: storageProducts,
     fileFilter: imageFilter
 });
 
 
-
+// Soal No 3
 // User can edit their profile account
-router.post('/', verifyToken, uploadProducts.single('image'), updateOrCreateProfile);
+router.post('/', verifyToken, uploadImage.single('image'), updateOrCreateProfile);
 
 module.exports = router;

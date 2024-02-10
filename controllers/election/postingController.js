@@ -1,18 +1,19 @@
-const { Op } = require('sequelize');
-const { posting, review, user } = require('../../models');
+const { Op, where } = require('sequelize');
+const { posting, review, user, comment } = require('../../models');
 const fs = require('fs');
 const { profile } = require('console');
 const path = require('path')
 const Review = require('../../models/review.js')
 const User = require('../../models/user.js')
-const Profile = require('../../models/profile.js')
+const Profile = require('../../models/profile.js');
+const { lookup } = require('dns');
 
 
 
-exports.addPosting= async (req, res) => {
+exports.addPosting = async (req, res) => {
 
     try {
-        
+
         let image = req.file
         let idUser = req.user.id
         let { name, description } = req.body
@@ -23,9 +24,17 @@ exports.addPosting= async (req, res) => {
             })
         }
 
-        
+        const isSameNamePost = await posting.findOne({
+            where: {
+                name: name
+            }
+        })
 
-
+        if (isSameNamePost) {
+            return res.status(400).json({
+                message: "judul postingan tidak boleh sama"
+            })
+        }
 
         const newPosting = await posting.create({
             name: name,
@@ -50,58 +59,74 @@ exports.addPosting= async (req, res) => {
 
 exports.readPostings = async (req, res) => {
     try {
-      // Mengambil semua produk dari database
-      const Postings = await posting.findAndCountAll();
-      
-      // Memeriksa jika daftar produk kosong
-      if (Postings.length === 0) {
-        return res.status(404).json({ message: 'Tidak ada produk yang ditemukan' });
-      }
-      
-      // Mengirim respons dengan daftar produk yang ditemukan
-      res.status(200).json({ Postings });
+        
+        const Postings = await posting.findAndCountAll();
+
+        
+        if (Postings.length === 0) {
+            return res.status(404).json({ message: 'Tidak ada produk yang ditemukan' });
+        }
+
+        
+        res.status(200).json({ Postings });
     } catch (error) {
-      // Mengirim respons jika terjadi kesalahan
-      console.error("Error while fetching products:", error);
-      res.status(500).json({ error: 'Internal server error' });
+        
+        
+        res.status(500).json({ error: 'Internal server error' });
     }
-  };
+};
 
 
 exports.detailPosting = async (req, res) => {
-
     
+   
+
+  
     try {
         let idPosting = req.params.id;
-
-        const postingData = await posting.findByPk(idPosting, {
+        const postingData = await posting.findAll({
+            where: {
+                id: idPosting
+            },
             include: [
                 {
                     model: user,
-                    attributes: { exclude: ["email","name","ktp" ,"password", "createdAt", "updatedAt", "roleId", "RoleId"] }
+                    attributes: { exclude: ["email", "name", "ktp", "password", "createdAt", "updatedAt", "roleId", "RoleId"] }
                 }
             ]
         });
-        
-        
+
+
         if (!postingData) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: "postingan yang ada cari tidak ada"
             })
         }
 
-        const commentData = await review.findAndCountAll({
-            where: {
-                postingId: postingData.id
-            },
-            attributes: {exclude: ["createdAt", "updatedAt", "UserId", "PostingId"]}
-        })
 
-        
+        const reviewData = await review.findAll({
+            where:{
+                postingId: idPosting
+            }
+        });
+      
+        const commentData = [];
+
+        for (let i = 0; i < reviewData.length; i++) {
+            const findComment = await comment.findAll({
+                where: {
+                    reviewId: reviewData[i].id
+                }
+            })
+            for(let j = 0; j < findComment.length; j++) {
+                commentData.push(findComment[j])
+            }
+        }
+
 
         return res.status(200).json({
             post: postingData,
-            comment: commentData    
+            comment: commentData
         })
 
     } catch (error) {
@@ -111,7 +136,6 @@ exports.detailPosting = async (req, res) => {
     }
 
 }
-
 
 
 
@@ -130,9 +154,7 @@ exports.updatePosting = async (req, res) => {
             });
         }
 
-
-
-        // Update product data
+        
         postingData.name = name || postingData.name;
         postingData.description = description || postingData.description;
 
@@ -141,8 +163,7 @@ exports.updatePosting = async (req, res) => {
             postingData.image = req.file.path;
         }
 
-
-        // Save the updated product
+        
         await postingData.save();
 
         res.status(200).json({
@@ -159,28 +180,27 @@ exports.updatePosting = async (req, res) => {
 
 
 
-exports.destroyPosting = async (req, res) => {
+exports.destroyPostingByCandidate = async (req, res) => {
 
     try {
         const postingId = req.params.id;
 
         const postingData = await posting.findByPk(postingId);
-        
-        console.log(req.user.id);
-        console.log(postingData.userId);
+
+
         if (!postingData) {
             return res.status(404).json({
                 message: "Postingan tidak ditemukan"
             });
         }
 
-        if(postingData.userId !== req.user.id) {
+        if (postingData.userId !== req.user.id) {
             return res.status(404).json({
-                message: "data postingan milik candidate lain"
+                message: "data postingan milik candidate lain, tidak bisa menghapus"
             })
         }
 
-        
+
 
         await posting.destroy({
             where: {
@@ -189,10 +209,10 @@ exports.destroyPosting = async (req, res) => {
             }
         });
 
-        
+
         if (postingData.image) {
             fs.unlinkSync(postingData.image);
-        }  
+        }
 
         return res.status(200).json({
             message: "Postingan berhasil dihapus"
@@ -200,7 +220,7 @@ exports.destroyPosting = async (req, res) => {
 
     } catch (error) {
 
-        
+
         return res.status(500).json({
             message: "Terjadi kesalahan saat menghapus postingan",
             error: error.message
@@ -210,3 +230,43 @@ exports.destroyPosting = async (req, res) => {
 
 
 
+exports.destroyPostingByAdmin = async (req, res) => {
+
+    try {
+        const postingId = req.params.id;
+
+        const postingData = await posting.findByPk(postingId);
+
+
+        if (!postingData) {
+            return res.status(404).json({
+                message: "Postingan tidak ditemukan"
+            });
+        }
+
+
+        await posting.destroy({
+            where: {
+                id: postingId,
+
+            }
+        });
+
+
+        if (postingData.image) {
+            fs.unlinkSync(postingData.image);
+        }
+
+        return res.status(200).json({
+            message: "Postingan berhasil dihapus"
+        });
+
+    } catch (error) {
+
+
+        return res.status(500).json({
+            message: "Terjadi kesalahan saat menghapus postingan",
+            error: error.message
+        });
+    }
+};

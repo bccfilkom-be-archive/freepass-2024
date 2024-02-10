@@ -1,4 +1,5 @@
-const { review, posting } = require('../../models');
+const { review, posting, comment } = require('../../models');
+
 
 
 
@@ -19,8 +20,14 @@ exports.createorUpdateReview = async (req, res) => {
         })
     }
 
-    const { comment } = req.body;
+    
+    const { komentar } = req.body;
 
+    if (komentar == null) {
+        return res.status(400).json({
+            message: "komentar belum diisi"
+        });
+    }
 
 
     try {
@@ -32,30 +39,31 @@ exports.createorUpdateReview = async (req, res) => {
         });
 
         if (myReview) {
-            await myReview.update({
-
-                comment: comment || myReview.comment
+            await comment.create({
+                comment: komentar,
+                reviewId: myReview.id
             });
+            
 
             return res.status(200).json({
-                message: "Comment berhasil diupdate"
+                message: "Komentar berhasil dibuat"
             });
         } else {
 
-            if (comment === null) {
-                return res.status(400).json({
-                    message: "Comment belum diisi dan anda juga belum melakukan review produk ini"
-                });
-            }
-
-            await review.create({
+            
+            const newReview = await review.create({
                 postingId: idPosting,
                 userId: idUser,
-                comment: comment
+            });
+
+            console.log(comment.comment);
+            await comment.create({
+                comment: komentar,
+                reviewId: newReview.id
             });
 
             return res.status(201).json({
-                message: "Comment berhasil dibuat"
+                message: "Komentar berhasil dibuat"
             });
         }
     } catch (error) {
@@ -72,21 +80,21 @@ exports.deleteReview = async (req, res) => {
     try {
         const idComment = req.params.id;
 
-        const isPostingExist = await review.findOne({
+        const isCommentExist = await comment.findOne({
             where: {
                 id: idComment
             }
         })
 
-        if (!isPostingExist) {
+        if (!isCommentExist) {
             return res.status(400).json({
                 message: "comment tidak ditemukan"
             })
         }
 
-        await review.destroy({
+        await comment.destroy({
             where: {
-                id: idComment
+                id: isCommentExist.id
             }
         })
 

@@ -1,7 +1,7 @@
 const { user, profile } = require('../../models');
 const bcrypt = require('bcryptjs');
 const { role } = require('../../models');
-
+const path = require('path')
 
 
 
@@ -11,13 +11,31 @@ exports.createCandidate = async (req, res) => {
     
 
     const { name_paslon, email_paslon, candidate } = req.body
-
+    const image = req.file
 
 
     if (name_paslon == null || email_paslon == null || candidate == null ) {
         return res.status(400).json({
             message: "mohon diisi dengan lengkap",
         });
+    }
+
+    if (!image) {
+        return res.status(400).json({
+          message: "image tidak ada"
+        })
+      }
+
+    const checkNomorCandidate = await user.findOne({
+        where: {
+            candidate: candidate
+        }
+    })
+
+    if(checkNomorCandidate) {
+        return res.status(403).json({
+            message: "nomor candidate tidak bisa dipakai karena sudah pakai candidate lain"
+        })
     }
 
     const isUserExist = await user.findOne({
@@ -34,7 +52,8 @@ exports.createCandidate = async (req, res) => {
         });
     }
 
-
+    let remider;
+    
 
     const userRole = await role.findOne({
         where: {
@@ -42,32 +61,73 @@ exports.createCandidate = async (req, res) => {
         }
     });
 
+    if(!userRole) {
+        return res.status(404).json({
+            message: "role tidak ditemukan"
+        })
+    }
 
+    const profileData = await profile.findOne({
+        where: {
+            userId: isUserExist.id
+        }
+    })
+
+    if(!profileData) {
+        return res.status(404).json({
+            message: "profile data tidak ditemukan"
+        })
+    }
+
+    console.log("halooo 1 ");
     try {
-        await user.update({
+        if(isUserExist.candidate) {
+            await user.update({
 
-            roleId: userRole.id,
-            candidate: candidate,
-            paslon: name_paslon
-
-        },
-            {
-                where: {
-                    email: email_paslon
+                roleId: userRole.id,
+                candidate: isUserExist.candidate,
+                paslon: name_paslon
+    
+            },
+                {
+                    where: {
+                        email: email_paslon
+                    }
                 }
-            }
-        );
+            );
+            remider = `nomor candidate tidak bisa diganti dan tetap ${isUserExist.candidate}`
+            
+        } else {
+            await user.update({
 
-        return res.status(200).json({ message: "Kandidat berhasil dibuat" });
+                roleId: userRole.id,
+                candidate: candidate,
+                paslon: name_paslon
+    
+            },
+                {
+                    where: {
+                        email: email_paslon
+                    }
+                }
+            );
+        }
+        
+        
+        
+        await profile.create({
+            age: profileData.age,
+            address: profileData.address,
+            image: image.path,
+            userId: isUserExist.id
+          })
 
-        //   createSendToken(newUser, 201, res);
+        return res.status(200).json({ 
+            message: "Kandidat berhasil dibuat",
+            remider: remider 
+        });
 
-        // const token = jwt.sign(newUser.id,
-        //   process.env.SECRET_KEY, 
-        //   {
-        //       expiresIn: '1h',
-        //   }
-        // );
+        
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -95,3 +155,4 @@ exports.getAllCandidate = async (req, res) => {
     }
 
 }
+

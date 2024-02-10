@@ -11,7 +11,7 @@ const { verifyToken } = require("../../middleware/verifyToken");
 router.get('/', verifyToken, countVoting)
 
 
-
+// Soal No 7
 // Users can cast their votes for candidates during the specified election period
 router.post('/', verifyToken, checkDeadline, updateOrCreateVoting)
 

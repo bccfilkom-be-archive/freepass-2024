@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addPosting, readPostings, detailPosting, updatePosting, destroyPosting } = require('../../controllers/election/postingController.js');
+const { addPosting, readPostings, detailPosting, updatePosting, destroyPosting, destroyPostingByCandidate, destroyPostingByAdmin } = require('../../controllers/election/postingController.js');
 
 const multer = require('multer');
 // const mulParse = multer();
@@ -33,39 +33,16 @@ const imageFilter = function (req, file, cb) {
     }
 };
 
-// UPLOAD PRODUCTS dengan filter
-// const uploadProducts = multer({
-//     storage: storageProducts,
-//     fileFilter: imageFilter
-// }).single('image');
-
-// router.post('/', (req, res, next) => {
-//     uploadProducts(req, res, function (err) {
-//         if (err instanceof multer.MulterError) {
-//             return res.status(400).json({
-//                 message: "Error during file upload",
-//                 error: err.message
-//             });
-//         } else if (err) {
-//             return res.status(500).json({
-//                 message: "Internal server error",
-//                 error: err.message
-//             });
-//         }
-//         // Jika tidak ada kesalahan, lanjut ke controller
-//         next();
-//     });
-// }, addProduct);
 
 
-const uploadPostingan = multer({
+const uploadImage = multer({
     storage: storageProducts,
     fileFilter: imageFilter
 });
 
 // Soal No 14
 // Candidate can create a post
-router.post('/', verifyToken, candidateOnly, uploadPostingan.single('image'), addPosting);
+router.post('/', verifyToken, candidateOnly, uploadImage.single('image'), addPosting);
 
 
 // Soal No 6
@@ -93,15 +70,15 @@ router.get('/:id', verifyToken, userOnly, detailPosting)
 
 // Soal No 15
 // Candidate can update a post
-router.put('/:id', verifyToken, candidateOnly, uploadPostingan.single('image'), updatePosting);
+router.put('/:id', verifyToken, candidateOnly, uploadImage.single('image'), updatePosting);
 
 
 // Soal No 16
 // Candidate can delete a post
-router.delete('/:id', verifyToken, candidateOnly, destroyPosting)
+router.delete('/:id', verifyToken, candidateOnly, destroyPostingByCandidate)
 
 // Soal No 12
 // Admin can delete the candidate's posts
-router.delete('/admin/:id', verifyToken, adminOnly, destroyPosting)
+router.delete('/admin/:id', verifyToken, adminOnly, destroyPostingByAdmin)
 
 module.exports = router;

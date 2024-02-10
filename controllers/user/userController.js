@@ -40,10 +40,20 @@ exports.destroyUser = async (req, res) => {
             });
         }
 
+        let infoRole;
+
         if (Role.name == "admin") {
             return res.status(403).json({
                 message: 'Admin jangan dihapus, nanti sistem rusak',
             });
+        } else if (Role.name == "candidate") {
+
+            infoRole = "candidate"
+
+        } else if (Role.name == "user") {
+
+            infoRole = "user"
+            
         }
 
         const Profile = await profile.findOne({
@@ -66,23 +76,26 @@ exports.destroyUser = async (req, res) => {
             })
         } 
 
-        
+        const checkCandidateOnVote = voting.findOne({
+            where: {
+                candidate_selected: userData.candidate
+            }
+        })
 
-        // await profile.destroy({
-        //     where: {
-        //         userId: userData.id,
-        //     }
-        // });
-
-        
+        if(checkCandidateOnVote) {
+            voting.destroy({
+                where: {
+                    candidate_selected: userData.candidate
+                }
+            })
+        }
 
         await user.destroy({
             where: {
                 id: userData.id,
                 
             },
-            cascade: true,
-            include: [posting, profile, review, voting]
+            
         });
 
         
@@ -90,17 +103,10 @@ exports.destroyUser = async (req, res) => {
             fs.unlinkSync(Profile.image);
         }  
               
-        
-        // await profile.destroy({
-        //     where: {
-        //         userId: profileData.id,
-                
-        //     }
-        // });
 
         return res.status(200).json({
             status: "success",
-            message: "Candidate atau User berhasil dihapus"
+            message: infoRole + " berhasil dihapus"
         });
 
     } catch (error) {

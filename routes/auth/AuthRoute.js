@@ -33,7 +33,7 @@ const imageFilter = function (req, file, cb) {
 };
 
 
-const uploadFile = multer({
+const uploadImage = multer({
     storage: storageProducts,
     fileFilter: imageFilter
 });
@@ -41,7 +41,7 @@ const uploadFile = multer({
 
 // Soal No 1
 // New user can register account to the system
-router.post('/register', uploadFile.single('image'), registerUser);
+router.post('/register', uploadImage.single('image'), registerUser);
 
 
 // Soal No 2

@@ -5,6 +5,7 @@ const Posting = require('./posting.js')
 const Voting = require('./voting.js')
 const Profile = require('./profile.js')
 const Review = require('./review.js')
+const Comment = require('./comment.js')
 const Time = require('./time.js')
 
 const db = require('../config/Database.js');
@@ -111,6 +112,21 @@ user.hasOne(time,  {
 time.belongsTo(user, { foreignKey: 'userId' });
 
 
+
+const comment = db.define("Comment", Comment, {
+  tableName: "comments",
+  underscored: true,
+}
+);
+
+review.hasMany(comment,  {
+  onDelete: 'CASCADE', 
+ 
+});
+comment.belongsTo(review, { 
+  foreignKey: 'reviewId' 
+});
+
 async function initial() {
   await role.create({
     name: "candidate"
@@ -187,4 +203,4 @@ db.sync()
     console.log("database failed");
   })
 
-module.exports = { db, user, role, posting, profile, review, voting, time };
+module.exports = { db, user, role, posting, profile, review, comment, voting, time };
