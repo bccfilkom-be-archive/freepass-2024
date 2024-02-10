@@ -23,6 +23,14 @@ func (repo *CandidateRepository) FindById(id uint) (*entity.Candidate, error) {
 	return &candidate, nil
 }
 
+func (repo *CandidateRepository) FindByUserId(id uint) (*entity.Candidate, error) {
+	var candidate entity.Candidate
+	if err := repo.db.Model(&entity.Candidate{}).Where("user_id = ?", id).First(&candidate).Error; err != nil {
+		return nil, err
+	}
+	return &candidate, nil
+}
+
 func (repo *CandidateRepository) FindAll() ([]entity.Candidate, error) {
 	var candidates []entity.Candidate
 	if err := repo.db.Find(&candidates).Error; err != nil {

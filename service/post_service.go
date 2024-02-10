@@ -117,12 +117,13 @@ func (service *PostService) GetByCandidateId(candidateId uint) ([]model.GetPostR
 	return postResponses, nil
 }
 
-func (service *PostService) Create(request *model.CreatePostRequest, candidateId uint) (uint, *errortypes.ApiError) {
-	candidate, _ := service.CandidateRepo.FindById(candidateId)
+func (service *PostService) Create(request *model.CreatePostRequest, userId uint) (uint, *errortypes.ApiError) {
+	candidate, _ := service.CandidateRepo.FindByUserId(userId)
+
 	post := entity.Post{
 		Title:       request.Title,
 		Content:     request.Content,
-		CandidateID: candidateId,
+		CandidateID: candidate.ID,
 		Candidate:   *candidate,
 	}
 	err := service.PostRepo.Create(&post)
@@ -137,7 +138,7 @@ func (service *PostService) Create(request *model.CreatePostRequest, candidateId
 	return post.ID, nil
 }
 
-func (service *PostService) Update(postId, candidateId uint, request *model.UpdatePostRequest) *errortypes.ApiError {
+func (service *PostService) Update(postId, userId uint, request *model.UpdatePostRequest) *errortypes.ApiError {
 	post, err := service.PostRepo.FindById(postId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -154,7 +155,9 @@ func (service *PostService) Update(postId, candidateId uint, request *model.Upda
 		}
 	}
 
-	if post.CandidateID != candidateId {
+	candidate, _ := service.CandidateRepo.FindByUserId(userId)
+
+	if post.CandidateID != candidate.ID {
 		return &errortypes.ApiError{
 			Code:    http.StatusForbidden,
 			Message: "not your post",
@@ -172,7 +175,7 @@ func (service *PostService) Update(postId, candidateId uint, request *model.Upda
 	return nil
 }
 
-func (service *PostService) DeleteById(postId, candId uint, isAdmin bool) *errortypes.ApiError {
+func (service *PostService) DeleteById(postId, userId uint, isAdmin bool) *errortypes.ApiError {
 	post, err := service.PostRepo.FindById(postId)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -189,7 +192,9 @@ func (service *PostService) DeleteById(postId, candId uint, isAdmin bool) *error
 		}
 	}
 
-	if !isAdmin && (post.CandidateID != candId) {
+	candidate, _ := service.CandidateRepo.FindByUserId(userId)
+
+	if !isAdmin && (post.CandidateID != candidate.ID) {
 		return &errortypes.ApiError{
 			Code:    http.StatusForbidden,
 			Message: "not your post",
