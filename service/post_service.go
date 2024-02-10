@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
 	"github.com/nathakusuma/bcc-be-freepass-2024/model"
 	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
@@ -134,4 +135,39 @@ func (service *PostService) Create(request *model.CreatePostRequest, candidateId
 	}
 
 	return post.ID, nil
+}
+
+func (service *PostService) Update(postId, candidateId uint, request *model.UpdatePostRequest) *errortypes.ApiError {
+	post, err := service.PostRepo.FindById(postId)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &errortypes.ApiError{
+				Code:    http.StatusNotFound,
+				Message: "post not found",
+				Data:    err,
+			}
+		}
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to update user data",
+			Data:    err,
+		}
+	}
+
+	if post.CandidateID != candidateId {
+		return &errortypes.ApiError{
+			Code:    http.StatusForbidden,
+			Message: "not your post",
+			Data:    gin.H{},
+		}
+	}
+
+	if err := service.PostRepo.Update(post, request); err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to update user data",
+			Data:    err,
+		}
+	}
+	return nil
 }

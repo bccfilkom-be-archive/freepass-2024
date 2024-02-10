@@ -62,3 +62,28 @@ func (handler *PostHandler) Create(ctx *gin.Context) {
 
 	apiresponse.Success(ctx, http.StatusCreated, "post created", response)
 }
+
+func (handler *PostHandler) Update(ctx *gin.Context) {
+	postId, err := binding.ShouldUintQuery(ctx, "postId")
+	if err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	claimsTemp, _ := ctx.Get("user")
+	claims := claimsTemp.(model.UserClaims)
+	issuerId := claims.ID
+
+	var request model.UpdatePostRequest
+	if err := binding.ShouldBindJSON(ctx, &request); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	if err := handler.PostService.Update(postId, issuerId, &request); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusCreated, "successfully edited post", gin.H{})
+}
