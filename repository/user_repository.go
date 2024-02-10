@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bcc-be-freepass-2024/entity"
+	"bcc-be-freepass-2024/model"
 	"gorm.io/gorm"
 )
 
@@ -40,4 +41,8 @@ func (repo *UserRepository) FindById(id uint) (*entity.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (repo *UserRepository) Update(user *entity.User, updates *model.UpdateUserRequest) error {
+	return repo.db.Model(user).Updates(updates).Error
 }

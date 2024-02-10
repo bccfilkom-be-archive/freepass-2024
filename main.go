@@ -45,6 +45,7 @@ func main() {
 	v1.POST("/login", userHandler.Login)
 
 	v1.GET("/users", middleware.Auth, userHandler.Get)
+	v1.PATCH("/users", middleware.Auth, userHandler.Update)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

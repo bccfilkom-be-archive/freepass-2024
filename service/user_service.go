@@ -167,3 +167,26 @@ func (service *UserService) GetByUsername(username string) (*model.GetUserRespon
 func (service *UserService) GetById(id uint) (*model.GetUserResponse, *errortypes.ApiError) {
 	return service.get(service.UserRepo.FindById(id))
 }
+
+func (service *UserService) Update(id uint, request *model.UpdateUserRequest) *errortypes.ApiError {
+	if request.Password != "" {
+		hashedPassword, err := crypto.Hash(request.Password)
+		if err != nil {
+			return &errortypes.ApiError{
+				Code:    http.StatusInternalServerError,
+				Message: "error when hashing password",
+				Data:    err,
+			}
+		}
+		request.Password = hashedPassword
+	}
+
+	if err := service.UserRepo.Update(&entity.User{Model: gorm.Model{ID: id}}, request); err != nil {
+		return &errortypes.ApiError{
+			Code:    http.StatusInternalServerError,
+			Message: "fail to update user data",
+			Data:    err,
+		}
+	}
+	return nil
+}

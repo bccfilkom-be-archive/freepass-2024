@@ -73,3 +73,22 @@ func (handler *UserHandler) Get(ctx *gin.Context) {
 
 	apiresponse.Success(ctx, http.StatusOK, "successfully retrieved user data", response)
 }
+
+func (handler *UserHandler) Update(ctx *gin.Context) {
+	claimsTemp, _ := ctx.Get("user")
+	claims := claimsTemp.(model.UserClaims)
+	userId := claims.ID
+
+	var request model.UpdateUserRequest
+	if err := binding.ShouldBindJSON(ctx, &request); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	if err := handler.UserService.Update(userId, &request); err != nil {
+		apiresponse.ApiError(ctx, err)
+		return
+	}
+
+	apiresponse.Success(ctx, http.StatusCreated, "successfully edited user", gin.H{})
+}
