@@ -20,3 +20,7 @@ func (repo *CommentRepository) FindByPostId(postId uint) ([]entity.Comment, erro
 	}
 	return comments, nil
 }
+
+func (repo *CommentRepository) Add(comment *entity.Comment) error {
+	return repo.db.Create(&comment).Error
+}

@@ -49,6 +49,7 @@ func main() {
 	candidateHandler := handler.NewCandidateHandler(candidateService)
 	periodHandler := handler.NewElectionPeriodHandler(periodService)
 	voteHandler := handler.NewVoteHandler(voteService)
+	commentHandler := handler.NewCommentHandler(commentService)
 	postHandler := handler.NewPostHandler(postService)
 
 	gin.SetMode(os.Getenv("GIN_MODE"))
@@ -76,6 +77,8 @@ func main() {
 	v1.POST("/posts", middleware.Auth, roleMid.RequireRole(roles.Candidate), postHandler.Create)
 	v1.PATCH("/posts", middleware.Auth, roleMid.RequireRole(roles.Candidate), postHandler.Update)
 	v1.DELETE("/posts", middleware.Auth, roleMid.RequireRole(roles.Admin, roles.Candidate), postHandler.Delete)
+
+	v1.POST("/comments", middleware.Auth, roleMid.RequireRole(roles.User), commentHandler.Add)
 
 	if err := router.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatalln(err)

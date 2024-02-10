@@ -8,3 +8,11 @@ type GetCommentResponse struct {
 	UserID    uint      `json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type AddCommentRequest struct {
+	Content string `binding:"required"`
+}
+
+type AddCommentResponse struct {
+	ID uint `json:"id"`
+}
