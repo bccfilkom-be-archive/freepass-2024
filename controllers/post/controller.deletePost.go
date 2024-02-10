@@ -8,7 +8,6 @@ import (
 	candidateRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/candidate"
 	postRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/post"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func DeletePost(c *gin.Context) {
@@ -29,8 +28,8 @@ func DeletePost(c *gin.Context) {
 		return
 	}
 
-	candidate, _ := candidateRepositorys.FindCandidateInElection(user.ID, post.ElectionID)
-	if candidate.ID == "" && !user.IsAdmin {
+	candidate, err := candidateRepositorys.FindCandidateInElection(user.ID, post.ElectionID)
+	if err != nil && !user.IsAdmin {
 		res := schemas.ResponeData{Error: true, Message: "Your not allowed to delete this post", Data: nil}
 		c.JSON(http.StatusNotAcceptable, res)
 		return

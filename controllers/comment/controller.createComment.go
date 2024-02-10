@@ -9,16 +9,15 @@ import (
 	commentRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/comment"
 	postRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/post"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func CreateComment(c *gin.Context) {
 	var comment *models.Comment
-	postID := c.Param("post_id")
+	PostID := c.Param("post_id")
 	getUser, _ := c.Get("user")
 	user := getUser.(schemas.UserTokenData)
 
-	if postID == "" {
+	if PostID == "" {
 		res := schemas.ResponeData{Error: true, Message: "post_id as a Param is required", Data: nil}
 		c.JSON(http.StatusBadRequest, res)
 		return
@@ -36,16 +35,10 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
-	post, err := postRepositorys.FindOne(postID)
-	if post.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "post_id is not found", Data: nil}
-		c.JSON(http.StatusNotFound, res)
-		return
-	}
-
+	post, err := postRepositorys.FindOne(PostID)
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something Went Wrong", Data: nil}
-		c.JSON(http.StatusInternalServerError, res)
+		res := schemas.ResponeData{Error: true, Message: "Post with id provided is not found", Data: nil}
+		c.JSON(http.StatusBadRequest, res)
 		return
 	}
 

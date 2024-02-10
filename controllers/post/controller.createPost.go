@@ -37,14 +37,8 @@ func CreateNewCandidatePost(c *gin.Context) {
 	}
 
 	election, err := electionRepositorys.FindSpecificElection(electionID)
-	if election.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "Election is not found", Data: nil}
-		c.JSON(http.StatusNotFound, res)
-		return
-	}
-
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Election with id provided is not found", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}
@@ -58,6 +52,7 @@ func CreateNewCandidatePost(c *gin.Context) {
 
 	data.CandidateID = candidate.ID
 	data.UserID = candidate.UserID
+	data.ElectionID = election.ID
 
 	post, err := postRepositorys.CreateNewPost(data)
 	if err != nil {

@@ -1,18 +1,17 @@
-package adminRoute
+package RegisteredRoute
 
 import (
 	"github.com/gin-gonic/gin"
 
-	authController "github.com/AkbarFikri/freepassBCC-2024/controllers/auth"
 	electionController "github.com/AkbarFikri/freepassBCC-2024/controllers/election"
 	userController "github.com/AkbarFikri/freepassBCC-2024/controllers/user"
-
 )
 
-func RegisterRoute(route *gin.RouterGroup) {
-	route.POST("/login", authController.LoginAdmin)
-	route.POST("/register", authController.RegisterAdmin)
+func AdminRoute(route *gin.RouterGroup) {
 	route.POST("/election/:election_id/candidate", electionController.PromoteCandidate)
+	route.POST("/election", electionController.CreateElection)
+	route.PATCH("/election/:id", electionController.EditElection)
+	route.DELETE("/election/:id", electionController.DeleteElection)
 	route.DELETE("/candidate/:id", electionController.DeleteCandidate)
 	route.DELETE("/user/:id", userController.DeleteUser)
 }

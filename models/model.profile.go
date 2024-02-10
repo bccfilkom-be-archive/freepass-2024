@@ -12,7 +12,7 @@ type Profile struct {
 	UpdatedAt    time.Time `gorm:"not null" json:"updatedAt"`
 	Fullname     string    `gorm:"not null" json:"full_name"`
 	Birthplace   string    `gorm:"not null" json:"birth_place"`
-	Birthdate    time.Time `gorm:"not null" json:"birth_date"`
+	Birthdate    string    `gorm:"not null;type:time" json:"birth_date"`
 	Address      string    `gorm:"not null" json:"address"`
 	ProfileUrl   string    `gorm:"not null" json:"profile_url"`
 	Posts        []Post    `gorm:"foreignKey:UserID"`

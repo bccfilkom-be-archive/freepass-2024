@@ -8,7 +8,6 @@ import (
 	"github.com/AkbarFikri/freepassBCC-2024/models"
 	postRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/post"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func UpdatePost(c *gin.Context) {
@@ -44,6 +43,7 @@ func UpdatePost(c *gin.Context) {
 
 	post.Caption = data.Caption
 	post.PictureUrl = data.PictureUrl
+	post.Comments = nil
 
 	if err := postRepositorys.EditPost(post); err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Something went wrong", Data: nil}

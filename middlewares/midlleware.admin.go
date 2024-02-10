@@ -31,7 +31,7 @@ func AuthAdmin() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, res)
 		}
 
-		user := schemas.UserTokenData{ID: claims["id"].(string), Email: claims["email"].(string)}
+		user := schemas.UserTokenData{ID: claims["id"].(string), Email: claims["email"].(string), IsAdmin: claims["isAdmin"].(bool)}
 		if err != nil {
 			res.Error = true
 			res.Message = "accessToken invalid or expired"

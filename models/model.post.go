@@ -16,7 +16,7 @@ type Post struct {
 	ElectionID  string    `gorm:"not null" json:"election_id"`
 	PictureUrl  string    `gorm:"not null" json:"picture_url"`
 	Caption     string    `gorm:"not null" json:"caption"`
-	Comments    []Comment `gorm:"foreignKey:PostID"`
+	Comments    []Comment `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"`
 }
 
 func (p *Post) BeforeCreate(c *gorm.DB) (err error) {
@@ -27,5 +27,10 @@ func (p *Post) BeforeCreate(c *gorm.DB) (err error) {
 
 func (p *Post) BeforeUpdate(db *gorm.DB) error {
 	p.UpdatedAt = time.Now().Local()
+	return nil
+}
+
+func (p *Post) BeforeDelete(db *gorm.DB) error {
+	db.Model(&Comment{}).Where("post_id = ?", p.ID).Delete(&Comment{PostID: p.ID})
 	return nil
 }

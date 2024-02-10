@@ -7,7 +7,6 @@ import (
 
 	postRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/post"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func GetSpecificPost(c *gin.Context) {
@@ -20,15 +19,8 @@ func GetSpecificPost(c *gin.Context) {
 	}
 
 	post, err := postRepositorys.FindOne(id)
-
-	if post.ID == "" {
-		res := schemas.ResponeData{Error: true, Message: "No Data Found", Data: nil}
-		c.JSON(http.StatusNotFound, res)
-		return
-	}
-
 	if err != nil {
-		res := schemas.ResponeData{Error: true, Message: "Something Went Wrong", Data: nil}
+		res := schemas.ResponeData{Error: true, Message: "Post with id provided is not found", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)
 		return
 	}

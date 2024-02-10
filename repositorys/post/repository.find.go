@@ -8,7 +8,7 @@ import (
 func FindAll() ([]models.Post, error) {
 	var posts []models.Post
 	if err := database.DB.Find(&posts).Error; err != nil {
-		return posts, err
+		return nil, err
 	}
 	return posts, nil
 }
@@ -39,7 +39,7 @@ func FindAllByElectionAndCandidate(ElectionID string, CandidateID string) ([]mod
 
 func FindOne(ID string) (*models.Post, error) {
 	var post *models.Post
-	if err := database.DB.Where("id = ?", ID).First(&post).Error; err != nil {
+	if err := database.DB.Where("id = ?", ID).Preload("Comments").First(&post).Error; err != nil {
 		return nil, err
 	}
 	return post, nil

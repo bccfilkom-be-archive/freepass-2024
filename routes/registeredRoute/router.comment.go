@@ -1,4 +1,4 @@
-package commentRoute
+package RegisteredRoute
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,7 @@ import (
 
 )
 
-func RegisterRoute(route *gin.RouterGroup) {
+func CommentRoute(route *gin.RouterGroup) {
 	route.POST("/post/:post_id", commentController.CreateComment)
 	route.DELETE("/:id", commentController.DeleteComment)
 }

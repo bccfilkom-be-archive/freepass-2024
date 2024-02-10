@@ -8,7 +8,6 @@ import (
 	"github.com/AkbarFikri/freepassBCC-2024/models"
 	profileRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/profile"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func EditProfileUser(c *gin.Context) {
@@ -30,6 +29,6 @@ func EditProfileUser(c *gin.Context) {
 		return
 	}
 
-	res := schemas.ResponeData{Error: false, Message: "No Data Found", Data: profile}
+	res := schemas.ResponeData{Error: false, Message: "Berhasil", Data: profile}
 	c.JSON(http.StatusOK, res)
 }

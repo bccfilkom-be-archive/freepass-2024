@@ -3,11 +3,12 @@ package candidateRepositorys
 import (
 	"github.com/AkbarFikri/freepassBCC-2024/database"
 	"github.com/AkbarFikri/freepassBCC-2024/models"
+
 )
 
 func FindSpecificCandidate(ID string) (*models.Candidate, error) {
 	var candidate *models.Candidate
-	if err := database.DB.First(&candidate).Where("id = ?", ID).Error; err != nil {
+	if err := database.DB.Where("id = ?", ID).Preload("Informations").First(&candidate).Error; err != nil {
 		return candidate, err
 	}
 	return candidate, nil
@@ -27,4 +28,12 @@ func FindCandidateInElection(userID string, electionID string) (*models.Candidat
 		return nil, err
 	}
 	return candidate, nil
+}
+
+func FindAllCandidateInElection(electionID string) ([]models.Candidate, error) {
+	var candidates []models.Candidate
+	if err := database.DB.Where("election_id = ?", electionID).Find(&candidates).Error; err != nil {
+		return nil, err
+	}
+	return candidates, nil
 }

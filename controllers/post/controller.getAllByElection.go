@@ -7,7 +7,6 @@ import (
 
 	postRepositorys "github.com/AkbarFikri/freepassBCC-2024/repositorys/post"
 	"github.com/AkbarFikri/freepassBCC-2024/schemas"
-
 )
 
 func GetAllPostByElection(c *gin.Context) {
@@ -20,7 +19,6 @@ func GetAllPostByElection(c *gin.Context) {
 	}
 
 	posts, err := postRepositorys.FindAllByElectionID(electionID)
-
 	if err != nil {
 		res := schemas.ResponeData{Error: true, Message: "Something Went Wrong", Data: nil}
 		c.JSON(http.StatusInternalServerError, res)

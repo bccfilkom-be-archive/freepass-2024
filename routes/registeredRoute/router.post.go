@@ -1,12 +1,13 @@
-package postRoute
+package RegisteredRoute
 
 import (
 	"github.com/gin-gonic/gin"
 
 	postController "github.com/AkbarFikri/freepassBCC-2024/controllers/post"
+
 )
 
-func RegisterRoute(route *gin.RouterGroup) {
+func PostRoute(route *gin.RouterGroup) {
 	route.GET("/", postController.GetAllPost)
 	route.GET("/:id", postController.GetSpecificPost)
 	route.PATCH("/:id", postController.UpdatePost)

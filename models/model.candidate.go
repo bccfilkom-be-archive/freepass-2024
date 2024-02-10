@@ -15,9 +15,9 @@ type Candidate struct {
 	ElectionNum  int                  `gorm:"not null" json:"election_number"`
 	ElectionID   string               `gorm:"not null" json:"election_id"`
 	Vote         int                  `gorm:"not null" json:"vote"`
-	VoteHistorys []Vote               `gorm:"foreignKey:CandidateID"`
-	Post         []Post               `gorm:"foreignKey:CandidateID"`
-	Informations CandidateInformation `gorm:"foreignKey:CandidateID"`
+	VoteHistorys []Vote               `gorm:"foreignKey:CandidateID;constraint:OnDelete:CASCADE"`
+	Posts        []Post               `gorm:"foreignKey:CandidateID;constraint:OnDelete:CASCADE"`
+	Informations CandidateInformation `gorm:"foreignKey:CandidateID;constraint:OnDelete:CASCADE"`
 }
 
 func (cd *Candidate) BeforeCreate(c *gorm.DB) (err error) {

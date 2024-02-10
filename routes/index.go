@@ -6,12 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	middleware "github.com/AkbarFikri/freepassBCC-2024/middlewares"
-	adminRoute "github.com/AkbarFikri/freepassBCC-2024/routes/admin"
-	authRoute "github.com/AkbarFikri/freepassBCC-2024/routes/auth"
-	commentRoute "github.com/AkbarFikri/freepassBCC-2024/routes/comment"
-	electionRoute "github.com/AkbarFikri/freepassBCC-2024/routes/election"
-	postRoute "github.com/AkbarFikri/freepassBCC-2024/routes/post"
-	userRoute "github.com/AkbarFikri/freepassBCC-2024/routes/user"
+	RegisteredRoute "github.com/AkbarFikri/freepassBCC-2024/routes/registeredRoute"
 )
 
 func SetupRoute() *gin.Engine {
@@ -24,21 +19,22 @@ func SetupRoute() *gin.Engine {
 	router.Use(middleware.CORSMiddleware())
 
 	auth := router.Group("/auth")
-	authRoute.RegisterRoute(auth)
+	RegisteredRoute.AuthRoute(auth)
 
 	post := router.Group("/post", middleware.Auth())
-	postRoute.RegisterRoute(post)
+	RegisteredRoute.PostRoute(post)
 
 	comment := router.Group("/comment", middleware.Auth())
-	commentRoute.RegisterRoute(comment)
+	RegisteredRoute.CommentRoute(comment)
 
 	election := router.Group("/election", middleware.Auth())
-	electionRoute.RegisterRoute(election)
+	RegisteredRoute.ElectionRoute(election)
 
 	admin := router.Group("/admin", middleware.AuthAdmin())
-	adminRoute.RegisterRoute(admin)
+	RegisteredRoute.AdminRoute(admin)
 
 	user := router.Group("/user", middleware.Auth())
-	userRoute.RegisterRoute(user)
+	RegisteredRoute.UserRoute(user)
+
 	return router
 }

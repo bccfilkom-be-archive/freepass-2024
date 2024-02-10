@@ -1,4 +1,4 @@
-package authRoute
+package RegisteredRoute
 
 import (
 	"net/http"
@@ -8,10 +8,12 @@ import (
 	authController "github.com/AkbarFikri/freepassBCC-2024/controllers/auth"
 )
 
-func RegisterRoute(route *gin.RouterGroup) {
+func AuthRoute(route *gin.RouterGroup) {
 	route.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Setup Success"})
 	})
+	route.POST("/admin/login", authController.LoginAdmin)
+	route.POST("/admin/register", authController.RegisterAdmin)
 	route.POST("/register", authController.RegisterUser)
 	route.POST("/login", authController.LoginUser)
 }
