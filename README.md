@@ -247,6 +247,9 @@ go get .
 go run main.go
 ```
 
+## 📃 **Api Documentation**
+https://documenter.getpostman.com/view/32594897/2s9YyzeJWk
+
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
 Have any questions? You can contact either [Vinncent](https://www.instagram.com/centwong_) or [Izra](https://www.instagram.com/izrarya).
