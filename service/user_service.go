@@ -1,15 +1,15 @@
 package service
 
 import (
-	"bcc-be-freepass-2024/entity"
-	"bcc-be-freepass-2024/model"
-	"bcc-be-freepass-2024/repository"
-	"bcc-be-freepass-2024/util/auth"
-	"bcc-be-freepass-2024/util/crypto"
-	"bcc-be-freepass-2024/util/errortypes"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
+	"github.com/nathakusuma/bcc-be-freepass-2024/model"
+	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/auth"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/crypto"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
 	"gorm.io/gorm"
 	"net/http"
 	"regexp"

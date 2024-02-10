@@ -1,8 +1,8 @@
 package apiresponse
 
 import (
-	"bcc-be-freepass-2024/util/errortypes"
 	"github.com/gin-gonic/gin"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
 )
 
 type res struct {

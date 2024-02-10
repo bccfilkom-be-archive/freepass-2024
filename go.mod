@@ -1,4 +1,4 @@
-module bcc-be-freepass-2024
+module github.com/nathakusuma/bcc-be-freepass-2024
 
 go 1.21
 

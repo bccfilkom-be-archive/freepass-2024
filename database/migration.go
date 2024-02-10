@@ -1,7 +1,7 @@
 package database
 
 import (
-	"bcc-be-freepass-2024/entity"
+	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
 	"gorm.io/gorm"
 )
 

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"bcc-be-freepass-2024/model"
-	"bcc-be-freepass-2024/service"
-	"bcc-be-freepass-2024/util/apiresponse"
-	"bcc-be-freepass-2024/util/binding"
-	"bcc-be-freepass-2024/util/errortypes"
 	"github.com/gin-gonic/gin"
+	"github.com/nathakusuma/bcc-be-freepass-2024/model"
+	"github.com/nathakusuma/bcc-be-freepass-2024/service"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/apiresponse"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/binding"
+	"github.com/nathakusuma/bcc-be-freepass-2024/util/errortypes"
 	"net/http"
 )
 

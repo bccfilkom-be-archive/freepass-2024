@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"bcc-be-freepass-2024/entity"
-	"bcc-be-freepass-2024/model"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
+	"github.com/nathakusuma/bcc-be-freepass-2024/model"
 	"log"
 	"os"
 	"time"

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bcc-be-freepass-2024/database"
-	"bcc-be-freepass-2024/handler"
-	"bcc-be-freepass-2024/middleware"
-	"bcc-be-freepass-2024/repository"
-	"bcc-be-freepass-2024/service"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/nathakusuma/bcc-be-freepass-2024/database"
+	"github.com/nathakusuma/bcc-be-freepass-2024/handler"
+	"github.com/nathakusuma/bcc-be-freepass-2024/middleware"
+	"github.com/nathakusuma/bcc-be-freepass-2024/repository"
+	"github.com/nathakusuma/bcc-be-freepass-2024/service"
 	"log"
 	"os"
 )

@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"bcc-be-freepass-2024/entity"
-	"bcc-be-freepass-2024/model"
+	"github.com/nathakusuma/bcc-be-freepass-2024/entity"
+	"github.com/nathakusuma/bcc-be-freepass-2024/model"
 	"gorm.io/gorm"
 )
 
