@@ -107,6 +107,67 @@ THEN  => System will show a deletion status message and delete relevant post
 We want to see your perspective about these problems. You can define various types of entities or actors. One thing for sure, there is no
 true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
 
+```
+## Entities ##
+User: Individuals who interact with the system. They can have different roles such as regular users, candidates, or administrators.
+Attributes:
+- id
+- username
+- password
+- name
+- bio
+- role (user | candidate | admin)
+- can_vote
+- created_at
+- updated_at
+- deleted_at
+
+Candidate: Represents users who are running for elections
+Attributes:
+- id
+- user_id
+- vote_count
+- created_at
+- updated_at
+- deleted_at
+
+Post: Represents the content created by candidates.
+Attributes:
+- id
+- title
+- content
+- candidate_id
+- created_at
+- updated_at
+- deleted_at
+
+Comment: Represents the comments made by users on candidates posts
+Attributes:
+- id
+- content
+- user_id
+- post_id
+- created_at
+- updated_at
+- deleted_at
+
+ElectionPeriod: Represents the period of election event
+Attributes include:
+- id
+- start_date
+- end_date
+- created_at
+- updated_at
+- deleted_at
+```
+
+```
+## Actors ##
+- User: Individuals who interact with the system. They can have different roles such as regular users, candidates, or administrators.
+- Candidate: Users who are running for election. They can create posts to campaign and receive comments from other users.
+- Administrator: Users with special privileges to manage the system, such as election period, users, candidates, posts, and comments.
+```
+
 ## **📘** References
 
 You might be overwhelmed by these requirements. Don’t worry, here’s a list of some tools that you could use (it’s not required to use all of them nor any of them):
@@ -149,6 +210,45 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 ## **🧪** API Installation
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+
+### Prerequisites
+Before you begin, ensure you have the these installed on your machine:
+
+- [Go](https://go.dev/doc/install)
+- [MySQL Server](https://dev.mysql.com/downloads/)
+
+### Running
+1. Make sure your MySQL server is configured correctly
+
+
+2. Clone the repository or download manually:
+```shell
+git clone --branch i-putu-natha-kusuma https://github.com/nathakusuma/bcc-be-freepass-2024
+```
+
+
+3. Navigate to the project directory:
+```shell
+cd bcc-be-freepass-2024
+```
+
+
+4. Install dependencies:
+```shell
+go get .
+```
+
+
+5. Configure your credentials and database configuration in `.env`. For reference, check `.env.example`.
+
+
+6. Start the application:
+```shell
+go run main.go
+```
+
+## 📃 **Api Documentation**
+https://documenter.getpostman.com/view/32594897/2s9YyzeJWk
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
