@@ -1,0 +1,2 @@
+*.env
+/pg_data/
