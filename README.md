@@ -160,38 +160,38 @@ List all the pre-requisites the system needs to develop this project.
 - First you need to Clone the github by using this command
 
 ```
-git clone https://github.com/AkbarFikri/freepassBCC-2024
+$ git clone https://github.com/AkbarFikri/freepassBCC-2024
 ```
 
 - enter the directory you have been copyed `( if you clone in current directory just leave this )` by command
 
 ```
-cd freepassBCC-2024
+$ cd freepassBCC-2024
 ```
 
 - after that you need to provide the `.env` file, just copy the `.env.example` then paste delete the `.example` extension
 - after provide the `.env` file you can run command
 
 ```
-go mod tidy
+$ go mod tidy
 ```
 
 - after this you need to choose you want to run the app with docker or not, if don't run the app with docker you can instead run command
 
 ```
-go run main.go
+$ go run main.go
 ```
 
 - if you want to run the app with docker you can do docker build first by command
 
 ```
-docker-compose build
+$ docker-compose build
 ```
 
 - then run the app with command
 
 ```
-docker-compose up
+$ docker-compose up
 ```
 
 🔰 **The app default running in [localhost:8000](localhost:8000)**
