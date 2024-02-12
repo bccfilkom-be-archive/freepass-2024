@@ -104,8 +104,38 @@ THEN  => System will show a deletion status message and delete relevant post
 
 ## **👪** Entities and Actors
 
-We want to see your perspective about these problems. You can define various types of entities or actors. One thing for sure, there is no
-true or false statement to define the entities. As long as the results are understandable, then go for it! 🚀
+```
+(entity) users
+- id
+- name
+- email
+- phone_number
+- role (user(default),admin,candidate)
+
+(entity) post
+-id
+-title
+-description
+-status
+-timestamp
+
+(entity) comment
+-id
+-user_id
+-post_id
+-comment
+
+(entity) setting
+-id
+-date
+
+(entity) vote
+-id
+-user_id
+-candidate_id
+```
+
+Tingginya tingkat hoax dalam periode pemilu ini menjadikan saya membangun aplikasi Pemilu Bersih yang membantu masyarakt memperoleh informasi secara benar, masyarakat dapat mengetahui gagasan dari setiap paslon tanpa taakut apakah hal tersebut hoax atau tidak karena hanya paslon saja yang bisa menulis gagasan2 mereka.
 
 ## **📘** References
 
@@ -135,20 +165,15 @@ You might be overwhelmed by these requirements. Don’t worry, here’s a list o
 
 You are welcome to use any libraries or frameworks, but we appreciate if you use the popular ones.
 
-## **🎒** Tasks
+## **🎒** Documentation
 
-```
-The implementation of this project MUST be in the form of a REST, gRPC, or GraphQL API (choose AT LEAST one type).
-```
-
-1. Fork this repository
-2. Follow the project convention
-3. Finish all service implementations
-4. Write the installation guide of your back-end service in the section below
+https://documenter.getpostman.com/view/16302697/2s9YyzddUR
 
 ## **🧪** API Installation
 
-> Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
+```
+go run main.go
+```
 
 ## **[📞](https://emojipedia.org/telephone-receiver)** Contact
 
