@@ -41,6 +41,9 @@ func CreatePost(c *gin.Context) {
 		// Inisialisasi ID (contoh sederhana, Anda mungkin membutuhkan mekanisme lain untuk ID)
 		newPost.ID = len(models.Posts) + 1
 
+		// user ID
+		newPost.UserID = userID;
+
 		// Tambahkan postingan baru ke slice posts
 		models.Posts = append(models.Posts, newPost)
 
